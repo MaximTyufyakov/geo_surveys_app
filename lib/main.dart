@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/tasks/pages/all_tasks.page.dart';
+import 'package:geo_surveys_app/tasks/pages/tasks.page.dart';
 import 'package:postgres_dart/postgres_dart.dart' as pg;
 
 /// Main entry point to the app.
@@ -29,7 +29,7 @@ class MainApp extends StatelessWidget {
   final pg.PostgresDb db;
 
   static const displayColor = Colors.brown;
-  static final scaffoldColor = Colors.deepOrange[100];
+  static const scaffoldColor = Color.fromARGB(255, 255, 233, 226);
   static const splashColor = Color.fromARGB(121, 177, 139, 103);
   static const buttonBColor = Color.fromARGB(121, 206, 162, 120);
   static const buttonFColor = Colors.black54;
@@ -85,7 +85,6 @@ class MainApp extends StatelessWidget {
           ),
           iconButtonTheme: IconButtonThemeData(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(buttonBColor),
               foregroundColor: WidgetStateProperty.all<Color>(
                 buttonFColor,
               ),
@@ -94,8 +93,11 @@ class MainApp extends StatelessWidget {
 
           scaffoldBackgroundColor: scaffoldColor,
         ),
-        home: AllTasksPage(
-          db: db,
-        ),
+        routes: {
+          '/': (_) => TasksPage(db: db),
+          // '/tasks': (_) => TasksListPage(),
+          // '/requisition': (_) => RequisitionPage(),
+        },
+        initialRoute: '/',
       );
 }
