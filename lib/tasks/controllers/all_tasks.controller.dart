@@ -6,5 +6,5 @@ class AllTasksController extends ChangeNotifier {
   final BuildContext context;
 
   // Models
-  AllTasksModel tasksModel;
+  final AllTasksModel tasksModel;
 }
