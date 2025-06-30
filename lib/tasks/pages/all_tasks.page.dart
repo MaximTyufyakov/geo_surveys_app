@@ -15,17 +15,19 @@ class AllTasksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       ChangeNotifierProvider<AllTasksController>(
-        create: (BuildContext context) => AllTasksController(context: context),
+        create: (BuildContext context) => AllTasksController(
+          context: context,
+          db: db,
+        ),
         child: Consumer<AllTasksController>(
           builder: (context, provider, child) => Scaffold(
-            // Панель сверху
             appBar: AppBar(
-                // Заголовок
-                backgroundColor: Theme.of(context).primaryColorLight,
-                title: InkWell(
-                  onTap: () {},
-                  child: Icon(Icons.abc_rounded),
-                )),
+              backgroundColor: Theme.of(context).primaryColorLight,
+              title: Text(
+                'Задания',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+            ),
           ),
         ),
       );

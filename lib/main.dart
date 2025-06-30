@@ -28,9 +28,11 @@ class MainApp extends StatelessWidget {
   const MainApp({super.key, required this.db});
   final pg.PostgresDb db;
 
-  static const dColor = Colors.brown;
+  static const displayColor = Colors.brown;
   static final scaffoldColor = Colors.deepOrange[100];
-  static const splashColor = Color.fromARGB(255, 206, 162, 120);
+  static const splashColor = Color.fromARGB(121, 177, 139, 103);
+  static const buttonBColor = Color.fromARGB(121, 206, 162, 120);
+  static const buttonFColor = Colors.black54;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -39,8 +41,6 @@ class MainApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.deepOrange,
           splashColor: splashColor,
-          // ThemeData do not run through colors' params.
-          // ignore: no-equal-arguments
           highlightColor: splashColor,
           fontFamily: 'Vinque Rg',
 
@@ -56,11 +56,11 @@ class MainApp extends StatelessWidget {
           textTheme: const TextTheme(
             /// Default text style.
             displayLarge: TextStyle(
-              color: dColor,
+              color: displayColor,
               fontSize: 36,
             ),
             displaySmall: TextStyle(
-              color: dColor,
+              color: displayColor,
               fontSize: 24,
             ),
             headlineMedium: TextStyle(
@@ -71,6 +71,24 @@ class MainApp extends StatelessWidget {
             ),
             bodyMedium: TextStyle(
               fontSize: 16,
+            ),
+          ),
+
+          /// Buttons style.
+          filledButtonTheme: FilledButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(buttonBColor),
+              foregroundColor: WidgetStateProperty.all<Color>(
+                buttonFColor,
+              ),
+            ),
+          ),
+          iconButtonTheme: IconButtonThemeData(
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(buttonBColor),
+              foregroundColor: WidgetStateProperty.all<Color>(
+                buttonFColor,
+              ),
             ),
           ),
 
