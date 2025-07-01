@@ -29,7 +29,7 @@ class TasksPage extends StatelessWidget {
                 /// Page reload.
                 IconButton(
                   onPressed: () async {
-                    await Navigator.popAndPushNamed(context, '/');
+                    await Navigator.popAndPushNamed(context, '/tasks');
                   },
                   icon: const Icon(Icons.replay_outlined),
                 ),

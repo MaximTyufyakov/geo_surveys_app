@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/main.dart';
 import 'package:geo_surveys_app/features/tasks/controllers/tasks.controller.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 
@@ -17,9 +16,9 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) => Card(
         /// To click.
         child: InkWell(
-          splashColor: MainApp.splashColor,
-          onTap: () {
-            // controller.editTest(test);
+          splashColor: Theme.of(context).splashColor,
+          onTap: () async {
+            controller.openTask();
           },
 
           /// Content.

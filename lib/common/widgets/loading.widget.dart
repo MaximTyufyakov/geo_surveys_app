@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/main.dart';
 
 /// A widget with a CircularProgressIndicator in the center.
 ///
@@ -8,11 +7,11 @@ class LoadingWidget extends StatelessWidget {
   const LoadingWidget({super.key});
 
   @override
-  Widget build(BuildContext context) => const Center(
+  Widget build(BuildContext context) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: MainApp.displayColor),
+            CircularProgressIndicator(color: Theme.of(context).primaryColor),
           ],
         ),
       );

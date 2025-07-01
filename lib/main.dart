@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/features/tasks/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
 
 /// Main entry point to the app.
@@ -14,20 +15,22 @@ void main() async {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
-  static const displayColor = Colors.brown;
-  static const scaffoldColor = Color.fromARGB(255, 255, 233, 226);
-  static const splashColor = Color.fromARGB(121, 177, 139, 103);
-  static const buttonBColor = Color.fromARGB(121, 206, 162, 120);
-  static const buttonFColor = Colors.black54;
+  static const _primaryColor = Colors.deepOrange;
+  static const _displayColor = Colors.brown;
+  static const _scaffoldColor = Color.fromARGB(255, 255, 233, 226);
+  static const _splashColor = Color.fromARGB(121, 177, 139, 103);
+  static const _buttonBColor = Color.fromARGB(121, 206, 162, 120);
+  static const _buttonFColor = Colors.black54;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: 'Геоконтролируемые съёмки',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          splashColor: splashColor,
-          highlightColor: splashColor,
+          primaryColor: _primaryColor,
+          primarySwatch: _primaryColor,
+          splashColor: _splashColor,
+          highlightColor: _splashColor,
           fontFamily: 'Vinque Rg',
 
           /// Text style hierarchy.
@@ -42,11 +45,11 @@ class MainApp extends StatelessWidget {
           textTheme: const TextTheme(
             /// Default text style.
             displayLarge: TextStyle(
-              color: displayColor,
+              color: _displayColor,
               fontSize: 36,
             ),
             displaySmall: TextStyle(
-              color: displayColor,
+              color: _displayColor,
               fontSize: 24,
             ),
             headlineMedium: TextStyle(
@@ -63,27 +66,28 @@ class MainApp extends StatelessWidget {
           /// Buttons style.
           filledButtonTheme: FilledButtonThemeData(
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(buttonBColor),
+              backgroundColor: WidgetStateProperty.all<Color>(_buttonBColor),
               foregroundColor: WidgetStateProperty.all<Color>(
-                buttonFColor,
+                _buttonFColor,
               ),
             ),
           ),
           iconButtonTheme: IconButtonThemeData(
             style: ButtonStyle(
               foregroundColor: WidgetStateProperty.all<Color>(
-                buttonFColor,
+                _buttonFColor,
               ),
             ),
           ),
 
-          scaffoldBackgroundColor: scaffoldColor,
+          scaffoldBackgroundColor: _scaffoldColor,
         ),
         routes: {
-          '/': (_) => TasksPage(),
-          // '/tasks': (_) => TasksListPage(),
+          // '/': (_) => TasksPage(),
+          '/tasks': (_) => const TasksPage(),
+          '/task': (_) => const TaskPage(),
           // '/requisition': (_) => RequisitionPage(),
         },
-        initialRoute: '/',
+        initialRoute: '/tasks',
       );
 }
