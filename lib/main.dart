@@ -1,32 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/tasks/pages/tasks.page.dart';
-import 'package:postgres_dart/postgres_dart.dart' as pg;
+import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
 
 /// Main entry point to the app.
 void main() async {
-  /// Connect to geosurveys database.
-  pg.PostgresDb db = pg.PostgresDb(
-    host: '10.0.2.2',
-    databaseName: 'geosurveys',
-    username: 'postgres',
-    password: 'admin',
-  );
-  await db.open();
-
   runApp(
-    MainApp(
-      db: db,
-    ),
+    const MainApp(),
   );
 }
 
 /// Main widget.
 ///
-/// @param [db] is the geosurveys database.
 /// {@category Widgets}
 class MainApp extends StatelessWidget {
-  const MainApp({super.key, required this.db});
-  final pg.PostgresDb db;
+  const MainApp({super.key});
 
   static const displayColor = Colors.brown;
   static const scaffoldColor = Color.fromARGB(255, 255, 233, 226);
@@ -94,7 +80,7 @@ class MainApp extends StatelessWidget {
           scaffoldBackgroundColor: scaffoldColor,
         ),
         routes: {
-          '/': (_) => TasksPage(db: db),
+          '/': (_) => TasksPage(),
           // '/tasks': (_) => TasksListPage(),
           // '/requisition': (_) => RequisitionPage(),
         },
