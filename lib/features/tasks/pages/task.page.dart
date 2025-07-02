@@ -3,6 +3,9 @@ import 'package:geo_surveys_app/features/tasks/widgets/photos.widget.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/points.widget.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/report.widget.dart';
 
+/// The page with navigation and task's widgets.
+///
+/// {@category Widgets}
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
 

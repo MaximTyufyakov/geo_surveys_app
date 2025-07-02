@@ -63,7 +63,7 @@ class MainApp extends StatelessWidget {
             ),
           ),
 
-          /// Buttons style.
+          /// Buttons styles.
           filledButtonTheme: FilledButtonThemeData(
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all<Color>(_buttonBColor),
