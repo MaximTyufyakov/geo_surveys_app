@@ -31,12 +31,14 @@ class TasksModel {
       List<Task> result = [];
       for (List<dynamic> d in response.data) {
         result.add(Task(
-            taskid: d[0] as int,
-            title: d[1] as String,
-            description: d[2] as String,
-            coordinates: d[3] as PgPoint,
-            completed: d[4] as bool,
-            report: d[5] as String?));
+          taskid: d[0] as int,
+          title: d[1] as String,
+          description: d[2] as String,
+          coordinates: d[3] as PgPoint,
+          completed: d[4] as bool,
+          report: d[5] as String?,
+          points: [],
+        ));
       }
       return result;
     } catch (e) {
