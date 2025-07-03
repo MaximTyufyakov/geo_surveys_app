@@ -1,6 +1,10 @@
-/// The task's point model.
+/// The task point model.
 ///
-/// {@category Models}
+/// The [pointid] parameter is a point identifier.
+/// The [taskid] parameter is the task identifier (parent element).
+/// The [number] parameter is the point number in the task.
+/// The [description] parameter is the text point description.
+/// The [completed] parameter is the completed flag.
 class Point {
   Point({
     required this.pointid,
@@ -9,9 +13,19 @@ class Point {
     required this.description,
     required this.completed,
   });
+
+  /// A point identifier.
   int pointid;
+
+  /// The task identifier (parent element).
   int taskid;
+
+  /// The point number in the task.
   int number;
+
+  /// The text point description.
   String description;
+
+  /// The completed flag.
   bool completed;
 }

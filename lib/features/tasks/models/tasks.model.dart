@@ -4,16 +4,19 @@ import 'package:postgres_dart/postgres_dart.dart';
 
 /// The model with all tasks.
 ///
-/// {@category Models}
+/// The [tasks] parameter is the list of tasks from database.
 class TasksModel {
   TasksModel() {
     tasks = getTasks();
   }
+
+  /// The list of tasks from database.
   late Future<List<Task>> tasks;
 
   /// Retrieves all tasks from the database.
   ///
   /// Returns a [Future] that completes when the response is successful.
+  /// Throws a [Future.error] with [String] message if database fails.
   Future<List<Task>> getTasks() async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {

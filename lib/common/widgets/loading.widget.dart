@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 /// A widget with a CircularProgressIndicator in the center.
-///
-/// {@category Widgets}
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget({super.key});
 

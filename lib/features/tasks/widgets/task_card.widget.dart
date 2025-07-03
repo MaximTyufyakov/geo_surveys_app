@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/tasks/controllers/tasks.controller.dart';
+import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 
 /// The task card.
 ///
-/// @param [task] is the task model.
-/// @param [controller] is the task controller.
-/// {@category Widgets}
+/// The [task] parameter is the task model.
+/// The [viewModel] parameter is the TasksPage ViewModel.
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key, required this.task, required this.controller});
+  const TaskCard({super.key, required this.task, required this.viewModel});
   final Task task;
-  final TasksController controller;
+  final TasksViewModel viewModel;
 
   @override
   Widget build(BuildContext context) => Card(
         /// To click.
         child: InkWell(
-          splashColor: Theme.of(context).splashColor,
           onTap: () async {
-            controller.openTask();
+            viewModel.openTask();
           },
 
           /// Content.
@@ -36,9 +34,9 @@ class TaskCard extends StatelessWidget {
                     : Text(
                         'Не завершено',
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.deepOrange,
+                              color: Colors.red,
                             ),
-                      )
+                      ),
               ],
             ),
           ),

@@ -4,7 +4,13 @@ import 'package:postgres_dart/postgres_dart.dart';
 
 /// The task model.
 ///
-/// {@category Models}
+/// The [taskid] parameter is the task identifier.
+/// The [title] parameter is the task name.
+/// The [description] parameter is the text task description.
+/// The [coordinates] parameter is the task geographic coordinates.
+/// The [completed] parameter is the completed flag.
+/// The [report] parameter is the text that the user writes (optional).
+/// The [points] parameter is the list of points that need to be completed.
 class Task {
   Task(
       {required this.taskid,
@@ -14,18 +20,33 @@ class Task {
       required this.completed,
       required this.report,
       required this.points});
+
+  /// The task identifier.
   int taskid;
+
+  /// The task name.
   String title;
+
+  /// The text task description.
   String description;
+
+  /// The task geographic coordinates.
   PgPoint coordinates;
+
+  /// The completed flag.
   bool completed;
+
+  /// The text that the user writes (optional).
   String? report;
+
+  /// The list of points that need to be completed.
   List<Point> points;
 
   /// Retrieves all points for task from the database.
   ///
   /// Returns a [Future] that completes when the response is successful.
-  Future<List<Task>> getPoints() async {
+  /// Throws a [Future.error] with [String] message if database fails.
+  Future<List<Point>> getPoints() async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
@@ -38,16 +59,14 @@ class Task {
         Column('description'),
         Column('completed'),
       ]);
-      List<Task> result = [];
+      List<Point> result = [];
       for (List<dynamic> d in response.data) {
-        result.add(Task(
-          taskid: d[0] as int,
-          title: d[1] as String,
-          description: d[2] as String,
-          coordinates: d[3] as PgPoint,
-          completed: d[4] as bool,
-          report: d[5] as String?,
-          points: [],
+        result.add(Point(
+          pointid: d[0] as int,
+          taskid: d[1] as int,
+          number: d[3] as int,
+          description: d[4] as String,
+          completed: d[5] as bool,
         ));
       }
       return result;

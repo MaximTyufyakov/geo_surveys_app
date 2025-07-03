@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
 
-/// A widget with task's photos.
-///
-/// {@category Widgets}
+/// A widget with task photos.
 class PhotosWidget extends StatelessWidget {
   const PhotosWidget({super.key});
 

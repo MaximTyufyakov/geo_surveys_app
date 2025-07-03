@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 /// A widget with a message in the center.
 ///
-/// @param [mes] is a message.
-/// {@category Widgets}
+/// The [mes] parameter is a display message.
 class MessageWidget extends StatelessWidget {
   const MessageWidget({super.key, required this.mes});
+
+  /// Message.
   final String mes;
 
   @override

@@ -10,14 +10,13 @@ void main() async {
 }
 
 /// Main widget.
-///
-/// {@category Widgets}
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   static const _primaryColor = Colors.deepOrange;
   static const _displayColor = Colors.brown;
-  static const _scaffoldColor = Color.fromARGB(255, 255, 233, 226);
+  static final _scaffoldColor = _primaryColor[50];
+  static final _appBarColor = _primaryColor[100];
   static const _splashColor = Color.fromARGB(121, 177, 139, 103);
   static const _buttonBColor = Color.fromARGB(121, 206, 162, 120);
   static const _buttonFColor = Colors.black54;
@@ -80,7 +79,33 @@ class MainApp extends StatelessWidget {
             ),
           ),
 
+          /// Input styles.
+          inputDecorationTheme: const InputDecorationTheme(
+            border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
+            suffixIconColor: _primaryColor,
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: _primaryColor,
+              ),
+            ),
+          ),
+          textSelectionTheme: TextSelectionThemeData(
+            cursorColor: _primaryColor,
+            selectionHandleColor: _primaryColor,
+            selectionColor: _primaryColor[100],
+          ),
+
+          /// Scaffold and navigation styles.
           scaffoldBackgroundColor: _scaffoldColor,
+          appBarTheme: AppBarTheme(
+            backgroundColor: _appBarColor,
+          ),
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: _appBarColor,
+            selectedItemColor: _primaryColor,
+          ),
         ),
         routes: {
           // '/': (_) => TasksPage(),

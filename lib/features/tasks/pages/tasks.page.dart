@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/tasks/controllers/tasks.controller.dart';
+import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
 
 /// The main page with a list of all tasks in the database.
-///
-/// {@category Widgets}
 class TasksPage extends StatelessWidget {
   const TasksPage({super.key});
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<TasksController>(
-        create: (BuildContext context) => TasksController(
+  Widget build(BuildContext context) => ChangeNotifierProvider<TasksViewModel>(
+        create: (BuildContext context) => TasksViewModel(
           context: context,
         ),
-        child: Consumer<TasksController>(
+        child: Consumer<TasksViewModel>(
           builder: (context, provider, child) => Scaffold(
             appBar: AppBar(
-              backgroundColor: Theme.of(context).primaryColorLight,
               title: Text(
                 'Задания',
                 style: Theme.of(context).textTheme.displaySmall,
@@ -36,7 +33,7 @@ class TasksPage extends StatelessWidget {
               ],
             ),
             body: FutureBuilder(
-              future: provider.tasksModel.tasks,
+              future: provider.model.tasks,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   /// Data from the database is received.
@@ -46,7 +43,7 @@ class TasksPage extends StatelessWidget {
                       taskCards.add(
                         TaskCard(
                           task: task,
-                          controller: provider,
+                          viewModel: provider,
                         ),
                       );
                     }

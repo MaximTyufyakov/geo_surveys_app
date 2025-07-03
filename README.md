@@ -1,10 +1,20 @@
 # geo_surveys_app
 
-A new Flutter project.
+Mobile app for geocontrol surveys.
+
+Uses the MVVM patern and features-first approach.
+
+## tasks feature
+
+Have two pages:
+
+- TasksPage for view all tasks;
+- TaskPage for review and execution task (read desription, check points, write report, take videos).
+
+## auth feature
 
 ## To do
-- S3 (для хранения видео не в БД)
-- Сделать авторизацию
-- Создание заданий через админку
-- Локальная БД (загрузка на устройство по запросу целиком, выгрузка напр. попытка раз в час)
 
+- S3 (for save videos not in db);
+- auth module;
+- Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
