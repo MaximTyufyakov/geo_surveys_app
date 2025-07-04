@@ -22,19 +22,20 @@ class TaskViewModel extends ChangeNotifier {
   void reloadPage() async {
     if (!model.saved) {
       if (await showDialog<bool>(
-              context: context,
-              builder: (context) => const UnsavedDialogWidget()) ==
+              context: context, builder: (context) => UnsavedDialog()) ==
           true) {
-        if (context.mounted) {
-          model.saved = true;
-          await Navigator.popAndPushNamed(
-            context,
-            '/task',
-            arguments: {
-              'model': model,
-            },
-          );
-        }
+        model.saved = true;
+      }
+    }
+    if (model.saved) {
+      if (context.mounted) {
+        await Navigator.popAndPushNamed(
+          context,
+          '/task',
+          arguments: {
+            'model': model,
+          },
+        );
       }
     }
   }
