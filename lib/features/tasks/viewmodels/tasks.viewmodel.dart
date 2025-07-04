@@ -24,4 +24,12 @@ class TasksViewModel extends ChangeNotifier {
       arguments: {'model': task},
     );
   }
+
+  /// Reload the tasks page.
+  void reloadPage() async {
+    await Navigator.popAndPushNamed(
+      context,
+      '/tasks',
+    );
+  }
 }

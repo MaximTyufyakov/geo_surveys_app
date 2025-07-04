@@ -43,13 +43,13 @@ class MainApp extends StatelessWidget {
           /// * label
           textTheme: const TextTheme(
             /// Default text style.
-            displayLarge: TextStyle(
+            displayMedium: TextStyle(
               color: _displayColor,
-              fontSize: 36,
+              fontSize: 24,
             ),
             displaySmall: TextStyle(
               color: _displayColor,
-              fontSize: 24,
+              fontSize: 20,
             ),
             headlineMedium: TextStyle(
               fontSize: 20,

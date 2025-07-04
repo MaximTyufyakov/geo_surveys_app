@@ -53,7 +53,10 @@ class _TaskPageState extends State<TaskPage> {
               decoration: const InputDecoration(
                 hintText: 'Здесь можно написать отчёт о выполненной работе.',
               ),
-              controller: TextEditingController(text: provider.model.report),
+              controller: provider.reportController,
+              onChanged: (action) {
+                provider.makeUnsaved();
+              },
               maxLines: 100,
             ),
 
@@ -64,16 +67,24 @@ class _TaskPageState extends State<TaskPage> {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                'Задание',
+                provider.model.title,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
               actions: [
                 /// Page reload.
                 IconButton(
                   onPressed: () async {
-                    await Navigator.popAndPushNamed(context, '/tasks');
+                    provider.reloadPage();
                   },
                   icon: const Icon(Icons.replay_outlined),
+                ),
+
+                /// Save.
+                IconButton(
+                  onPressed: () async {
+                    provider.save();
+                  },
+                  icon: const Icon(Icons.save),
                 ),
               ],
             ),

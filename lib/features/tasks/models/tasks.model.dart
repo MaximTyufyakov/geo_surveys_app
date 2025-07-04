@@ -41,6 +41,7 @@ class TasksModel {
           completed: d[4] as bool,
           report: d[5] as String?,
           points: [],
+          saved: true,
         ));
       }
       return result;

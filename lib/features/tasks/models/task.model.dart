@@ -11,15 +11,18 @@ import 'package:postgres_dart/postgres_dart.dart';
 /// The [completed] parameter is the completed flag.
 /// The [report] parameter is the text that the user writes (optional).
 /// The [points] parameter is the list of points that need to be completed.
+/// The [saved] parameter is the saved flag.
 class Task {
-  Task(
-      {required this.taskid,
-      required this.title,
-      required this.description,
-      required this.coordinates,
-      required this.completed,
-      required this.report,
-      required this.points});
+  Task({
+    required this.taskid,
+    required this.title,
+    required this.description,
+    required this.coordinates,
+    required this.completed,
+    required this.report,
+    required this.points,
+    required this.saved,
+  });
 
   /// The task identifier.
   int taskid;
@@ -41,6 +44,9 @@ class Task {
 
   /// The list of points that need to be completed.
   List<Point> points;
+
+  /// The saved flag.
+  bool saved;
 
   /// Retrieves all points for task from the database.
   ///

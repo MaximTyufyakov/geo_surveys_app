@@ -20,13 +20,13 @@ class TasksPage extends StatelessWidget {
             appBar: AppBar(
               title: Text(
                 'Задания',
-                style: Theme.of(context).textTheme.displaySmall,
+                style: Theme.of(context).textTheme.displayMedium,
               ),
               actions: [
                 /// Page reload.
                 IconButton(
                   onPressed: () async {
-                    await Navigator.popAndPushNamed(context, '/tasks');
+                    provider.reloadPage();
                   },
                   icon: const Icon(Icons.replay_outlined),
                 ),

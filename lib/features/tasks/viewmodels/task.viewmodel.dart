@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/widgets/unsaved_dialog.widget.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 
 /// A ViewModel of the task page.
@@ -16,4 +17,36 @@ class TaskViewModel extends ChangeNotifier {
 
   /// Controller with a text of the report.
   final TextEditingController reportController;
+
+  /// Reload the task page if the model is saved.
+  void reloadPage() async {
+    if (!model.saved) {
+      if (await showDialog<bool>(
+              context: context,
+              builder: (context) => const UnsavedDialogWidget()) ==
+          true) {
+        if (context.mounted) {
+          model.saved = true;
+          await Navigator.popAndPushNamed(
+            context,
+            '/task',
+            arguments: {
+              'model': model,
+            },
+          );
+        }
+      }
+    }
+  }
+
+  /// Marks the task as unsaved.
+  /// Run when widgets change.
+  void makeUnsaved() {
+    model.saved = false;
+  }
+
+  /// Save task data.
+  void save() async {
+    model.saved = true;
+  }
 }
