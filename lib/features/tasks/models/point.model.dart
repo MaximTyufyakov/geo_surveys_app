@@ -1,6 +1,6 @@
 /// The task point model.
 ///
-/// The [pointid] parameter is a point identifier.
+/// The [pointid] parameter is the point identifier.
 /// The [taskid] parameter is the task identifier (parent element).
 /// The [number] parameter is the point number in the task.
 /// The [description] parameter is the text point description.
@@ -14,7 +14,7 @@ class Point {
     required this.completed,
   });
 
-  /// A point identifier.
+  /// The point identifier.
   int pointid;
 
   /// The task identifier (parent element).

@@ -5,7 +5,7 @@ import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 /// The task card.
 ///
 /// The [task] parameter is the task model.
-/// The [viewModel] parameter is the TasksPage ViewModel.
+/// The [viewModel] parameter is the tasks page ViewModel.
 class TaskCard extends StatelessWidget {
   const TaskCard({super.key, required this.task, required this.viewModel});
   final Task task;
@@ -16,7 +16,7 @@ class TaskCard extends StatelessWidget {
         /// To click.
         child: InkWell(
           onTap: () async {
-            viewModel.openTask();
+            viewModel.openTask(task);
           },
 
           /// Content.

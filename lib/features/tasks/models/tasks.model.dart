@@ -2,12 +2,12 @@ import 'package:geo_surveys_app/common/models/db.model.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
-/// The model with all tasks.
+/// A model with all tasks.
 ///
 /// The [tasks] parameter is the list of tasks from database.
 class TasksModel {
   TasksModel() {
-    tasks = getTasks();
+    tasks = _getTasks();
   }
 
   /// The list of tasks from database.
@@ -17,7 +17,7 @@ class TasksModel {
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  Future<List<Task>> getTasks() async {
+  Future<List<Task>> _getTasks() async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();

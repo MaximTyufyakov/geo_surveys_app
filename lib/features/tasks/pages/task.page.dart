@@ -5,54 +5,24 @@ import 'package:geo_surveys_app/features/tasks/widgets/photos.widget.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/points.widget.dart';
 import 'package:provider/provider.dart';
 
-/// The page with BottomNavigationBar and task's widgets.
-///
-/// {@category Widgets}
+/// A page with BottomNavigationBar and task's widgets.
 class TaskPage extends StatefulWidget {
-  const TaskPage({super.key, required this.model});
-
-  final Task model;
+  const TaskPage({super.key});
 
   @override
   State<TaskPage> createState() => _TaskPageState();
 }
 
 /// A state of task page.
-///
-/// {@category Widgets}
 class _TaskPageState extends State<TaskPage> {
   /// The selected index of BottomNavigationBar.
   int _selectedIndex = 0;
 
-  /// Widgets on the page.
-  late List<Widget> _widgetOptions;
+  /// The widgets on the page.
+  late List<Widget> _widgets;
 
-  late TextEditingController reportController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    reportController = TextEditingController(text: widget.model.report);
-
-    _widgetOptions = <Widget>[
-      const PointsWidget(),
-
-      /// Report
-      TextField(
-        decoration: const InputDecoration(
-          hintText: 'Здесь можно написать отчёт о выполненной работе.',
-        ),
-        controller: reportController,
-        maxLines: 100,
-        onChanged: (action) {
-          // widget.result.visibleValue = valueController.text;
-        },
-      ),
-
-      const PhotosWidget(),
-    ];
-  }
+  /// The arguments from the previous page.
+  late Map<String, dynamic> _arguments;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -61,13 +31,37 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<TaskViewModel>(
-        create: (BuildContext context) => TaskViewModel(
-          context: context,
-          model: widget.model,
-        ),
-        child: Consumer<TaskViewModel>(
-          builder: (context, provider, child) => Scaffold(
+  Widget build(BuildContext context) {
+    /// Decoding arguments.
+    _arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map<String, dynamic>;
+
+    return ChangeNotifierProvider<TaskViewModel>(
+      create: (BuildContext context) => TaskViewModel(
+        context: context,
+        model: _arguments['model'] as Task,
+      ),
+      child: Consumer<TaskViewModel>(
+        builder: (context, provider, child) {
+          /// Initialization of widgets.
+          _widgets = <Widget>[
+            /// Points.
+            const PointsWidget(),
+
+            /// Report.
+            TextField(
+              decoration: const InputDecoration(
+                hintText: 'Здесь можно написать отчёт о выполненной работе.',
+              ),
+              controller: TextEditingController(text: provider.model.report),
+              maxLines: 100,
+            ),
+
+            /// Photos.
+            const PhotosWidget(),
+          ];
+
+          return Scaffold(
             appBar: AppBar(
               title: Text(
                 'Задание',
@@ -86,7 +80,7 @@ class _TaskPageState extends State<TaskPage> {
             body: Padding(
               padding: const EdgeInsets.all(8),
               child: Center(
-                child: _widgetOptions.elementAt(_selectedIndex),
+                child: _widgets.elementAt(_selectedIndex),
               ),
             ),
             bottomNavigationBar: BottomNavigationBar(
@@ -107,7 +101,9 @@ class _TaskPageState extends State<TaskPage> {
               currentIndex: _selectedIndex,
               onTap: _onItemTapped,
             ),
-          ),
-        ),
-      );
+          );
+        },
+      ),
+    );
+  }
 }
