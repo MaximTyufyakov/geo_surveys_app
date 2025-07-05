@@ -19,6 +19,24 @@ class TaskViewModel extends ChangeNotifier {
   /// Controller with a text of the report.
   final TextEditingController reportController;
 
+  /// Exit to previous page.
+  void exit() async {
+    if (!model.saved) {
+      if (await showDialog<bool>(
+            context: context,
+            builder: (context) => UnsavedDialog(),
+          ) ==
+          true) {
+        model.saved = true;
+      }
+    }
+    if (model.saved) {
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+    }
+  }
+
   /// Reload the task page if the model is saved.
   void reloadPage() async {
     if (!model.saved) {
@@ -62,22 +80,5 @@ class TaskViewModel extends ChangeNotifier {
         redTitle: null,
       ),
     );
-  }
-
-  void exit() async {
-    if (!model.saved) {
-      if (await showDialog<bool>(
-            context: context,
-            builder: (context) => UnsavedDialog(),
-          ) ==
-          true) {
-        model.saved = true;
-      }
-    }
-    if (model.saved) {
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
-    }
   }
 }

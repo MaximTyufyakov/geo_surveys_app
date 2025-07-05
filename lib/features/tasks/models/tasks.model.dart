@@ -6,18 +6,16 @@ import 'package:postgres_dart/postgres_dart.dart';
 ///
 /// The [tasks] parameter is the list of tasks from database.
 class TasksModel {
-  TasksModel() {
-    tasks = _getTasks();
-  }
+  TasksModel();
 
   /// The list of tasks from database.
-  late Future<List<Task>> tasks;
+  Future<List<Task>> tasks = _getTasks();
 
   /// Retrieves all tasks from the database.
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  Future<List<Task>> _getTasks() async {
+  static Future<List<Task>> _getTasks() async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
@@ -40,7 +38,6 @@ class TasksModel {
           coordinates: d[3] as PgPoint,
           completed: d[4] as bool,
           report: d[5] as String?,
-          points: [],
           saved: true,
         ));
       }

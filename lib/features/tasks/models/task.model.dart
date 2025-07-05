@@ -20,7 +20,6 @@ class Task {
     required this.coordinates,
     required this.completed,
     required this.report,
-    required this.points,
     required this.saved,
   });
 
@@ -43,7 +42,7 @@ class Task {
   String? report;
 
   /// The list of points that need to be completed.
-  List<Point> points;
+  final Future<List<Point>> points = _getPoints();
 
   /// The saved flag.
   bool saved;
@@ -52,7 +51,7 @@ class Task {
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  Future<List<Point>> getPoints() async {
+  static Future<List<Point>> _getPoints() async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
@@ -70,9 +69,9 @@ class Task {
         result.add(Point(
           pointid: d[0] as int,
           taskid: d[1] as int,
-          number: d[3] as int,
-          description: d[4] as String,
-          completed: d[5] as bool,
+          number: d[2] as int,
+          description: d[3] as String,
+          completed: d[4] as bool,
         ));
       }
       return result;

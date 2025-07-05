@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/task.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/photos.widget.dart';
-import 'package:geo_surveys_app/features/tasks/widgets/points.widget.dart';
+import 'package:geo_surveys_app/features/tasks/widgets/task.widget.dart';
 import 'package:provider/provider.dart';
 
 /// A page with BottomNavigationBar and task's widgets.
@@ -46,7 +46,9 @@ class _TaskPageState extends State<TaskPage> {
           /// Initialization of widgets.
           _widgets = <Widget>[
             /// Points.
-            const PointsWidget(),
+            TaskWidget(
+              task: provider.model,
+            ),
 
             /// Report.
             TextField(
@@ -95,16 +97,12 @@ class _TaskPageState extends State<TaskPage> {
             ),
             body: Padding(
               padding: const EdgeInsets.all(8),
-              child: Center(
-                child: _widgets.elementAt(_selectedIndex),
-              ),
+              child: _widgets.elementAt(_selectedIndex),
             ),
             bottomNavigationBar: BottomNavigationBar(
               items: const <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.task_alt),
-                  label: 'Пункты',
-                ),
+                    icon: Icon(Icons.task_alt), label: 'Задание'),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.edit_document),
                   label: 'Отчёт',
