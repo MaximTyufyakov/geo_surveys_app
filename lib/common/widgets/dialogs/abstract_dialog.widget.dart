@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 
-/// Dialog with a FutureBuilder and choice between two actions.
+/// A dialog with any widget and two buttons.
 /// Returns true when GreenBtn is clicked.
 /// Returns false when RedBtn is clicked.
-/// If title is null, there will be no button.
+/// If title of the button is null, there will be no button.
 ///
 /// The [title] parameter is a dialog name.
-/// The [messages] parameter is the [Future] content of the dialog.
+/// The [content] parameter is the content of the dialog (any widget).
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
 ///
 /// Throws an ArgumentError when both titles is null.
-class FutureDialog extends StatelessWidget {
-  FutureDialog({
-    super.key,
-    required this.title,
-    required this.messages,
-    required this.greenTitle,
-    required this.redTitle,
-  });
+class AbstractDialog extends StatelessWidget {
+  AbstractDialog(
+      {super.key,
+      required this.title,
+      required this.content,
+      required this.greenTitle,
+      required this.redTitle});
 
   /// Dialog name.
   final String title;
 
   /// Content of the dialog.
-  final Future<List<String>> messages;
+  final Widget content;
 
   /// Title of the green button.
   final String? greenTitle;
@@ -32,6 +31,7 @@ class FutureDialog extends StatelessWidget {
   /// Title of the red button.
   final String? redTitle;
 
+  /// A List with buttons.
   final List<FilledButton> buttons = [];
 
   @override
@@ -50,10 +50,10 @@ class FutureDialog extends StatelessWidget {
               Colors.lightGreen[200],
             ),
           ),
+          child: Text(greenTitle!),
           onPressed: () {
             Navigator.pop(context, true);
           },
-          child: Text(greenTitle!),
         ),
       );
     }
@@ -65,10 +65,10 @@ class FutureDialog extends StatelessWidget {
               Colors.red[200],
             ),
           ),
+          child: Text(redTitle!),
           onPressed: () {
             Navigator.pop(context, false);
           },
-          child: Text(redTitle!),
         ),
       );
     }
@@ -79,37 +79,7 @@ class FutureDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            FutureBuilder(
-              future: messages,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  /// Data is received.
-                  if (snapshot.hasData) {
-                    List<Widget> texts = [];
-                    for (String text in snapshot.data!) {
-                      texts.add(Text(text));
-                    }
-                    return Column(
-                      children: texts,
-                    );
-
-                    /// Error.
-                  } else if (snapshot.hasError) {
-                    return Text(
-                      snapshot.error.toString(),
-                    );
-                  }
-                }
-
-                /// Loading.
-                return Center(
-                  child: CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor),
-                );
-              },
-            ),
-          ],
+          children: [content],
         ),
       ),
       actions: buttons,

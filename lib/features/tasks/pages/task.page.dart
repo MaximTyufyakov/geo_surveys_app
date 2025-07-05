@@ -70,6 +70,11 @@ class _TaskPageState extends State<TaskPage> {
                 provider.model.title,
                 style: Theme.of(context).textTheme.displaySmall,
               ),
+              leading: BackButton(
+                onPressed: () {
+                  provider.exit();
+                },
+              ),
               actions: [
                 /// Page reload.
                 IconButton(

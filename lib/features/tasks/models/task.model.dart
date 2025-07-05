@@ -81,13 +81,13 @@ class Task {
     }
   }
 
-  Future<List<String>> save() async {
+  Future<String> save() async {
     await Future.delayed(const Duration(seconds: 2));
     if (!saved) {
       saved = true;
-      return ['Успешно.'];
+      return 'Успешно.';
     } else {
-      return Future.error('Ошибка. Уже сохранено.');
+      return Future.error('Нет изменений.');
     }
   }
 }
