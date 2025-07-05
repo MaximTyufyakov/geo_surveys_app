@@ -1,20 +1,37 @@
 import 'package:flutter/material.dart';
 
-// Диалог с возможностью выбора между двумя действиями
-// Возвращает true при нажатии на GreenBtn
-// false при нажатии на RedBtn
-// Если title == null, кнопки не будет
+/// Dialog with a choice between two actions.
+/// Returns true when GreenBtn is clicked.
+/// Returns false when RedBtn is clicked.
+/// If title is null, there will be no button.
+///
+/// The [title] parameter is a dialog name.
+/// The [messages] parameter is the content of the dialog.
+/// The [greenTitle] parameter is the title of the green button.
+/// The [redTitle] parameter is the title of the red button.
+///
+/// Throws an ArgumentError when both titles is null.
 class ChoiceDialog extends StatelessWidget {
   ChoiceDialog(
       {super.key,
       required this.title,
-      required this.contentList,
+      required this.messages,
       required this.greenTitle,
       required this.redTitle});
+
+  /// Dialog name.
   final String title;
-  final List<Widget> contentList;
+
+  /// Content of the dialog.
+  final List<String> messages;
+
+  /// Title of the green button.
   final String? greenTitle;
+
+  /// Title of the red button.
   final String? redTitle;
+
+  /// A List with buttons (buttons adds in the widget build).
   final List<FilledButton> buttons = [];
 
   @override
@@ -53,6 +70,12 @@ class ChoiceDialog extends StatelessWidget {
             Navigator.pop(context, false);
           },
         ),
+      );
+    }
+    List<Text> contentList = [];
+    for (String text in messages) {
+      contentList.add(
+        Text(text),
       );
     }
 

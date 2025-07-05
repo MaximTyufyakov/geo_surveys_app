@@ -80,4 +80,14 @@ class Task {
       return Future.error('Ошибка при обращении к базе данных.');
     }
   }
+
+  Future<List<String>> save() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!saved) {
+      saved = true;
+      return ['Успешно.'];
+    } else {
+      return Future.error('Ошибка. Уже сохранено.');
+    }
+  }
 }

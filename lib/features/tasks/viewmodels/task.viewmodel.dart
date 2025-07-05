@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/widgets/future_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/unsaved_dialog.widget.dart';
 import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 
@@ -48,6 +49,13 @@ class TaskViewModel extends ChangeNotifier {
 
   /// Save task data.
   void save() async {
-    model.saved = true;
+    await showDialog<bool>(
+        context: context,
+        builder: (context) => FutureDialog(
+              messages: model.save(),
+              title: 'Сохранение',
+              greenTitle: 'Ок',
+              redTitle: null,
+            ));
   }
 }
