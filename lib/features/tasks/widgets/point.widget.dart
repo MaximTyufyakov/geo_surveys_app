@@ -23,13 +23,11 @@ class PointWidgetState extends State<PointWidget> {
     textController = TextEditingController(text: widget.point.description);
     return Column(
       children: [
-        const Divider(
-          color: Colors.black26,
-        ),
         Row(
           children: [
             // Номер вопроса
-            Text('${widget.point.number}'),
+            Text('${widget.point.number}.',
+                style: Theme.of(context).textTheme.bodyMedium),
             // Чек бокс
             Checkbox(
                 value: widget.point.completed,
@@ -41,10 +39,16 @@ class PointWidgetState extends State<PointWidget> {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [Text(widget.point.description)],
+                children: [
+                  SelectableText(widget.point.description,
+                      style: Theme.of(context).textTheme.bodyMedium),
+                ],
               ),
             ),
           ],
+        ),
+        const Divider(
+          color: Colors.black26,
         ),
       ],
     );

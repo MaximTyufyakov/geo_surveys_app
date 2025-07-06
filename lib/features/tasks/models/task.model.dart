@@ -21,7 +21,9 @@ class Task {
     required this.completed,
     required this.report,
     required this.saved,
-  });
+  }) {
+    points = _getPoints();
+  }
 
   /// The task identifier.
   int taskid;
@@ -42,7 +44,7 @@ class Task {
   String? report;
 
   /// The list of points that need to be completed.
-  final Future<List<Point>> points = _getPoints();
+  late Future<List<Point>> points;
 
   /// The saved flag.
   bool saved;
@@ -51,19 +53,29 @@ class Task {
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  static Future<List<Point>> _getPoints() async {
+  Future<List<Point>> _getPoints() async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
       }
-      DbResponse response =
-          await DbModel.geosurveysDb.table('point').select(columns: [
-        Column('pointid'),
-        Column('taskid'),
-        Column('number'),
-        Column('description'),
-        Column('completed'),
-      ]);
+      DbResponse response = await DbModel.geosurveysDb.table('point').select(
+        columns: [
+          Column('pointid'),
+          Column('taskid'),
+          Column('number'),
+          Column('description'),
+          Column('completed'),
+        ],
+        where: Where(
+          'taskid',
+          WhereOperator.isEqual,
+          taskid,
+        ),
+        orderBy: OrderBy(
+          'number',
+          ascending: true,
+        ),
+      );
       List<Point> result = [];
       for (List<dynamic> d in response.data) {
         result.add(Point(

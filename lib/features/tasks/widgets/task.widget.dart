@@ -16,12 +16,35 @@ class TaskWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(task.title,
-                style: Theme.of(context).textTheme.titleMedium),
             SelectableText(
-              'Описание: ${task.description}',
+              task.title,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Описание',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Divider(
+              color: Theme.of(context).primaryColorDark,
+            ),
+            SelectableText(
+              task.description,
               style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              'Ход работы',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Divider(
+              color: Theme.of(context).primaryColorDark,
             ),
             FutureBuilder(
               future: task.points,

@@ -6,10 +6,10 @@ import 'package:postgres_dart/postgres_dart.dart';
 ///
 /// The [tasks] parameter is the list of tasks from database.
 class TasksModel {
-  TasksModel();
+  TasksModel() : tasks = _getTasks();
 
   /// The list of tasks from database.
-  Future<List<Task>> tasks = _getTasks();
+  Future<List<Task>> tasks;
 
   /// Retrieves all tasks from the database.
   ///
