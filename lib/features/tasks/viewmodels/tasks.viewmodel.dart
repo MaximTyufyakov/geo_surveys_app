@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
 
 /// A ViewModel of the tasks page.
@@ -21,7 +20,7 @@ class TasksViewModel extends ChangeNotifier {
     await Navigator.pushNamed(
       context,
       '/task',
-      arguments: {'model': task},
+      arguments: {'taskid': task.taskid},
     );
   }
 

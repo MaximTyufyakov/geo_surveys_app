@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/tasks/pages/task.page.dart';
+import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
 
 /// Main entry point to the app.

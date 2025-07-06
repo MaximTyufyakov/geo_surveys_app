@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
-import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 
 /// The task card.
 ///

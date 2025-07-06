@@ -1,6 +1,27 @@
 import 'package:geo_surveys_app/common/models/db.model.dart';
-import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
+
+/// A class with basic information of the task.
+///
+/// The [taskid] parameter is the task identifier.
+/// The [title] parameter is the task name.
+/// The [completed] parameter is the completed flag.
+class Task {
+  Task({
+    required this.taskid,
+    required this.title,
+    required this.completed,
+  });
+
+  /// The task identifier.
+  int taskid;
+
+  /// The task name.
+  String title;
+
+  /// The completed flag.
+  bool completed;
+}
 
 /// A model with all tasks.
 ///
@@ -20,25 +41,19 @@ class TasksModel {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
       }
+
       DbResponse response =
           await DbModel.geosurveysDb.table('task').select(columns: [
         Column('taskid'),
         Column('title'),
-        Column('description'),
-        Column('coordinates'),
         Column('completed'),
-        Column('report')
       ]);
       List<Task> result = [];
       for (List<dynamic> d in response.data) {
         result.add(Task(
           taskid: d[0] as int,
           title: d[1] as String,
-          description: d[2] as String,
-          coordinates: d[3] as PgPoint,
-          completed: d[4] as bool,
-          report: d[5] as String?,
-          saved: true,
+          completed: d[2] as bool,
         ));
       }
       return result;

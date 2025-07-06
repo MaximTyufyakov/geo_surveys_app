@@ -7,11 +7,9 @@ import 'package:geo_surveys_app/common/widgets/dialogs/abstract_dialog.widget.da
 /// If title is null, there will be no button.
 ///
 /// The [title] parameter is a dialog name.
-/// The [messages] parameter is the [Future] content of the dialog.
+/// The [futureContent] parameter is the [Future] content of the dialog.
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
-///
-/// Throws an ArgumentError when both titles is null.
 class FutureDialog extends AbstractDialog {
   FutureDialog({
     super.key,

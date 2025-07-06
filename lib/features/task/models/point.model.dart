@@ -5,8 +5,8 @@
 /// The [number] parameter is the point number in the task.
 /// The [description] parameter is the text point description.
 /// The [completed] parameter is the completed flag.
-class Point {
-  Point({
+class PointModel {
+  PointModel({
     required this.pointid,
     required this.taskid,
     required this.number,

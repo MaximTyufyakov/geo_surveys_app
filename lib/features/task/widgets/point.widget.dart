@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/tasks/models/point.model.dart';
+import 'package:geo_surveys_app/features/task/models/point.model.dart';
 
-// Один чек бокс с текстом справа
+/// A Widget with check-box and point information.
+///
+/// The [point] parameter is a point information.
 class PointWidget extends StatefulWidget {
   const PointWidget({
     super.key,
     required this.point,
   });
 
-  final Point point;
+  final PointModel point;
 
   @override
   createState() => PointWidgetState();
 }
 
 class PointWidgetState extends State<PointWidget> {
-  // Контролер поля ввода
+  /// Point information.
   late TextEditingController textController;
 
   @override

@@ -1,5 +1,5 @@
 import 'package:geo_surveys_app/common/models/db.model.dart';
-import 'package:geo_surveys_app/features/tasks/models/point.model.dart';
+import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
 /// The task model.
@@ -12,30 +12,30 @@ import 'package:postgres_dart/postgres_dart.dart';
 /// The [report] parameter is the text that the user writes (optional).
 /// The [points] parameter is the list of points that need to be completed.
 /// The [saved] parameter is the saved flag.
-class Task {
-  Task({
+class TaskModel {
+  /// Private constructor
+  TaskModel._create({
     required this.taskid,
     required this.title,
     required this.description,
     required this.coordinates,
     required this.completed,
     required this.report,
+    required this.points,
     required this.saved,
-  }) {
-    points = _getPoints();
-  }
+  });
 
   /// The task identifier.
-  int taskid;
+  final int taskid;
 
   /// The task name.
-  String title;
+  final String title;
 
   /// The text task description.
-  String description;
+  final String description;
 
   /// The task geographic coordinates.
-  PgPoint coordinates;
+  final PgPoint coordinates;
 
   /// The completed flag.
   bool completed;
@@ -44,16 +44,60 @@ class Task {
   String? report;
 
   /// The list of points that need to be completed.
-  late Future<List<Point>> points;
+  final List<PointModel> points;
 
   /// The saved flag.
   bool saved;
+
+  /// Public factory.
+  /// Retrieves task from the database.
+  ///
+  /// Returns a [Future] that completes when the response is successful.
+  /// Throws a [Future.error] with [String] message if database fails.
+  static Future<TaskModel> create({required int taskid}) async {
+    try {
+      if (DbModel.geosurveysDb.db.isClosed) {
+        await DbModel.geosurveysDb.open();
+      }
+      DbResponse response = await DbModel.geosurveysDb.table('task').select(
+        columns: [
+          Column('taskid'),
+          Column('title'),
+          Column('description'),
+          Column('coordinates'),
+          Column('completed'),
+          Column('report')
+        ],
+        where: Where(
+          'taskid',
+          WhereOperator.isEqual,
+          taskid,
+        ),
+      );
+
+      /// Call the private constructor
+      TaskModel result = TaskModel._create(
+        taskid: response.data[0][0] as int,
+        title: response.data[0][1] as String,
+        description: response.data[0][2] as String,
+        coordinates: response.data[0][3] as PgPoint,
+        completed: response.data[0][4] as bool,
+        report: response.data[0][5] as String?,
+        saved: true,
+        points: await _getPoints(taskid: taskid),
+      );
+
+      return result;
+    } catch (e) {
+      return Future.error('Ошибка при обращении к базе данных.');
+    }
+  }
 
   /// Retrieves all points for task from the database.
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  Future<List<Point>> _getPoints() async {
+  static Future<List<PointModel>> _getPoints({required int taskid}) async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
@@ -76,9 +120,9 @@ class Task {
           ascending: true,
         ),
       );
-      List<Point> result = [];
+      List<PointModel> result = [];
       for (List<dynamic> d in response.data) {
-        result.add(Point(
+        result.add(PointModel(
           pointid: d[0] as int,
           taskid: d[1] as int,
           number: d[2] as int,

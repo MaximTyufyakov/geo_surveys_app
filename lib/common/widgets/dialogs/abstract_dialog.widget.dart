@@ -9,8 +9,6 @@ import 'package:flutter/material.dart';
 /// The [content] parameter is the content of the dialog (any widget).
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
-///
-/// Throws an ArgumentError when both titles is null.
 class AbstractDialog extends StatelessWidget {
   AbstractDialog(
       {super.key,
@@ -36,12 +34,6 @@ class AbstractDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (greenTitle == null && redTitle == null) {
-      throw ArgumentError(
-        'redTitle and greenTitle cannot be null at the same time',
-        'ChoiceDialog Error',
-      );
-    }
     if (greenTitle != null) {
       buttons.add(
         FilledButton(

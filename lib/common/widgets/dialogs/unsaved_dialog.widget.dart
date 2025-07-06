@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/abstract_dialog.widget.dart';
 
 /// Dialog with unsaved message.
+///
+/// Returns true when GreenBtn is clicked.
+/// Returns false when RedBtn is clicked.
 class UnsavedDialog extends AbstractDialog {
   UnsavedDialog({
     super.key,
@@ -10,11 +13,10 @@ class UnsavedDialog extends AbstractDialog {
           content: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Несохранённые данные будут удалены.'),
-              Text('Вы уверены?'),
+              Text('Имеются несохранённые данные.'),
             ],
           ),
-          greenTitle: 'Да',
-          redTitle: 'Отмена',
+          greenTitle: 'Сохранить',
+          redTitle: 'Не сохранять',
         );
 }

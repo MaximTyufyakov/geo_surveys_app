@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
+import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
-import 'package:geo_surveys_app/features/tasks/models/task.model.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
 
