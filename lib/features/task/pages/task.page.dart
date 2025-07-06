@@ -88,6 +88,7 @@ class _TaskPageState extends State<TaskPage> {
                         /// Points.
                         TaskWidget(
                           task: snapshot.data!,
+                          viewModel: provider,
                         ),
 
                         /// Report.

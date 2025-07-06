@@ -136,13 +136,54 @@ class TaskModel {
     }
   }
 
-  Future<String> save() async {
-    await Future.delayed(const Duration(seconds: 2));
+  Future<String> save(String? actualReport) async {
+    final (bool check, String checkMessage) = _completedCheck();
     if (!saved) {
+      completed = check;
+      try {
+        if (DbModel.geosurveysDb.db.isClosed) {
+          await DbModel.geosurveysDb.open();
+        }
+        await DbModel.geosurveysDb.table('task').update(
+          update: {
+            'completed': completed,
+            'report': actualReport,
+          },
+          where: Where(
+            'taskid',
+            WhereOperator.isEqual,
+            taskid,
+          ),
+        );
+
+        for (PointModel point in points) {
+          await DbModel.geosurveysDb.table('point').update(
+            update: {
+              'completed': point.completed,
+            },
+            where: Where(
+              'pointid',
+              WhereOperator.isEqual,
+              point.pointid,
+            ),
+          );
+        }
+      } catch (e) {
+        return Future.error('Ошибка при обращении к базе данных.');
+      }
       saved = true;
-      return 'Успешно.';
+      return 'Успешно. $checkMessage';
     } else {
-      return Future.error('Нет изменений.');
+      return Future.error('Нет изменений. $checkMessage');
     }
+  }
+
+  (bool, String) _completedCheck() {
+    for (PointModel point in points) {
+      if (!point.completed) {
+        return (false, 'Для завершения задания окончите все пункты.');
+      }
+    }
+    return (true, 'Задание завершено.');
   }
 }

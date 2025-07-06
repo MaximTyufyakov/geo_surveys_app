@@ -17,11 +17,15 @@ class TasksViewModel extends ChangeNotifier {
   ///
   ///  The [task] parameter is the tapped task.
   void openTask(Task task) async {
-    await Navigator.pushNamed(
+    final bool? completed = await Navigator.pushNamed(
       context,
       '/task',
       arguments: {'taskid': task.taskid},
-    );
+    ) as bool?;
+
+    completed == null ? null : task.completed = completed;
+
+    notifyListeners();
   }
 
   /// Reload the tasks page.

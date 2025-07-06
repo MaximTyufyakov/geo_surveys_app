@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/unsaved_dialog.widget.dart';
+import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
 /// A ViewModel of the task page.
@@ -36,19 +37,39 @@ class TaskViewModel extends ChangeNotifier {
         /// Unsave = false;
         /// Close = null.
         if (ret == true) {
-          await save().then((val) {
+          await save().then((sValue) {
             if (value.saved) {
-              context.mounted ? Navigator.pop(context) : null;
+              context.mounted
+                  ? Navigator.pop(
+                      context,
+                      value.completed,
+                    )
+                  : null;
             }
           });
         } else if (ret == false) {
-          context.mounted ? Navigator.pop(context) : null;
+          context.mounted
+              ? Navigator.pop(
+                  context,
+                  value.completed,
+                )
+              : null;
         }
       } else {
-        context.mounted ? Navigator.pop(context) : null;
+        context.mounted
+            ? Navigator.pop(
+                context,
+                value.completed,
+              )
+            : null;
       }
     }).catchError((err) {
-      context.mounted ? Navigator.pop(context) : null;
+      context.mounted
+          ? Navigator.pop(
+              context,
+              null,
+            )
+          : null;
     });
   }
 
@@ -67,7 +88,7 @@ class TaskViewModel extends ChangeNotifier {
         /// Unsave = false;
         /// Close = null.
         if (ret == true) {
-          await save().then((val) async {
+          await save().then((sValue) async {
             if (value.saved) {
               context.mounted
                   ? await Navigator.popAndPushNamed(
@@ -129,7 +150,7 @@ class TaskViewModel extends ChangeNotifier {
       context: context,
       builder: (context) => FutureDialog(
         futureContent: model.then(
-          (value) => value.save().then(
+          (value) => value.save(reportController!.text).then(
                 Text.new,
               ),
         ),
@@ -138,5 +159,12 @@ class TaskViewModel extends ChangeNotifier {
         redTitle: null,
       ),
     );
+  }
+
+  /// Tap on the point CheckBox.
+  void onPointTap(PointModel point) {
+    point.completed = !point.completed;
+    makeUnsaved();
+    notifyListeners();
   }
 }

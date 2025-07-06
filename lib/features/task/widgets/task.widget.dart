@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
+import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/point.widget.dart';
 
 /// A widget with task information.
 /// The [task] parameter is a model with task information.
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({super.key, required this.task});
+  const TaskWidget({
+    super.key,
+    required this.task,
+    required this.viewModel,
+  });
 
   /// Model with task information.
   final TaskModel task;
+
+  final TaskViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +25,7 @@ class TaskWidget extends StatelessWidget {
       pointsCards.add(
         PointWidget(
           point: point,
+          viewModel: viewModel,
         ),
       );
     }
@@ -41,6 +49,20 @@ class TaskWidget extends StatelessWidget {
               ),
               SelectableText(
                 task.description,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Координаты',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Divider(
+                color: Theme.of(context).primaryColorDark,
+              ),
+              SelectableText(
+                '${task.coordinates.latitude}°, ${task.coordinates.longitude}°',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(
