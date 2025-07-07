@@ -6,10 +6,14 @@ import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
 ///
 /// The [context] parameter is the context of the tasks page.
 class TasksViewModel extends ChangeNotifier {
-  TasksViewModel({required this.context}) : model = TasksModel.create();
+  TasksViewModel({required this.context, required this.userid})
+      : model = TasksModel.create(userid);
 
   /// The context of the tasks page.
   final BuildContext context;
+
+  /// User identifier.
+  final int userid;
 
   /// Model with all tasks.
   final Future<TasksModel> model;
@@ -34,6 +38,9 @@ class TasksViewModel extends ChangeNotifier {
     await Navigator.popAndPushNamed(
       context,
       '/tasks',
+      arguments: {
+        'userid': userid,
+      },
     );
   }
 }

@@ -19,24 +19,41 @@ class TasksModel {
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  static Future<TasksModel> create() async {
+  static Future<TasksModel> create(int userid) async {
     try {
       if (DbModel.geosurveysDb.db.isClosed) {
         await DbModel.geosurveysDb.open();
       }
 
-      DbResponse response =
-          await DbModel.geosurveysDb.table('task').select(columns: [
-        Column('taskid'),
-        Column('title'),
-        Column('completed'),
-      ]);
+      DbResponse utResponse =
+          await DbModel.geosurveysDb.table('user_task').select(
+        columns: [
+          Column('taskid'),
+        ],
+        where: Where(
+          'userid',
+          WhereOperator.isEqual,
+          userid,
+        ),
+      );
       List<BaseTaskModel> tasksList = [];
-      for (List<dynamic> d in response.data) {
+      for (List<dynamic> d in utResponse.data) {
+        DbResponse tResponse = await DbModel.geosurveysDb.table('task').select(
+          columns: [
+            Column('taskid'),
+            Column('title'),
+            Column('completed'),
+          ],
+          where: Where(
+            'taskid',
+            WhereOperator.isEqual,
+            d[0] as int,
+          ),
+        );
         tasksList.add(BaseTaskModel(
-          taskid: d[0] as int,
-          title: d[1] as String,
-          completed: d[2] as bool,
+          taskid: tResponse.data[0][0] as int,
+          title: tResponse.data[0][1] as String,
+          completed: tResponse.data[0][2] as bool,
         ));
       }
 

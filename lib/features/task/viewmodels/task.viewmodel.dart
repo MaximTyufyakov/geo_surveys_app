@@ -17,6 +17,7 @@ class TaskViewModel extends ChangeNotifier {
   /// Model with task.
   final Future<TaskModel> model;
 
+  /// Task identifier.
   final int taskid;
 
   /// Controller with a text of the report.
