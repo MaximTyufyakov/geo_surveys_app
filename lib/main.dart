@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
 
@@ -106,13 +107,15 @@ class MainApp extends StatelessWidget {
             backgroundColor: _appBarColor,
             selectedItemColor: _primaryColor,
           ),
+          progressIndicatorTheme: const ProgressIndicatorThemeData(
+            color: _primaryColor,
+          ),
         ),
         routes: {
-          // '/': (_) => TasksPage(),
+          '/': (_) => const AuthPage(),
           '/tasks': (_) => const TasksPage(),
           '/task': (_) => const TaskPage(),
-          // '/requisition': (_) => RequisitionPage(),
         },
-        initialRoute: '/tasks',
+        initialRoute: '/',
       );
 }

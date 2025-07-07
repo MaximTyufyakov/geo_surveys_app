@@ -5,11 +5,11 @@ class LoadingWidget extends StatelessWidget {
   const LoadingWidget({super.key});
 
   @override
-  Widget build(BuildContext context) => Center(
+  Widget build(BuildContext context) => const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(color: Theme.of(context).primaryColor),
+            CircularProgressIndicator(),
           ],
         ),
       );

@@ -4,6 +4,12 @@ Mobile app for geocontrol surveys.
 
 Uses the MVVM patern and features-first approach.
 
+## To do
+
+- S3 (for save videos not in db);
+- auth module;
+- Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
+
 ## Features
 
 ### auth
@@ -23,12 +29,6 @@ You can view and complete the task on the TaskPage.
 It has a bottom navigation and three widgets (task, report, videos).
 It takes you to the TasksPage.
 
-## To do
-
-- S3 (for save videos not in db);
-- auth module;
-- Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
-
 ## Сonnecting to the database
 
 ### For closed network (for real device)
@@ -43,3 +43,22 @@ It takes you to the TasksPage.
 ### For emulator
 
 The emulator can run in a closed network or on a localhost (host 10.0.2.2 in DbModel).
+
+## Database administration
+
+### Test users
+
+1. login = 'test_1', password = 'pas_1';
+2. login = 'test_2', password = 'pas_2'.
+
+### User create
+
+INSERT INTO public."user"(
+login, "password")
+VALUES ('login', crypt('password', gen_salt('bf')));
+
+### Password update
+
+UPDATE public."user"
+SET password = crypt('password', gen_salt('bf'))
+WHERE login = 'login';
