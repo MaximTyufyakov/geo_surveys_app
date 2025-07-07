@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
+import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 
 /// The task card.
@@ -8,7 +8,7 @@ import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 /// The [viewModel] parameter is the tasks page ViewModel.
 class TaskCard extends StatelessWidget {
   const TaskCard({super.key, required this.task, required this.viewModel});
-  final Task task;
+  final BaseTaskModel task;
   final TasksViewModel viewModel;
 
   @override

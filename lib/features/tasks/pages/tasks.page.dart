@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
+import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
@@ -33,13 +33,13 @@ class TasksPage extends StatelessWidget {
               ],
             ),
             body: FutureBuilder(
-              future: provider.model.tasks,
+              future: provider.model,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   /// Data from the database is received.
                   if (snapshot.hasData) {
                     List<Widget> taskCards = [];
-                    for (Task task in snapshot.data!) {
+                    for (BaseTaskModel task in snapshot.data!.tasks) {
                       taskCards.add(
                         TaskCard(
                           task: task,

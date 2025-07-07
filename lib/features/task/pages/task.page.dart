@@ -47,7 +47,7 @@ class _TaskPageState extends State<TaskPage> {
           appBar: AppBar(
             title: Text(
               'Задание',
-              style: Theme.of(context).textTheme.displaySmall,
+              style: Theme.of(context).textTheme.displayMedium,
             ),
             leading: BackButton(
               onPressed: () {

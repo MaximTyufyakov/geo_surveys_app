@@ -76,7 +76,7 @@ class TaskModel {
       );
 
       /// Call the private constructor
-      TaskModel result = TaskModel._create(
+      TaskModel component = TaskModel._create(
         taskid: response.data[0][0] as int,
         title: response.data[0][1] as String,
         description: response.data[0][2] as String,
@@ -87,7 +87,7 @@ class TaskModel {
         points: await _getPoints(taskid: taskid),
       );
 
-      return result;
+      return component;
     } catch (e) {
       return Future.error('Ошибка при обращении к базе данных.');
     }
