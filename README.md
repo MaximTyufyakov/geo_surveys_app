@@ -6,14 +6,22 @@ Uses the MVVM patern and features-first approach.
 
 ## Features
 
+### auth
+
+Main page.
+Simple authentication.
+It takes you to the TasksPage.
+
 ### tasks
 
-Have two pages:
+The TasksPage displays all the tasks in the card list.
+It takes you to the TaskPage and AuthPage.
 
-- TasksPage for view all tasks;
-- TaskPage for review and execution task (read desription, check points, write report, take videos).
+### task
 
-### auth
+You can view and complete the task on the TaskPage.
+It has a bottom navigation and three widgets (task, report, videos).
+It takes you to the TasksPage.
 
 ## To do
 
