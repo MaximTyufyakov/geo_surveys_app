@@ -14,9 +14,10 @@ class UnsavedDialog extends AbstractDialog {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Имеются несохранённые данные.'),
+              Text('Сохранить?')
             ],
           ),
-          greenTitle: 'Сохранить',
-          redTitle: 'Не сохранять',
+          greenTitle: 'Да',
+          redTitle: 'Нет',
         );
 }
