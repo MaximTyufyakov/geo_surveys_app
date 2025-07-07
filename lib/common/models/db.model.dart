@@ -4,13 +4,12 @@ import 'package:postgres_dart/postgres_dart.dart';
 class DbModel {
   /// The geosurveys database.
   static final PostgresDb geosurveysDb = PostgresDb(
-    host: '10.0.2.2',
-    // host: '192.168.237.180',
-    // port: 5432,
+    // host: '10.0.2.2', // Only for emulator.
+    host: '192.168.72.180', // For closed network (real device or emulator).
     databaseName: 'geosurveys',
     username: 'postgres',
     password: 'admin',
-    // queryTimeoutInSeconds: 5,
-    // timeoutInSeconds: 5,
+    queryTimeoutInSeconds: 10,
+    timeoutInSeconds: 10,
   );
 }
