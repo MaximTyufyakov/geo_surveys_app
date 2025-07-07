@@ -73,7 +73,9 @@ class _TaskPageState extends State<TaskPage> {
             ],
           ),
           body: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+            ),
             child: FutureBuilder(
                 future: provider.model,
                 builder: (context, snapshot) {
@@ -130,7 +132,7 @@ class _TaskPageState extends State<TaskPage> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.photo_library_outlined),
-                label: 'Фотографии',
+                label: 'Видео',
               ),
             ],
             currentIndex: _selectedIndex,

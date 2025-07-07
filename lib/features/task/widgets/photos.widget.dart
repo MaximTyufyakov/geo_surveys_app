@@ -7,5 +7,5 @@ class PhotosWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const MessageWidget(mes: 'Здесь будут фотографии.');
+      const MessageWidget(mes: 'Здесь будут видео.');
 }
