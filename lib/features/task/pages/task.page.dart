@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
-import 'package:geo_surveys_app/features/task/widgets/photos.widget.dart';
+import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
 import 'package:provider/provider.dart';
 
@@ -107,7 +107,7 @@ class _TaskPageState extends State<TaskPage> {
                         ),
 
                         /// Photos.
-                        const PhotosWidget(),
+                        const VideosWidget(),
                       ];
 
                       return _widgets.elementAt(_selectedIndex);

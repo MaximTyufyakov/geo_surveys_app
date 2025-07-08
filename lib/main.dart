@@ -115,6 +115,7 @@ class MainApp extends StatelessWidget {
           '/': (_) => const AuthPage(),
           '/tasks': (_) => const TasksPage(),
           '/task': (_) => const TaskPage(),
+          // '/video_shoot' =>
         },
         initialRoute: '/',
       );
