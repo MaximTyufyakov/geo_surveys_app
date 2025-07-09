@@ -136,6 +136,11 @@ class TaskModel {
     }
   }
 
+  /// Save task progress (points, report, videos).
+  ///
+  /// Returns a [Future] that completes when the response is successful.
+  /// Throws a [Future.error] with [String] message if database fails or
+  /// no update.
   Future<String> save(String? actualReport) async {
     final (bool check, String checkMessage) = _completedCheck();
     if (!saved) {
@@ -178,6 +183,9 @@ class TaskModel {
     }
   }
 
+  /// Check task completed (all points completed, add video).
+  ///
+  /// Returns a true if task completed else false and message.
   (bool, String) _completedCheck() {
     for (PointModel point in points) {
       if (!point.completed) {

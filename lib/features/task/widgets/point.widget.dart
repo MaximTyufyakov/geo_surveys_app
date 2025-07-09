@@ -5,6 +5,7 @@ import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
 /// A Widget with check-box and point information.
 ///
 /// The [point] parameter is a point information.
+/// The [viewModel] parameter is a task page view model.
 class PointWidget extends StatelessWidget {
   const PointWidget({
     super.key,
@@ -12,7 +13,10 @@ class PointWidget extends StatelessWidget {
     required this.viewModel,
   });
 
+  /// Point information.
   final PointModel point;
+
+  /// Task page view model.
   final TaskViewModel viewModel;
 
   @override

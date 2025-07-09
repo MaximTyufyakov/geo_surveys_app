@@ -5,7 +5,9 @@ import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/point.widget.dart';
 
 /// A widget with task information.
+///
 /// The [task] parameter is a model with task information.
+/// The [viewModel] parameter is a task page view model.
 class TaskWidget extends StatelessWidget {
   const TaskWidget({
     super.key,
@@ -16,6 +18,7 @@ class TaskWidget extends StatelessWidget {
   /// Model with task information.
   final TaskModel task;
 
+  /// Task page view model.
   final TaskViewModel viewModel;
 
   @override

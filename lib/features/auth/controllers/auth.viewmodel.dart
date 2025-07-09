@@ -9,6 +9,7 @@ class AuthViewModel extends ChangeNotifier {
     required this.context,
   });
 
+  /// Context of the auth page.
   final BuildContext context;
 
   /// Controller for login.
