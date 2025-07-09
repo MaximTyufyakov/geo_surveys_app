@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
+import 'package:geo_surveys_app/features/video/pages/video_shoot.page.dart';
 
 /// Main entry point to the app.
-void main() async {
+void main() {
   runApp(
     const MainApp(),
   );
@@ -12,7 +13,9 @@ void main() async {
 
 /// Main widget.
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({
+    super.key,
+  });
 
   static const _primaryColor = Colors.deepOrange;
   static const _displayColor = Colors.brown;
@@ -115,8 +118,8 @@ class MainApp extends StatelessWidget {
           '/': (_) => const AuthPage(),
           '/tasks': (_) => const TasksPage(),
           '/task': (_) => const TaskPage(),
-          // '/video_shoot' =>
+          '/video_shoot': (_) => const VideoShootPage(),
         },
-        initialRoute: '/',
+        initialRoute: '/video_shoot',
       );
 }
