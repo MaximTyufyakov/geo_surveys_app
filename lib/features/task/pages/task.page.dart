@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
+import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
 import 'package:provider/provider.dart';
@@ -87,23 +88,15 @@ class _TaskPageState extends State<TaskPage> {
                           TextEditingController(text: snapshot.data!.report);
 
                       _widgets = <Widget>[
-                        /// Points.
+                        /// Task.
                         TaskWidget(
                           task: snapshot.data!,
                           viewModel: provider,
                         ),
 
                         /// Report.
-                        TextField(
-                          decoration: const InputDecoration(
-                            hintText:
-                                'Здесь можно написать отчёт о выполненной работе.',
-                          ),
-                          controller: provider.reportController,
-                          onChanged: (action) {
-                            provider.makeUnsaved();
-                          },
-                          maxLines: 100,
+                        ReportWidget(
+                          viewModel: provider,
                         ),
 
                         /// Videos.
