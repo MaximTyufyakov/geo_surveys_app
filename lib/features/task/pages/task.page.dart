@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
-import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
+import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
 import 'package:provider/provider.dart';
 
 /// A page with BottomNavigationBar and task's widgets.
@@ -106,7 +106,7 @@ class _TaskPageState extends State<TaskPage> {
                           maxLines: 100,
                         ),
 
-                        /// Photos.
+                        /// Videos.
                         const VideosWidget(),
                       ];
 

@@ -7,7 +7,6 @@ Uses the MVVM patern and features-first approach.
 ## To do
 
 - S3 (for save videos not in db);
-- auth module;
 - Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
 
 ## Features
