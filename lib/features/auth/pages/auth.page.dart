@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/auth/controllers/auth.viewmodel.dart';
+import 'package:geo_surveys_app/features/auth/viewmodels/auth.viewmodel.dart';
 import 'package:provider/provider.dart';
 
 /// The page with a login form.
