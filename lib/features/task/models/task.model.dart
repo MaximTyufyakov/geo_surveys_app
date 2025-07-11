@@ -13,7 +13,7 @@ import 'package:postgres_dart/postgres_dart.dart';
 /// The [points] parameter is the list of points that need to be completed.
 /// The [saved] parameter is the saved flag.
 class TaskModel {
-  /// Private constructor
+  /// Private constructor.
   TaskModel._create({
     required this.taskid,
     required this.title,

@@ -1,25 +1,17 @@
+import 'dart:ffi';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
+import 'package:geo_surveys_app/common/widgets/message.widget.dart';
 import 'package:geo_surveys_app/features/video/viewmodels/video_shoot.viewmodel.dart';
 import 'package:provider/provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
-class VideoShootPage extends StatefulWidget {
+class VideoShootPage extends StatelessWidget {
   const VideoShootPage({
     super.key,
   });
-
-  @override
-  VideoShootPageState createState() => VideoShootPageState();
-}
-
-class VideoShootPageState extends State<VideoShootPage> {
-  @override
-  void dispose() {
-    // Dispose of the controller when the widget is disposed.
-    VideoShootViewModel.controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) =>
@@ -29,28 +21,64 @@ class VideoShootPageState extends State<VideoShootPage> {
         ),
         child: Consumer<VideoShootViewModel>(
           builder: (context, provider, child) => Scaffold(
+            backgroundColor: Colors.black,
             // You must wait until the controller is initialized before displaying
             // the camera preview. Use a FutureBuilder to display a loading spinner
             // until the controller has finished initializing.
-            body: FutureBuilder<void>(
-              future: provider.init(),
-              builder: (context, snapshot) =>
-                  snapshot.connectionState == ConnectionState.done
-                      ?
-                      // If the Future is complete, display the preview.
-                      Center(
-                          child: CameraPreview(
-                            VideoShootViewModel.controller,
+            body: FutureBuilder<CameraController>(
+              future: provider.controller,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CameraPreview(
+                                snapshot.data!,
+                              ),
+                            ],
                           ),
-                        )
-                      :
-                      // Otherwise, display a loading indicator.
-                      const Center(child: CircularProgressIndicator()),
-            ),
-            floatingActionButton: FloatingActionButton(
-              // Provide an onPressed callback.
-              onPressed: () => provider.shootPressed(context),
-              child: const Icon(Icons.camera_alt),
+                        ),
+                        Expanded(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              iconSize: 40,
+                              style: Theme.of(context)
+                                  .iconButtonTheme
+                                  .style!
+                                  .copyWith(
+                                    backgroundColor:
+                                        WidgetStateProperty.all<Color>(
+                                      Colors.white,
+                                    ),
+                                    foregroundColor:
+                                        WidgetStateProperty.all<Color>(
+                                      Colors.red,
+                                    ),
+                                  ),
+                              onPressed: provider.shootPressed,
+                              icon: snapshot.data!.value.isRecordingVideo
+                                  ? const Icon(Icons.square)
+                                  : const Icon(Icons.circle),
+                            ),
+                          ],
+                        ))
+                      ],
+                    );
+                  } else if (snapshot.hasError) {
+                    return MessageWidget(
+                      mes: snapshot.error.toString(),
+                    );
+                  }
+                }
+                return const LoadingWidget();
+              },
             ),
           ),
         ),
