@@ -1,10 +1,8 @@
-import 'dart:ffi';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/video/viewmodels/video_shoot.viewmodel.dart';
+import 'package:geo_surveys_app/features/video_shoot/viewmodels/video_shoot.viewmodel.dart';
 import 'package:provider/provider.dart';
 
 // A screen that allows users to take a picture using a given camera.

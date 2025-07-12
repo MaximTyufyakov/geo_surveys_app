@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// A ViewModel of the video shoot page.
 ///
@@ -50,15 +53,19 @@ class VideoShootViewModel extends ChangeNotifier {
 
   /// Press shoot button.
   Future<void> shootPressed() async {
-    XFile video;
     await controller.then((value) async {
       if (!value.value.isRecordingVideo) {
         await value.startVideoRecording();
         notifyListeners();
       } else {
-        video = await value.stopVideoRecording();
-        // await video.saveTo('/storage/emulated/0/Download/${'Видео.mp4'}');
+        final XFile video = await value.stopVideoRecording();
         notifyListeners();
+        final Directory docDir = await getApplicationDocumentsDirectory();
+        final Directory videosDir = Directory('${docDir.path}/videos');
+        await videosDir.create(recursive: true);
+        final String videoPath =
+            '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+        final File videoFile = await File(video.path).rename(videoPath);
       }
     }).catchError((err) {});
   }
