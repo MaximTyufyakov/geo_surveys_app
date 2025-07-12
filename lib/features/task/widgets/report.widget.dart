@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
+import 'package:geo_surveys_app/features/task/models/report.model.dart';
+import 'package:geo_surveys_app/features/task/viewmodels/report.viewmodel.dart';
+import 'package:provider/provider.dart';
 
 /// A Widget with report text field.
 ///
-/// The [viewModel] parameter is a task page view model.
+/// The [provider] parameter is a report view model.
 class ReportWidget extends StatelessWidget {
-  const ReportWidget({
+  ReportWidget({
     super.key,
-    required this.viewModel,
-  });
+    required ReportModel report,
+  }) : provider = ReportViewModel(model: report);
 
-  /// Task page view model.
-  final TaskViewModel viewModel;
+  /// Report view model.
+  final ReportViewModel provider;
 
   @override
-  Widget build(BuildContext context) => TextField(
-        decoration: const InputDecoration(
-          hintText: 'Здесь можно написать отчёт о выполненной работе.',
+  Widget build(BuildContext context) => ChangeNotifierProvider<ReportViewModel>(
+        create: (BuildContext context) => provider,
+        child: Consumer<ReportViewModel>(
+          builder: (context, provider, child) => TextField(
+            decoration: const InputDecoration(
+              hintText: 'Здесь можно написать отчёт о выполненной работе.',
+            ),
+            controller: provider.reportController,
+            onChanged: (action) {
+              provider.onTextChange();
+            },
+            maxLines: 100,
+          ),
         ),
-        controller: viewModel.reportController,
-        onChanged: (action) {
-          viewModel.makeUnsaved();
-        },
-        maxLines: 100,
       );
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
+import 'package:geo_surveys_app/features/task/viewmodels/task_page.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
@@ -21,7 +21,9 @@ class _TaskPageState extends State<TaskPage> {
   int _selectedIndex = 0;
 
   /// The widgets on the page.
-  late List<Widget> _widgets;
+  late TaskWidget taskWidget;
+  late ReportWidget reportWidget;
+  late VideosWidget videosWidget;
 
   /// The arguments from the previous page.
   late Map<String, dynamic> _arguments;
@@ -38,12 +40,11 @@ class _TaskPageState extends State<TaskPage> {
     _arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map<String, dynamic>;
 
-    return ChangeNotifierProvider<TaskViewModel>(
-      create: (BuildContext context) => TaskViewModel(
-        context: context,
+    return ChangeNotifierProvider<TaskPageViewModel>(
+      create: (BuildContext context) => TaskPageViewModel(
         taskid: _arguments['taskid'] as int,
       ),
-      child: Consumer<TaskViewModel>(
+      child: Consumer<TaskPageViewModel>(
         builder: (context, provider, child) => Scaffold(
           appBar: AppBar(
             title: Text(
@@ -52,14 +53,14 @@ class _TaskPageState extends State<TaskPage> {
             ),
             leading: BackButton(
               onPressed: () {
-                provider.exit();
+                provider.exit(context);
               },
             ),
             actions: [
               /// Page reload.
               IconButton(
                 onPressed: () async {
-                  provider.reloadPage();
+                  provider.reloadPage(context);
                 },
                 icon: const Icon(Icons.replay_outlined),
               ),
@@ -67,7 +68,7 @@ class _TaskPageState extends State<TaskPage> {
               /// Save.
               IconButton(
                 onPressed: () async {
-                  await provider.save();
+                  await provider.save(context);
                 },
                 icon: const Icon(Icons.save),
               ),
@@ -84,26 +85,25 @@ class _TaskPageState extends State<TaskPage> {
                     /// Data from the database is received.
                     if (snapshot.hasData) {
                       /// Initialization of widgets.
-                      provider.reportController ??=
-                          TextEditingController(text: snapshot.data!.report);
 
-                      _widgets = <Widget>[
-                        /// Task.
-                        TaskWidget(
-                          task: snapshot.data!,
-                          viewModel: provider,
-                        ),
+                      /// Task.
+                      taskWidget = TaskWidget(
+                        task: snapshot.data!,
+                      );
 
-                        /// Report.
-                        ReportWidget(
-                          viewModel: provider,
-                        ),
+                      /// Report.
+                      reportWidget = ReportWidget(
+                        report: snapshot.data!.report,
+                      );
 
-                        /// Videos.
-                        const VideosWidget(),
-                      ];
+                      /// Videos.
+                      videosWidget = const VideosWidget();
 
-                      return _widgets.elementAt(_selectedIndex);
+                      return [
+                        taskWidget,
+                        reportWidget,
+                        videosWidget,
+                      ].elementAt(_selectedIndex);
 
                       /// Error.
                     } else if (snapshot.hasError) {

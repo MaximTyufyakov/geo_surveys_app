@@ -3,84 +3,86 @@ import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/point.widget.dart';
+import 'package:provider/provider.dart';
 
 /// A widget with task information.
 ///
-/// The [task] parameter is a model with task information.
-/// The [viewModel] parameter is a task page view model.
+/// The [provider] parameter is a task view model.
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({
+  TaskWidget({
     super.key,
-    required this.task,
-    required this.viewModel,
-  });
+    required TaskModel task,
+  }) : provider = TaskViewModel(
+          model: task,
+        );
 
-  /// Model with task information.
-  final TaskModel task;
-
-  /// Task page view model.
-  final TaskViewModel viewModel;
+  /// Task task view model.
+  final TaskViewModel provider;
 
   @override
-  Widget build(BuildContext context) {
-    List<Widget> pointsCards = [];
-    for (PointModel point in task.points) {
-      pointsCards.add(
-        PointWidget(
-          point: point,
-          viewModel: viewModel,
+  Widget build(BuildContext context) => ChangeNotifierProvider<TaskViewModel>(
+        create: (BuildContext context) => provider,
+        child: Consumer<TaskViewModel>(
+          builder: (context, provider, child) {
+            List<Widget> pointsCards = [];
+            for (PointModel point in provider.model.points) {
+              pointsCards.add(
+                PointWidget(
+                  point: point,
+                ),
+              );
+            }
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                      SelectableText(
+                        provider.model.title,
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Описание',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Divider(
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                      SelectableText(
+                        provider.model.description,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Координаты',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Divider(
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                      SelectableText(
+                        '${provider.model.coordinates.latitude}°, ${provider.model.coordinates.longitude}°',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Ход работы',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      Divider(
+                        color: Theme.of(context).primaryColorDark,
+                      )
+                    ] +
+                    pointsCards,
+              ),
+            );
+          },
         ),
       );
-    }
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-              SelectableText(
-                task.title,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Описание',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Divider(
-                color: Theme.of(context).primaryColorDark,
-              ),
-              SelectableText(
-                task.description,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Координаты',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Divider(
-                color: Theme.of(context).primaryColorDark,
-              ),
-              SelectableText(
-                '${task.coordinates.latitude}°, ${task.coordinates.longitude}°',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Ход работы',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Divider(
-                color: Theme.of(context).primaryColorDark,
-              )
-            ] +
-            pointsCards,
-      ),
-    );
-  }
 }

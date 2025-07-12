@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
-import 'package:geo_surveys_app/features/video/pages/video_shoot.page.dart';
+import 'package:geo_surveys_app/features/video_shoot/pages/video_shoot.page.dart';
 
 /// Main entry point to the app.
 void main() {
@@ -120,6 +120,6 @@ class MainApp extends StatelessWidget {
           '/task': (_) => const TaskPage(),
           '/video_shoot': (_) => const VideoShootPage(),
         },
-        initialRoute: '/video_shoot',
+        initialRoute: '/',
       );
 }

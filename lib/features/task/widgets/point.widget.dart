@@ -1,54 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
-import 'package:geo_surveys_app/features/task/viewmodels/task.viewmodel.dart';
+import 'package:geo_surveys_app/features/task/viewmodels/point.viewmodel.dart';
+import 'package:provider/provider.dart';
 
 /// A Widget with check-box and point information.
 ///
-/// The [point] parameter is a point information.
-/// The [viewModel] parameter is a task page view model.
+/// The [provider] parameter is a point view model.
 class PointWidget extends StatelessWidget {
-  const PointWidget({
+  PointWidget({
     super.key,
-    required this.point,
-    required this.viewModel,
-  });
+    required PointModel point,
+  }) : provider = PointViewModel(model: point);
 
-  /// Point information.
-  final PointModel point;
-
-  /// Task page view model.
-  final TaskViewModel viewModel;
+  /// Point view model.
+  final PointViewModel provider;
 
   @override
-  Widget build(BuildContext context) => Column(
-        children: [
-          Row(
+  Widget build(BuildContext context) => ChangeNotifierProvider<PointViewModel>(
+        create: (BuildContext context) => provider,
+        child: Consumer<PointViewModel>(
+          builder: (context, provider, child) => Column(
             children: [
-              /// Number.
-              Text('${point.number}.',
-                  style: Theme.of(context).textTheme.bodyMedium),
+              Row(
+                children: [
+                  /// Number.
+                  Text('${provider.model.number}.',
+                      style: Theme.of(context).textTheme.bodyMedium),
 
-              Checkbox(
-                  value: point.completed,
-                  onChanged: (onChanged) async {
-                    viewModel.onPointTap(point);
-                  }),
+                  Checkbox(
+                      value: provider.model.completed,
+                      onChanged: (onChanged) => provider.onPointTap()),
 
-              /// Description.
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectableText(point.description,
-                        style: Theme.of(context).textTheme.bodyMedium),
-                  ],
-                ),
+                  /// Description.
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SelectableText(
+                          provider.model.description,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          onTap: () => provider.onPointTap(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const Divider(
+                color: Colors.black26,
               ),
             ],
           ),
-          const Divider(
-            color: Colors.black26,
-          ),
-        ],
+        ),
       );
 }

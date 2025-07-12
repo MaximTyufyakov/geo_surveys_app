@@ -1,5 +1,6 @@
 import 'package:geo_surveys_app/common/models/db.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
+import 'package:geo_surveys_app/features/task/models/report.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
 /// The task model.
@@ -9,7 +10,7 @@ import 'package:postgres_dart/postgres_dart.dart';
 /// The [description] parameter is the text task description.
 /// The [coordinates] parameter is the task geographic coordinates.
 /// The [completed] parameter is the completed flag.
-/// The [report] parameter is the text that the user writes (optional).
+/// The [report] parameter is the report model.
 /// The [points] parameter is the list of points that need to be completed.
 /// The [saved] parameter is the saved flag.
 class TaskModel {
@@ -20,9 +21,9 @@ class TaskModel {
     required this.description,
     required this.coordinates,
     required this.completed,
-    required this.report,
     required this.points,
     required this.saved,
+    required this.report,
   });
 
   /// The task identifier.
@@ -41,7 +42,7 @@ class TaskModel {
   bool completed;
 
   /// The text that the user writes (optional).
-  String? report;
+  ReportModel report;
 
   /// The list of points that need to be completed.
   final List<PointModel> points;
@@ -82,10 +83,10 @@ class TaskModel {
         description: response.data[0][2] as String,
         coordinates: response.data[0][3] as PgPoint,
         completed: response.data[0][4] as bool,
-        report: response.data[0][5] as String?,
+        report: ReportModel(text: response.data[0][5] as String? ?? ''),
         saved: true,
         points: await _getPoints(taskid: taskid),
-      );
+      ).._setParent();
 
       return component;
     } catch (e) {
@@ -136,23 +137,36 @@ class TaskModel {
     }
   }
 
+  void _setParent() {
+    report.parent = this;
+    for (PointModel point in points) {
+      point.parent = this;
+    }
+  }
+
+  /// Marks the task as unsaved.
+  /// Run when widgets change.
+  void makeUnsaved() {
+    saved = false;
+  }
+
   /// Save task progress (points, report, videos).
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails or
   /// no update.
-  Future<String> save(String? actualReport) async {
-    final (bool check, String checkMessage) = _completedCheck();
+  Future<String> save() async {
+    final (bool completedCheck, String checkMessage) = _completedCheck();
     if (!saved) {
-      completed = check;
+      completed = completedCheck;
       try {
         if (DbModel.geosurveysDb.db.isClosed) {
           await DbModel.geosurveysDb.open();
         }
         await DbModel.geosurveysDb.table('task').update(
           update: {
-            'completed': completed,
-            'report': actualReport,
+            'completed': completedCheck,
+            'report': report.text,
           },
           where: Where(
             'taskid',
@@ -162,16 +176,7 @@ class TaskModel {
         );
 
         for (PointModel point in points) {
-          await DbModel.geosurveysDb.table('point').update(
-            update: {
-              'completed': point.completed,
-            },
-            where: Where(
-              'pointid',
-              WhereOperator.isEqual,
-              point.pointid,
-            ),
-          );
+          await point.comletedUpdate();
         }
       } catch (e) {
         return Future.error('Ошибка при обращении к базе данных.');
