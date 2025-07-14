@@ -23,6 +23,6 @@ class BaseTaskModel {
   ///
   /// The [flag] parameter is the completed flag.
   void completedUpdate(bool? flag) {
-    flag == null ? null : completed = completed;
+    flag == null ? null : completed = flag;
   }
 }
