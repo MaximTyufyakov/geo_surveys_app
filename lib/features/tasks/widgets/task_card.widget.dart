@@ -1,43 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
-import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
+import 'package:geo_surveys_app/features/tasks/viewmodels/task_card.viewmodel.dart';
+import 'package:provider/provider.dart';
 
 /// The task card.
 ///
-/// The [task] parameter is the task model.
-/// The [viewModel] parameter is the tasks page ViewModel.
+/// The [provider] parameter is the task card ViewModel.
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key, required this.task, required this.viewModel});
-  final BaseTaskModel task;
-  final TasksViewModel viewModel;
+  TaskCard({super.key, required BaseTaskModel task})
+      : provider = TaskCardViewModel(model: task);
+
+  final TaskCardViewModel provider;
 
   @override
-  Widget build(BuildContext context) => Card(
-        /// To click.
-        child: InkWell(
-          onTap: () async {
-            viewModel.openTask(task);
-          },
+  Widget build(BuildContext context) =>
+      ChangeNotifierProvider<TaskCardViewModel>(
+        create: (BuildContext context) => provider,
+        child: Consumer<TaskCardViewModel>(
+          builder: (context, provider, child) => Card(
+            /// To click.
+            child: InkWell(
+              onTap: () async {
+                provider.openTask(context);
+              },
 
-          /// Content.
-          /// ListTile with a title and completed text.
-          child: ListTile(
-            title: Text(task.title),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                task.completed
-                    ? Text('Завершено',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.green,
-                            ))
-                    : Text(
-                        'Не завершено',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.red,
-                            ),
-                      ),
-              ],
+              /// Content.
+              /// ListTile with a title and completed text.
+              child: ListTile(
+                title: Text(provider.model.title),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    provider.model.completed
+                        ? Text('Завершено',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: Colors.green,
+                                ))
+                        : Text(
+                            'Не завершено',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  color: Colors.red,
+                                ),
+                          ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

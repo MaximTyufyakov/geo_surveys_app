@@ -17,6 +17,8 @@ class TasksModel {
   /// Public factory.
   /// Retrieves all tasks from the database.
   ///
+  /// The [userid] parameter is the user ID.
+  ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
   static Future<TasksModel> create(int userid) async {

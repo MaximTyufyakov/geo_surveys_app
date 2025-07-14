@@ -26,7 +26,6 @@ class _TasksPageState extends State<TasksPage> {
         <String, dynamic>{}) as Map<String, dynamic>;
     return ChangeNotifierProvider<TasksViewModel>(
       create: (BuildContext context) => TasksViewModel(
-        context: context,
         userid: _arguments['userid'] as int,
       ),
       child: Consumer<TasksViewModel>(
@@ -40,7 +39,7 @@ class _TasksPageState extends State<TasksPage> {
               /// Page reload.
               IconButton(
                 onPressed: () async {
-                  provider.reloadPage();
+                  provider.reloadPage(context);
                 },
                 icon: const Icon(Icons.replay_outlined),
               ),
@@ -57,7 +56,6 @@ class _TasksPageState extends State<TasksPage> {
                     taskCards.add(
                       TaskCard(
                         task: task,
-                        viewModel: provider,
                       ),
                     );
                   }
