@@ -75,9 +75,7 @@ class _TaskPageState extends State<TaskPage> {
             ],
           ),
           body: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-            ),
+            padding: const EdgeInsets.all(8),
             child: FutureBuilder(
                 future: provider.model,
                 builder: (context, snapshot) {
@@ -97,7 +95,9 @@ class _TaskPageState extends State<TaskPage> {
                       );
 
                       /// Videos.
-                      videosWidget = const VideosWidget();
+                      videosWidget = VideosWidget(
+                        task: snapshot.data!,
+                      );
 
                       return [
                         taskWidget,

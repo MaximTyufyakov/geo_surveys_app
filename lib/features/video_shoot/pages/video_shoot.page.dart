@@ -14,9 +14,7 @@ class VideoShootPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       ChangeNotifierProvider<VideoShootViewModel>(
-        create: (BuildContext context) => VideoShootViewModel(
-          context: context,
-        ),
+        create: (BuildContext context) => VideoShootViewModel(),
         child: Consumer<VideoShootViewModel>(
           builder: (context, provider, child) => Scaffold(
             backgroundColor: Colors.black,
@@ -60,7 +58,9 @@ class VideoShootPage extends StatelessWidget {
                                       Colors.red,
                                     ),
                                   ),
-                              onPressed: provider.shootPressed,
+                              onPressed: () {
+                                provider.shootPressed(context);
+                              },
                               icon: snapshot.data!.value.isRecordingVideo
                                   ? const Icon(Icons.square)
                                   : const Icon(Icons.circle),

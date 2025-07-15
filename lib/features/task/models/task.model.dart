@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:geo_surveys_app/common/models/db.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/report.model.dart';
+import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
 /// The task model.
@@ -24,6 +27,7 @@ class TaskModel {
     required this.points,
     required this.saved,
     required this.report,
+    required this.videos,
   });
 
   /// The task identifier.
@@ -46,6 +50,9 @@ class TaskModel {
 
   /// The list of points that need to be completed.
   final List<PointModel> points;
+
+  /// The list of videos.
+  final List<VideoModel> videos;
 
   /// The saved flag.
   bool saved;
@@ -86,6 +93,7 @@ class TaskModel {
         report: ReportModel(text: response.data[0][5] as String? ?? ''),
         saved: true,
         points: await _getPoints(taskid: taskid),
+        videos: await _getVideos(taskid: taskid),
       ).._setParent();
 
       return component;
@@ -125,7 +133,6 @@ class TaskModel {
       for (List<dynamic> d in response.data) {
         result.add(PointModel(
           pointid: d[0] as int,
-          taskid: d[1] as int,
           number: d[2] as int,
           description: d[3] as String,
           completed: d[4] as bool,
@@ -137,10 +144,56 @@ class TaskModel {
     }
   }
 
+  /// Retrieves all videos for task from the database.
+  ///
+  /// Returns a [Future] that completes when the response is successful.
+  /// Throws a [Future.error] with [String] message if database fails.
+  static Future<List<VideoModel>> _getVideos({required int taskid}) async {
+    try {
+      if (DbModel.geosurveysDb.db.isClosed) {
+        await DbModel.geosurveysDb.open();
+      }
+      DbResponse response = await DbModel.geosurveysDb.table('video').select(
+        columns: [
+          Column('videoid'),
+          Column('taskid'),
+          Column('title'),
+          Column('url'),
+          Column('path'),
+        ],
+        where: Where(
+          'taskid',
+          WhereOperator.isEqual,
+          taskid,
+        ),
+        orderBy: OrderBy(
+          'title',
+          ascending: true,
+        ),
+      );
+      List<VideoModel> result = [];
+      for (List<dynamic> d in response.data) {
+        result.add(VideoModel(
+          videoid: d[0] as int,
+          title: d[2] as String,
+          url: d[3] as String?,
+          file: (d[4] as String?) == null ? null : File(d[4] as String),
+        ));
+      }
+      return result;
+    } catch (e) {
+      return Future.error('Ошибка при обращении к базе данных.');
+    }
+  }
+
+  /// Set task as a parent for childs.
   void _setParent() {
     report.parent = this;
     for (PointModel point in points) {
       point.parent = this;
+    }
+    for (VideoModel video in videos) {
+      video.parent = this;
     }
   }
 
@@ -148,6 +201,12 @@ class TaskModel {
   /// Run when widgets change.
   void makeUnsaved() {
     saved = false;
+  }
+
+  void addVideo(VideoModel video) {
+    video.parent = this;
+    videos.add(video);
+    makeUnsaved();
   }
 
   /// Save task progress (points, report, videos).
@@ -178,11 +237,14 @@ class TaskModel {
         for (PointModel point in points) {
           await point.comletedUpdate();
         }
+        for (VideoModel video in videos) {
+          await video.save();
+        }
+        saved = true;
+        return 'Успешно. $checkMessage';
       } catch (e) {
         return Future.error('Ошибка при обращении к базе данных.');
       }
-      saved = true;
-      return 'Успешно. $checkMessage';
     } else {
       return Future.error('Нет изменений. $checkMessage');
     }
@@ -196,6 +258,9 @@ class TaskModel {
       if (!point.completed) {
         return (false, 'Для завершения задания окончите все пункты.');
       }
+    }
+    if (videos.isEmpty) {
+      return (false, 'Для завершения задания прикрепите видео.');
     }
     return (true, 'Задание завершено.');
   }

@@ -1,19 +1,10 @@
 import 'dart:io';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// A ViewModel of the video shoot page.
-///
-/// The [context] is the context of the video shoot page.
 class VideoShootViewModel extends ChangeNotifier {
-  VideoShootViewModel({
-    required this.context,
-  }) : controller = _initController();
-
-  /// The context of the video shoot page.
-  final BuildContext context;
+  VideoShootViewModel() : controller = _initController();
 
   /// The camera controller.
   Future<CameraController> controller;
@@ -49,10 +40,15 @@ class VideoShootViewModel extends ChangeNotifier {
   }
 
   /// Opens a page with information about task.
-  void exit() async {}
+  void exit(File video, BuildContext context) {
+    Navigator.pop(
+      context,
+      video,
+    );
+  }
 
   /// Press shoot button.
-  Future<void> shootPressed() async {
+  Future<void> shootPressed(BuildContext context) async {
     await controller.then((value) async {
       if (!value.value.isRecordingVideo) {
         await value.startVideoRecording();
@@ -60,12 +56,7 @@ class VideoShootViewModel extends ChangeNotifier {
       } else {
         final XFile video = await value.stopVideoRecording();
         notifyListeners();
-        final Directory docDir = await getApplicationDocumentsDirectory();
-        final Directory videosDir = Directory('${docDir.path}/videos');
-        await videosDir.create(recursive: true);
-        final String videoPath =
-            '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
-        final File videoFile = await File(video.path).rename(videoPath);
+        context.mounted ? exit(File(video.path), context) : null;
       }
     }).catchError((err) {});
   }

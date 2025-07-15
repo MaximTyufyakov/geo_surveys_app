@@ -5,7 +5,7 @@
 -- Dumped from database version 16.4
 -- Dumped by pg_dump version 16.4
 
--- Started on 2025-07-09 08:31:55
+-- Started on 2025-07-15 20:31:13
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -27,7 +27,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- TOC entry 4917 (class 0 OID 0)
+-- TOC entry 4921 (class 0 OID 0)
 -- Dependencies: 2
 -- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
@@ -71,7 +71,7 @@ CREATE SEQUENCE public.point_pointid_seq
 ALTER SEQUENCE public.point_pointid_seq OWNER TO postgres;
 
 --
--- TOC entry 4918 (class 0 OID 0)
+-- TOC entry 4922 (class 0 OID 0)
 -- Dependencies: 218
 -- Name: point_pointid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -112,7 +112,7 @@ CREATE SEQUENCE public.task_taskid_seq
 ALTER SEQUENCE public.task_taskid_seq OWNER TO postgres;
 
 --
--- TOC entry 4919 (class 0 OID 0)
+-- TOC entry 4923 (class 0 OID 0)
 -- Dependencies: 216
 -- Name: task_taskid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -164,7 +164,7 @@ CREATE SEQUENCE public.user_userid_seq
 ALTER SEQUENCE public.user_userid_seq OWNER TO postgres;
 
 --
--- TOC entry 4920 (class 0 OID 0)
+-- TOC entry 4924 (class 0 OID 0)
 -- Dependencies: 222
 -- Name: user_userid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -180,8 +180,9 @@ ALTER SEQUENCE public.user_userid_seq OWNED BY public."user".userid;
 CREATE TABLE public.video (
     videoid bigint NOT NULL,
     taskid bigint NOT NULL,
-    title character varying(100),
-    file bytea NOT NULL
+    title character varying(100) NOT NULL,
+    url text,
+    path text
 );
 
 
@@ -203,7 +204,7 @@ CREATE SEQUENCE public.video_videoid_seq
 ALTER SEQUENCE public.video_videoid_seq OWNER TO postgres;
 
 --
--- TOC entry 4921 (class 0 OID 0)
+-- TOC entry 4925 (class 0 OID 0)
 -- Dependencies: 220
 -- Name: video_videoid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -271,7 +272,7 @@ ALTER TABLE ONLY public.task
 
 
 --
--- TOC entry 4760 (class 2606 OID 78119)
+-- TOC entry 4764 (class 2606 OID 78119)
 -- Name: user user_login_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -280,7 +281,7 @@ ALTER TABLE ONLY public."user"
 
 
 --
--- TOC entry 4762 (class 2606 OID 78117)
+-- TOC entry 4766 (class 2606 OID 78117)
 -- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -289,7 +290,7 @@ ALTER TABLE ONLY public."user"
 
 
 --
--- TOC entry 4764 (class 2606 OID 78166)
+-- TOC entry 4768 (class 2606 OID 78166)
 -- Name: user_task user_task_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -298,12 +299,30 @@ ALTER TABLE ONLY public.user_task
 
 
 --
--- TOC entry 4758 (class 2606 OID 69900)
+-- TOC entry 4758 (class 2606 OID 86302)
+-- Name: video video_path_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.video
+    ADD CONSTRAINT video_path_key UNIQUE (path);
+
+
+--
+-- TOC entry 4760 (class 2606 OID 69900)
 -- Name: video video_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.video
     ADD CONSTRAINT video_pkey PRIMARY KEY (videoid);
+
+
+--
+-- TOC entry 4762 (class 2606 OID 86298)
+-- Name: video video_url_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.video
+    ADD CONSTRAINT video_url_key UNIQUE (url);
 
 
 --
@@ -323,7 +342,7 @@ CREATE INDEX fki_video_task_fkey ON public.video USING btree (taskid);
 
 
 --
--- TOC entry 4765 (class 2606 OID 69901)
+-- TOC entry 4769 (class 2606 OID 69901)
 -- Name: point point_task_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -332,7 +351,7 @@ ALTER TABLE ONLY public.point
 
 
 --
--- TOC entry 4767 (class 2606 OID 78172)
+-- TOC entry 4771 (class 2606 OID 78172)
 -- Name: user_task user_task_taskid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -341,7 +360,7 @@ ALTER TABLE ONLY public.user_task
 
 
 --
--- TOC entry 4768 (class 2606 OID 78167)
+-- TOC entry 4772 (class 2606 OID 78167)
 -- Name: user_task user_task_userid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -350,7 +369,7 @@ ALTER TABLE ONLY public.user_task
 
 
 --
--- TOC entry 4766 (class 2606 OID 69907)
+-- TOC entry 4770 (class 2606 OID 69907)
 -- Name: video video_task_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -358,7 +377,7 @@ ALTER TABLE ONLY public.video
     ADD CONSTRAINT video_task_fkey FOREIGN KEY (taskid) REFERENCES public.task(taskid) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- Completed on 2025-07-09 08:31:55
+-- Completed on 2025-07-15 20:31:13
 
 --
 -- PostgreSQL database dump complete
