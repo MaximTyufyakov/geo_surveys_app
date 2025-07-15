@@ -6,14 +6,12 @@ import 'package:postgres_dart/postgres_dart.dart';
 ///
 /// The [parent] parameter is the task.
 /// The [pointid] parameter is the point identifier.
-/// The [taskid] parameter is the task identifier (parent element).
 /// The [number] parameter is the point number in the task.
 /// The [description] parameter is the text point description.
 /// The [completed] parameter is the completed flag.
 class PointModel {
   PointModel({
     required this.pointid,
-    required this.taskid,
     required this.number,
     required this.description,
     required this.completed,
@@ -24,9 +22,6 @@ class PointModel {
 
   /// The point identifier.
   int pointid;
-
-  /// The task identifier (parent element).
-  int taskid;
 
   /// The point number in the task.
   int number;
@@ -61,12 +56,12 @@ class PointModel {
   /// Inverse completed field.
   void comletedInverse() {
     completed = !completed;
-    _makeUnsaved();
+    makeUnsaved();
   }
 
   /// Marks the task as unsaved.
   /// Run when widgets change.
-  void _makeUnsaved() {
+  void makeUnsaved() {
     parent.makeUnsaved();
   }
 }

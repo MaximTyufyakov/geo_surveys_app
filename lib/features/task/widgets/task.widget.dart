@@ -19,12 +19,14 @@ class TaskWidget extends StatelessWidget {
   /// Task task view model.
   final TaskViewModel provider;
 
+  /// Points widgets.
+  final List<Widget> pointsCards = [];
+
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<TaskViewModel>(
         create: (BuildContext context) => provider,
         child: Consumer<TaskViewModel>(
           builder: (context, provider, child) {
-            List<Widget> pointsCards = [];
             for (PointModel point in provider.model.points) {
               pointsCards.add(
                 PointWidget(

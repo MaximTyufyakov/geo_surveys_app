@@ -27,7 +27,10 @@ class TaskCard extends StatelessWidget {
               /// Content.
               /// ListTile with a title and completed text.
               child: ListTile(
-                title: Text(provider.model.title),
+                title: Text(
+                  provider.model.title,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

@@ -60,9 +60,7 @@ class _TasksPageState extends State<TasksPage> {
                     );
                   }
                   return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                    ),
+                    padding: const EdgeInsets.all(8),
 
                     /// Scrolling and cards.
                     child: SingleChildScrollView(

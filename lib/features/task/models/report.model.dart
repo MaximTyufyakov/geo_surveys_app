@@ -1,6 +1,6 @@
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
-/// The task model.
+/// The report model.
 ///
 /// The [parent] parameter is the task.
 /// The [text] parameter is the text that the user writes (optional).
