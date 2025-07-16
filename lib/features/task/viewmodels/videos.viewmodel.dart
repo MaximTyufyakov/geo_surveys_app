@@ -19,6 +19,12 @@ class VideosViewModel extends ChangeNotifier {
     text: '',
   );
 
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+  }
+
+  /// Open page with camera and add new video in the list.
   void videoCreate(BuildContext context) async {
     if (newTitleController.text == '') {
       await showDialog<bool>(

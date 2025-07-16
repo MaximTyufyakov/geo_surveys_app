@@ -54,6 +54,9 @@ class TaskModel {
   /// The list of videos.
   final List<VideoModel> videos;
 
+  /// The list of deleted videos.
+  final List<VideoModel> deletedVideos = [];
+
   /// The saved flag.
   bool saved;
 
@@ -203,9 +206,17 @@ class TaskModel {
     saved = false;
   }
 
+  /// Add new video in the list.
   void addVideo(VideoModel video) {
     video.parent = this;
     videos.add(video);
+    makeUnsaved();
+  }
+
+  /// Delete a video from the main list and add in the deleted list.
+  void deleteVideo(VideoModel video) {
+    videos.remove(video);
+    deletedVideos.add(video);
     makeUnsaved();
   }
 
@@ -222,6 +233,8 @@ class TaskModel {
         if (DbModel.geosurveysDb.db.isClosed) {
           await DbModel.geosurveysDb.open();
         }
+
+        /// Task update.
         await DbModel.geosurveysDb.table('task').update(
           update: {
             'completed': completedCheck,
@@ -234,9 +247,17 @@ class TaskModel {
           ),
         );
 
+        /// Point update.
         for (PointModel point in points) {
           await point.comletedUpdate();
         }
+
+        /// Videos delete.
+        for (VideoModel video in deletedVideos) {
+          await video.delete();
+        }
+
+        /// Videos create (created only null-id videos).
         for (VideoModel video in videos) {
           await video.save();
         }

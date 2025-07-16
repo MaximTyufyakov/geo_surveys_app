@@ -8,7 +8,11 @@ class VideoCardWidget extends StatelessWidget {
   VideoCardWidget({
     super.key,
     required VideoModel video,
-  }) : provider = VideoCardViewModel(model: video);
+    required void Function() videosUpd,
+  }) : provider = VideoCardViewModel(
+          model: video,
+          videosUpd: videosUpd,
+        );
 
   final VideoCardViewModel provider;
 
@@ -18,11 +22,24 @@ class VideoCardWidget extends StatelessWidget {
         create: (BuildContext context) => provider,
         child: Consumer<VideoCardViewModel>(
           builder: (context, provider, child) => Card(
-            child: ListTile(
-              title: Text(
-                provider.model.title,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: Text(
+                      provider.model.title,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    provider.delete();
+                  },
+                  icon: const Icon(Icons.delete),
+                  color: Colors.red[400],
+                ),
+              ],
             ),
           ),
         ),

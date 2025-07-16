@@ -15,17 +15,19 @@ class VideosWidget extends StatelessWidget {
   /// Videos ViewModel.
   final VideosViewModel provider;
 
-  /// Video cards.
-  final List<Widget> videoCards = [];
-
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<VideosViewModel>(
         create: (BuildContext context) => provider,
         child: Consumer<VideosViewModel>(
           builder: (context, provider, child) {
+            /// Video cards.
+            final List<Widget> videoCards = [];
             for (VideoModel video in provider.model.videos) {
               videoCards.add(
-                VideoCardWidget(video: video),
+                VideoCardWidget(
+                  video: video,
+                  videosUpd: provider.notifyListeners,
+                ),
               );
             }
             return Column(
@@ -56,7 +58,9 @@ class VideosWidget extends StatelessWidget {
                         provider.videoCreate(context);
                       },
                       icon: const Icon(Icons.add_a_photo),
-                    )
+                      color: Colors.lightGreen[500],
+                      iconSize: 30,
+                    ),
                   ],
                 )
               ],
