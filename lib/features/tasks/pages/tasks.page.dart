@@ -51,7 +51,7 @@ class _TasksPageState extends State<TasksPage> {
               if (snapshot.connectionState == ConnectionState.done) {
                 /// Data from the database is received.
                 if (snapshot.hasData) {
-                  List<Widget> taskCards = [];
+                  final List<Widget> taskCards = [];
                   for (BaseTaskModel task in snapshot.data!.tasks) {
                     taskCards.add(
                       TaskCard(
