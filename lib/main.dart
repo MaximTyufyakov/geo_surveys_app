@@ -82,6 +82,13 @@ class MainApp extends StatelessWidget {
               ),
             ),
           ),
+          checkboxTheme: const CheckboxThemeData(
+            fillColor: WidgetStateProperty.fromMap(
+              <WidgetStatesConstraint, Color?>{
+                WidgetState.selected: _primaryColor,
+              },
+            ),
+          ),
 
           /// Input styles.
           inputDecorationTheme: const InputDecorationTheme(
