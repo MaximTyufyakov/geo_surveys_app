@@ -56,12 +56,12 @@ class PointModel {
   /// Inverse completed field.
   void comletedInverse() {
     completed = !completed;
-    makeUnsaved();
+    _makeUnsaved();
   }
 
   /// Marks the task as unsaved.
   /// Run when widgets change.
-  void makeUnsaved() {
+  void _makeUnsaved() {
     parent.makeUnsaved();
   }
 }

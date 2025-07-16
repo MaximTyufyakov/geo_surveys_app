@@ -18,12 +18,12 @@ class ReportModel {
   /// On report text change.
   void textChange(String actualText) {
     text = actualText;
-    makeUnsaved();
+    _makeUnsaved();
   }
 
   /// Marks the task as unsaved.
   /// Run when widgets change.
-  void makeUnsaved() {
+  void _makeUnsaved() {
     parent.makeUnsaved();
   }
 }
