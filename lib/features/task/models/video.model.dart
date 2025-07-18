@@ -108,7 +108,7 @@ class VideoModel {
       await _deleteFromDB();
       return 'Успешно.';
     } catch (e) {
-      return Future.error(e.toString());
+      return Future.error('Ошибка при удалении видео из локального хранилища.');
     }
   }
 

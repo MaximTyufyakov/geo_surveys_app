@@ -256,8 +256,9 @@ class TaskModel {
         }
 
         /// Videos delete.
-        for (VideoModel video in deletedVideos) {
-          await video.delete();
+        while (deletedVideos.isNotEmpty) {
+          await deletedVideos[0].delete();
+          deletedVideos.removeAt(0);
         }
 
         /// Videos create (created only null-id videos).
