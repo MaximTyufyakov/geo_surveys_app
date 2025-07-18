@@ -27,6 +27,7 @@ class VideosWidget extends StatelessWidget {
                 VideoCardWidget(
                   video: video,
                   videosUpd: provider.notifyListeners,
+                  key: UniqueKey(),
                 ),
               );
             }
