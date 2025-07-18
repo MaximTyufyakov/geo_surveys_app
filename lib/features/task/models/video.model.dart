@@ -38,37 +38,48 @@ class VideoModel {
   Future<String> save() async {
     /// If did not save later.
     if (videoid == null) {
-      await _saveFileLocal();
-
       try {
-        if (DbModel.geosurveysDb.db.isClosed) {
-          await DbModel.geosurveysDb.open();
-        }
-        await DbModel.geosurveysDb.table('video').insert(
-          columns: [
-            'taskid',
-            'title',
-            'url',
-            'path',
-          ],
-          values: [
-            parent.taskid,
-            title,
-            url,
-            file?.path,
-          ],
-        );
+        await _saveFileLocal();
+        await _saveInDB();
         return 'Успешно.';
       } catch (e) {
-        return Future.error('Ошибка при обращении к базе данных.');
+        return Future.error(e.toString());
       }
     } else {
-      return Future.error('Файл уже сохранён.');
+      return 'Файл уже сохранён.';
+    }
+  }
+
+  /// Save video info in database.
+  Future<String> _saveInDB() async {
+    try {
+      if (DbModel.geosurveysDb.db.isClosed) {
+        await DbModel.geosurveysDb.open();
+      }
+
+      String query =
+          'INSERT INTO video (taskid, title, url, path) VALUES (${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)}, ${PostgreSQLFormat.id('title', type: PostgreSQLDataType.varChar)}, ${PostgreSQLFormat.id('url', type: PostgreSQLDataType.text)}, ${PostgreSQLFormat.id('path', type: PostgreSQLDataType.text)}) RETURNING (videoid)';
+      var result = await DbModel.geosurveysDb.query(
+        query,
+        substitutionValues: {
+          'taskid': parent.taskid,
+          'title': title,
+          'url': url,
+          'path': file?.path,
+        },
+      );
+
+      videoid = result[0][0] as int?;
+
+      return 'Успешно.';
+    } catch (e) {
+      return Future.error('Ошибка при обращении к базе данных.');
     }
   }
 
   /// Save video file in local storage.
   Future<String> _saveFileLocal() async {
+    /// Video created.
     if (file != null) {
       final Directory docDir = await getApplicationDocumentsDirectory();
       final Directory videosDir = Directory('${docDir.path}/videos');
@@ -90,12 +101,21 @@ class VideoModel {
     parent.deleteVideo(this);
   }
 
-  // Delete video info from database and file from storage.
+  /// Delete video info from database and file from storage.
   Future<String> delete() async {
-    /// If saved.
-    if (videoid != null) {
-      await _deleteFileLocal();
+    try {
+      await file?.delete();
+      await _deleteFromDB();
+      return 'Успешно.';
+    } catch (e) {
+      return Future.error(e.toString());
+    }
+  }
 
+  /// Delete video info from db.
+  Future<String> _deleteFromDB() async {
+    /// If saved in db.
+    if (videoid != null) {
       try {
         if (DbModel.geosurveysDb.db.isClosed) {
           await DbModel.geosurveysDb.open();
@@ -112,17 +132,7 @@ class VideoModel {
         return Future.error('Ошибка при обращении к базе данных.');
       }
     } else {
-      return Future.error('Файл не сохранён.');
-    }
-  }
-
-  // Delete video file from local storage.
-  Future<String> _deleteFileLocal() async {
-    if (file != null) {
-      await file!.delete();
-      return ('Успешно.');
-    } else {
-      return Future.error('Ошибка. Файл не найден.');
+      return 'Видео нет в базе данных.';
     }
   }
 

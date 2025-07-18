@@ -246,7 +246,10 @@ class TaskModel {
             taskid,
           ),
         );
-
+      } catch (e) {
+        return Future.error('Ошибка при обращении к базе данных.');
+      }
+      try {
         /// Point update.
         for (PointModel point in points) {
           await point.comletedUpdate();
@@ -261,13 +264,13 @@ class TaskModel {
         for (VideoModel video in videos) {
           await video.save();
         }
-        saved = true;
-        return 'Успешно. $checkMessage';
       } catch (e) {
-        return Future.error('Ошибка при обращении к базе данных.');
+        return Future.error(e.toString());
       }
+      saved = true;
+      return 'Успешно. $checkMessage';
     } else {
-      return Future.error('Нет изменений. $checkMessage');
+      return 'Нет изменений. $checkMessage';
     }
   }
 
