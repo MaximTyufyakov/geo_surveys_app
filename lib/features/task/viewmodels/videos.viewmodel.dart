@@ -26,6 +26,7 @@ class VideosViewModel extends ChangeNotifier {
 
   /// Open page with camera and add new video in the list.
   void videoCreate(BuildContext context) async {
+    /// The title does not exist.
     if (newTitleController.text == '') {
       await showDialog<bool>(
         context: context,
@@ -37,19 +38,24 @@ class VideosViewModel extends ChangeNotifier {
         ),
       );
       return;
+
+      /// The title exists.
     } else {
-      final File? video = await Navigator.pushNamed(
+      final File? videoFile = await Navigator.pushNamed(
         context,
         '/video_shoot',
       ) as File?;
-      if (video != null) {
-        model.addVideo(
-          VideoModel(
-              videoid: null,
-              title: newTitleController.text,
-              url: null,
-              file: video),
+
+      /// The video returned.
+      if (videoFile != null) {
+        final VideoModel video = VideoModel(
+          videoid: null,
+          title: newTitleController.text,
+          url: null,
+          file: videoFile,
         );
+        await video.renameFile();
+        model.addVideo(video);
       }
     }
   }

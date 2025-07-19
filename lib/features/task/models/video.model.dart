@@ -39,7 +39,6 @@ class VideoModel {
     /// If did not save later.
     if (videoid == null) {
       try {
-        await _saveFileLocal();
         await _saveInDB();
         return 'Успешно.';
       } catch (e) {
@@ -77,8 +76,8 @@ class VideoModel {
     }
   }
 
-  /// Save video file in local storage.
-  Future<String> _saveFileLocal() async {
+  /// Rename video file and save in docDir.
+  Future<String> renameFile() async {
     /// Video created.
     if (file != null) {
       final Directory docDir = await getApplicationDocumentsDirectory();
@@ -104,11 +103,11 @@ class VideoModel {
   /// Delete video info from database and file from storage.
   Future<String> delete() async {
     try {
-      await file?.delete();
+      await _deleteFileLocal();
       await _deleteFromDB();
       return 'Успешно.';
     } catch (e) {
-      return Future.error('Ошибка при удалении видео из локального хранилища.');
+      return Future.error(e.toString());
     }
   }
 
@@ -132,7 +131,22 @@ class VideoModel {
         return Future.error('Ошибка при обращении к базе данных.');
       }
     } else {
-      return 'Видео нет в базе данных.';
+      return 'Видео уже удалено из базы данных.';
+    }
+  }
+
+  /// Delete video file from local storage.
+  Future<String> _deleteFileLocal() async {
+    if (file != null) {
+      try {
+        await file!.delete();
+        return 'Успешно.';
+      } catch (e) {
+        return Future.error(
+            'Ошибка при удалении видео из локального хранилища.');
+      }
+    } else {
+      return 'Локальный файл уже удалён.';
     }
   }
 
