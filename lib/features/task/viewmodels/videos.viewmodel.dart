@@ -56,6 +56,7 @@ class VideosViewModel extends ChangeNotifier {
         );
         await video.renameFile();
         model.addVideo(video);
+        notifyListeners();
       }
     }
   }
