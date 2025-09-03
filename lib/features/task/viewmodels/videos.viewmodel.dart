@@ -54,7 +54,6 @@ class VideosViewModel extends ChangeNotifier {
           url: null,
           file: videoFile,
         );
-        await video.renameFile();
         model.addVideo(video);
         notifyListeners();
       }
