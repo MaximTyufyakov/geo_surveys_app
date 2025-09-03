@@ -66,7 +66,7 @@ class TaskWidget extends StatelessWidget {
                         color: Theme.of(context).primaryColorDark,
                       ),
                       SelectableText(
-                        '${provider.model.coordinates.latitude}°, ${provider.model.coordinates.longitude}°',
+                        '''${provider.model.coordinates.latitude}°, ${provider.model.coordinates.longitude}°''',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(

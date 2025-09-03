@@ -5,7 +5,7 @@ import 'package:geo_surveys_app/features/task/viewmodels/videos.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/video_card.widget.dart';
 import 'package:provider/provider.dart';
 
-/// A widget with task photos.
+/// A widget with task videos.
 class VideosWidget extends StatelessWidget {
   VideosWidget({
     super.key,

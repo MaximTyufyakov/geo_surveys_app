@@ -18,9 +18,9 @@ class VideoShootPage extends StatelessWidget {
         child: Consumer<VideoShootViewModel>(
           builder: (context, provider, child) => Scaffold(
             backgroundColor: Colors.black,
-            // You must wait until the controller is initialized before displaying
-            // the camera preview. Use a FutureBuilder to display a loading spinner
-            // until the controller has finished initializing.
+            // You must wait until the controller is initialized before
+            // displaying the camera preview. Use a FutureBuilder to display a
+            // loading spinner until the controller has finished initializing.
             body: FutureBuilder<CameraController>(
               future: provider.controller,
               builder: (context, snapshot) {
