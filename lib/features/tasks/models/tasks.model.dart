@@ -1,4 +1,4 @@
-import 'package:geo_surveys_app/common/models/db.model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
@@ -23,12 +23,20 @@ class TasksModel {
   /// Throws a [Future.error] with [String] message if database fails.
   static Future<TasksModel> create(int userid) async {
     try {
-      if (DbModel.geosurveysDb.db.isClosed) {
-        await DbModel.geosurveysDb.open();
+      PostgresDb geosurveysDb = PostgresDb(
+        host: dotenv.env['DB_HOST'] as String,
+        databaseName: dotenv.env['DB_NAME'] as String,
+        username: dotenv.env['DB_USERNAME'] as String,
+        password: dotenv.env['DB_PASSWORD'] as String,
+        queryTimeoutInSeconds:
+            int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
+        timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
+      );
+      if (geosurveysDb.db.isClosed) {
+        await geosurveysDb.open();
       }
 
-      DbResponse utResponse =
-          await DbModel.geosurveysDb.table('user_task').select(
+      DbResponse utResponse = await geosurveysDb.table('user_task').select(
         columns: [
           Column('taskid'),
         ],
@@ -40,7 +48,7 @@ class TasksModel {
       );
       List<BaseTaskModel> tasksList = [];
       for (List<dynamic> d in utResponse.data) {
-        DbResponse tResponse = await DbModel.geosurveysDb.table('task').select(
+        DbResponse tResponse = await geosurveysDb.table('task').select(
           columns: [
             Column('taskid'),
             Column('title'),
