@@ -1,6 +1,8 @@
 import 'dart:io';
-
+import 'package:minio_flutter/io.dart';
+import 'package:minio_flutter/minio.dart';
 import 'package:geo_surveys_app/common/models/db.model.dart';
+import 'package:geo_surveys_app/common/models/s3.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:postgres_dart/postgres_dart.dart';
@@ -39,6 +41,7 @@ class VideoModel {
     /// If did not save later.
     if (videoid == null) {
       try {
+        await _saveFileCloud();
         await _saveInDB();
         return 'Успешно.';
       } catch (e) {
@@ -56,8 +59,14 @@ class VideoModel {
         await DbModel.geosurveysDb.open();
       }
 
-      String query =
-          'INSERT INTO video (taskid, title, url, path) VALUES (${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)}, ${PostgreSQLFormat.id('title', type: PostgreSQLDataType.varChar)}, ${PostgreSQLFormat.id('url', type: PostgreSQLDataType.text)}, ${PostgreSQLFormat.id('path', type: PostgreSQLDataType.text)}) RETURNING (videoid)';
+      String query = '''INSERT INTO video (taskid, title, url, path)
+                        VALUES (
+                          ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)},
+                          ${PostgreSQLFormat.id('title', type: PostgreSQLDataType.varChar)},
+                          ${PostgreSQLFormat.id('url', type: PostgreSQLDataType.text)},
+                          ${PostgreSQLFormat.id('path', type: PostgreSQLDataType.text)}
+                        )
+                        RETURNING (videoid)''';
       var result = await DbModel.geosurveysDb.query(
         query,
         substitutionValues: {
@@ -77,7 +86,7 @@ class VideoModel {
   }
 
   /// Rename video file and save in docDir.
-  Future<String> renameFile() async {
+  Future<String> _saveFileLocal() async {
     /// Video created.
     if (file != null) {
       final Directory docDir = await getApplicationDocumentsDirectory();
@@ -92,12 +101,29 @@ class VideoModel {
     }
   }
 
-  // // Save video file in cloud storage.
-  // Future<String> _saveFileCloud() async {}
+  // Save video file in cloud storage.
+  Future<String> _saveFileCloud() async {
+    if (file != null) {
+      try {
+        final minio = Minio.init(
+          endPoint: S3Model.url,
+          accessKey: S3Model.key,
+          secretKey: S3Model.secretKey,
+          useSSL: true,
+        );
 
-  /// Delete this video from task model.
-  void deleteFromTask() {
-    parent.deleteVideo(this);
+        url = await minio.fPutObject(
+          S3Model.bucketName,
+          '$title.mp4',
+          file!.path,
+        );
+        return ('Успешно.');
+      } catch (e) {
+        return Future.error(e.toString());
+      }
+    } else {
+      return Future.error('Ошибка. Файл не найден.');
+    }
   }
 
   /// Delete video info from database and file from storage.
@@ -150,6 +176,13 @@ class VideoModel {
     }
   }
 
-  // // Delete video file from cloud storage.
-  // Future<String> _deleteFileCloud() async {}
+  // Delete video file from cloud storage.
+  // Future<String> _deleteFileCloud() async {
+
+  // }
+
+  /// Delete this video from task model.
+  void deleteFromTask() {
+    parent.deleteVideo(this);
+  }
 }
