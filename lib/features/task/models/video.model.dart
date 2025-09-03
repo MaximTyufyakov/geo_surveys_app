@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:minio_flutter/io.dart';
 import 'package:minio_flutter/minio.dart';
 import 'package:geo_surveys_app/common/models/db.model.dart';
-import 'package:geo_surveys_app/common/models/s3.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:postgres_dart/postgres_dart.dart';
@@ -106,14 +106,14 @@ class VideoModel {
     if (file != null) {
       try {
         final minio = Minio.init(
-          endPoint: S3Model.url,
-          accessKey: S3Model.key,
-          secretKey: S3Model.secretKey,
+          endPoint: dotenv.env['S3_URL'] as String,
+          accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
+          secretKey: dotenv.env['S3_SECRET_KEY'] as String,
           useSSL: true,
         );
 
         url = await minio.fPutObject(
-          S3Model.bucketName,
+          dotenv.env['S3_BUCKET_NAME'] as String,
           '$title.mp4',
           file!.path,
         );
