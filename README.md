@@ -8,7 +8,7 @@ Uses the MVVM patern and features-first approach.
 
 - S3 (for save videos not in db);
 - Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
-- dotenv file
+- Errors log.
 
 ## Features
 
