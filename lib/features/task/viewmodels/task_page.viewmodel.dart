@@ -17,7 +17,7 @@ class TaskPageViewModel extends ChangeNotifier {
 
   @override
   void dispose() async {
-    /// Delete unsaved videos.
+    /// Delete unsaved in db videos.
     await model.then((value) async {
       for (VideoModel video in value.videos + value.deletedVideos) {
         if (video.videoid == null) {
