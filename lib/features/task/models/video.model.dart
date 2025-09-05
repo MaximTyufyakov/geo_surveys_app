@@ -41,13 +41,14 @@ class VideoModel {
     if (videoid == null) {
       try {
         await _saveFileCloud();
+        await _deleteFileLocal();
         await _saveInDB();
         return 'Успешно.';
       } catch (e) {
         return Future.error(e.toString());
       }
     } else {
-      return 'Файл уже сохранён.';
+      return 'Видео уже сохранено.';
     }
   }
 
@@ -109,35 +110,42 @@ class VideoModel {
     }
   }
 
-  // Save video file in cloud storage.
+  /// Save video file in cloud storage.
   Future<String> _saveFileCloud() async {
-    if (file != null) {
-      try {
-        final minio = Minio.init(
-          endPoint: dotenv.env['S3_URL'] as String,
-          accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
-          secretKey: dotenv.env['S3_SECRET_KEY'] as String,
-          useSSL: true,
-        );
+    /// Not saved in cloud.
+    if (url == null) {
+      /// File exists.
+      if (file != null) {
+        try {
+          final minio = Minio.init(
+            endPoint: dotenv.env['S3_URL'] as String,
+            accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
+            secretKey: dotenv.env['S3_SECRET_KEY'] as String,
+            useSSL: true,
+          );
 
-        url = await minio.fPutObject(
-          dotenv.env['S3_BUCKET_NAME'] as String,
-          '$title.mp4',
-          file!.path,
-        );
-        return ('Успешно.');
-      } catch (e) {
-        return Future.error(e.toString());
+          url = await minio.fPutObject(
+            dotenv.env['S3_BUCKET_NAME'] as String,
+            '$title.mp4',
+            file!.path,
+          );
+
+          return ('Успешно.');
+        } catch (e) {
+          return Future.error('Ошибка при загрузке видео в облако.');
+        }
+      } else {
+        return Future.error('Ошибка. Файл не найден.');
       }
     } else {
-      return Future.error('Ошибка. Файл не найден.');
+      return 'Файл уже сохранён в облаке.';
     }
   }
 
   /// Delete video info from database and file from storage.
   Future<String> delete() async {
     try {
-      await _deleteFileLocal();
+      await _deleteFileCloud();
       await _deleteFromDB();
       return 'Успешно.';
     } catch (e) {
@@ -180,6 +188,7 @@ class VideoModel {
 
   /// Delete video file from local storage.
   Future<String> _deleteFileLocal() async {
+    /// File exists.
     if (file != null) {
       try {
         await file!.delete();
@@ -193,10 +202,32 @@ class VideoModel {
     }
   }
 
-  // Delete video file from cloud storage.
-  // Future<String> _deleteFileCloud() async {
+  /// Delete video file from cloud storage.
+  Future<String> _deleteFileCloud() async {
+    /// The file is saved in cloud.
+    if (url != null) {
+      try {
+        final minio = Minio.init(
+          endPoint: dotenv.env['S3_URL'] as String,
+          accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
+          secretKey: dotenv.env['S3_SECRET_KEY'] as String,
+          useSSL: true,
+        );
 
-  // }
+        await minio.removeObject(
+          dotenv.env['S3_BUCKET_NAME'] as String,
+          '$title.mp4',
+        );
+
+        url = null;
+        return ('Успешно.');
+      } catch (e) {
+        return Future.error('Ошибка при удалении видео из облака.');
+      }
+    } else {
+      return Future.error('Ошибка. Файл не сохранён в облаке.');
+    }
+  }
 
   /// Delete this video from task model.
   void deleteFromTask() {
