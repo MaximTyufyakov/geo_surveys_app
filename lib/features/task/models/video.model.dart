@@ -1,10 +1,10 @@
 import 'dart:io';
+import 'package:aws_s3_api/s3-2006-03-01.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:minio_flutter/io.dart';
-import 'package:minio_flutter/minio.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:postgres_dart/postgres_dart.dart';
+import 'package:uuid/uuid.dart';
 
 /// The video model.
 ///
@@ -52,6 +52,63 @@ class VideoModel {
     }
   }
 
+  /// Save video file in cloud storage.
+  Future<String> _saveFileCloud() async {
+    /// Not saved in cloud.
+    if (url == null) {
+      /// File exists.
+      if (file != null) {
+        try {
+          // S3 init.
+          final s3 = S3(
+            region: dotenv.env['S3_REGION'] as String,
+            endpointUrl: dotenv.env['S3_URL'] as String,
+            credentials: AwsClientCredentials(
+              accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
+              secretKey: dotenv.env['S3_SECRET_KEY'] as String,
+            ),
+          );
+
+          // URL generated.
+          url = '${const Uuid().v4()}.mp4';
+
+          // Loading file.
+          await s3.putObject(
+            bucket: dotenv.env['S3_BUCKET_NAME'] as String,
+            key: url!,
+            body: await file!.readAsBytes(),
+            contentType: 'video/mp4',
+          );
+
+          return ('Успешно.');
+        } catch (e) {
+          url = null;
+          return Future.error('Ошибка при загрузке видео в облако.');
+        }
+      } else {
+        return Future.error('Ошибка. Файл не найден.');
+      }
+    } else {
+      return 'Файл уже сохранён в облаке.';
+    }
+  }
+
+  /// Rename video file, delete from tmpDir and save in docDir.
+  Future<String> _saveFileLocal() async {
+    /// Video created.
+    if (file != null) {
+      final Directory docDir = await getApplicationDocumentsDirectory();
+      final Directory videosDir = Directory('${docDir.path}/videos');
+      await videosDir.create(recursive: true);
+      final String videoPath =
+          '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+      file = await file!.rename(videoPath);
+      return ('Успешно.');
+    } else {
+      return Future.error('Ошибка. Файл не найден.');
+    }
+  }
+
   /// Save video info in database.
   Future<String> _saveInDB() async {
     try {
@@ -94,54 +151,6 @@ class VideoModel {
     }
   }
 
-  /// Rename video file and save in docDir.
-  Future<String> _saveFileLocal() async {
-    /// Video created.
-    if (file != null) {
-      final Directory docDir = await getApplicationDocumentsDirectory();
-      final Directory videosDir = Directory('${docDir.path}/videos');
-      await videosDir.create(recursive: true);
-      final String videoPath =
-          '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
-      file = await file!.rename(videoPath);
-      return ('Успешно.');
-    } else {
-      return Future.error('Ошибка. Файл не найден.');
-    }
-  }
-
-  /// Save video file in cloud storage.
-  Future<String> _saveFileCloud() async {
-    /// Not saved in cloud.
-    if (url == null) {
-      /// File exists.
-      if (file != null) {
-        try {
-          final minio = Minio.init(
-            endPoint: dotenv.env['S3_URL'] as String,
-            accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
-            secretKey: dotenv.env['S3_SECRET_KEY'] as String,
-            useSSL: true,
-          );
-
-          url = await minio.fPutObject(
-            dotenv.env['S3_BUCKET_NAME'] as String,
-            '$title.mp4',
-            file!.path,
-          );
-
-          return ('Успешно.');
-        } catch (e) {
-          return Future.error('Ошибка при загрузке видео в облако.');
-        }
-      } else {
-        return Future.error('Ошибка. Файл не найден.');
-      }
-    } else {
-      return 'Файл уже сохранён в облаке.';
-    }
-  }
-
   /// Delete video info from database and file from storage.
   Future<String> delete() async {
     try {
@@ -150,6 +159,54 @@ class VideoModel {
       return 'Успешно.';
     } catch (e) {
       return Future.error(e.toString());
+    }
+  }
+
+  /// Delete video file from cloud storage.
+  Future<String> _deleteFileCloud() async {
+    /// The file is saved in cloud.
+    if (url != null) {
+      try {
+        // S3 init.
+        final s3 = S3(
+          region: dotenv.env['S3_REGION'] as String,
+          endpointUrl: dotenv.env['S3_URL'] as String,
+          credentials: AwsClientCredentials(
+            accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
+            secretKey: dotenv.env['S3_SECRET_KEY'] as String,
+          ),
+        );
+
+        // Delete file.
+        await s3.deleteObject(
+          bucket: dotenv.env['S3_BUCKET_NAME'] as String,
+          key: url!,
+        );
+
+        url = null;
+        return ('Успешно.');
+      } catch (e) {
+        return Future.error('Ошибка при удалении видео из облака.');
+      }
+    } else {
+      return Future.error('Ошибка. Файл не сохранён в облаке.');
+    }
+  }
+
+  /// Delete video file from local storage.
+  Future<String> _deleteFileLocal() async {
+    /// File exists.
+    if (file != null) {
+      try {
+        await file!.delete();
+        file = null;
+        return 'Успешно.';
+      } catch (e) {
+        return Future.error(
+            'Ошибка при удалении видео из локального хранилища.');
+      }
+    } else {
+      return 'Локальный файл уже удалён.';
     }
   }
 
@@ -183,49 +240,6 @@ class VideoModel {
       }
     } else {
       return 'Видео уже удалено из базы данных.';
-    }
-  }
-
-  /// Delete video file from local storage.
-  Future<String> _deleteFileLocal() async {
-    /// File exists.
-    if (file != null) {
-      try {
-        await file!.delete();
-        return 'Успешно.';
-      } catch (e) {
-        return Future.error(
-            'Ошибка при удалении видео из локального хранилища.');
-      }
-    } else {
-      return 'Локальный файл уже удалён.';
-    }
-  }
-
-  /// Delete video file from cloud storage.
-  Future<String> _deleteFileCloud() async {
-    /// The file is saved in cloud.
-    if (url != null) {
-      try {
-        final minio = Minio.init(
-          endPoint: dotenv.env['S3_URL'] as String,
-          accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
-          secretKey: dotenv.env['S3_SECRET_KEY'] as String,
-          useSSL: true,
-        );
-
-        await minio.removeObject(
-          dotenv.env['S3_BUCKET_NAME'] as String,
-          '$title.mp4',
-        );
-
-        url = null;
-        return ('Успешно.');
-      } catch (e) {
-        return Future.error('Ошибка при удалении видео из облака.');
-      }
-    } else {
-      return Future.error('Ошибка. Файл не сохранён в облаке.');
     }
   }
 
