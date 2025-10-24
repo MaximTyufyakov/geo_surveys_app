@@ -64,6 +64,7 @@ class TasksModel {
           taskid: tResponse.data[0][0] as int,
           title: tResponse.data[0][1] as String,
           completed: tResponse.data[0][2] as bool,
+          userid: userid,
         ));
       }
 

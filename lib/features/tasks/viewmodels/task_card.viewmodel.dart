@@ -18,7 +18,10 @@ class TaskCardViewModel extends ChangeNotifier {
     final bool? completed = await Navigator.pushNamed(
       context,
       '/task',
-      arguments: {'taskid': model.taskid},
+      arguments: {
+        'taskid': model.taskid,
+        'userid': model.userid,
+      },
     ) as bool?;
     model.completedUpdate(completed);
     notifyListeners();

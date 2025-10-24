@@ -65,7 +65,8 @@ class TaskModel {
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  static Future<TaskModel> create({required int taskid}) async {
+  static Future<TaskModel> create(
+      {required int taskid, required int userid}) async {
     try {
       PostgresDb geosurveysDb = PostgresDb(
         host: dotenv.env['DB_HOST'] as String,
@@ -79,6 +80,27 @@ class TaskModel {
       if (geosurveysDb.db.isClosed) {
         await geosurveysDb.open();
       }
+
+      /// User_task check.
+      String query = '''SELECT *
+                          FROM user_task
+                          WHERE userid = 
+                            ${PostgreSQLFormat.id('userid', type: PostgreSQLDataType.bigInteger)} AND
+                                taskid = 
+                            ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)};''';
+      var result = await geosurveysDb.query(
+        query,
+        substitutionValues: {
+          'userid': userid,
+          'taskid': taskid,
+        },
+      );
+
+      // No answer (user_task was deleted).
+      if ((result as List).isEmpty) {
+        throw StateError('Ошибка: нет доступа.');
+      }
+
       DbResponse response = await geosurveysDb.table('task').select(
         columns: [
           Column('taskid'),
@@ -110,6 +132,9 @@ class TaskModel {
 
       return component;
     } catch (e) {
+      if (e is StateError) {
+        return Future.error(e.message);
+      }
       return Future.error('Ошибка при обращении к базе данных.');
     }
   }
@@ -277,7 +302,7 @@ class TaskModel {
                             report = ${PostgreSQLFormat.id('report', type: PostgreSQLDataType.text)}
                           WHERE
                             taskid = ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)}
-                          RETURNING (taskid)''';
+                          RETURNING (taskid);''';
         var result = await geosurveysDb.query(
           query,
           substitutionValues: {

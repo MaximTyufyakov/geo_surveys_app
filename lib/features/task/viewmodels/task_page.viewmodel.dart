@@ -6,14 +6,17 @@ import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
 /// A ViewModel of the task page.
 class TaskPageViewModel extends ChangeNotifier {
-  TaskPageViewModel({required this.taskid})
-      : model = TaskModel.create(taskid: taskid);
+  TaskPageViewModel({required this.taskid, required this.userid})
+      : model = TaskModel.create(taskid: taskid, userid: userid);
 
   /// Model with task.
   final Future<TaskModel> model;
 
   /// Task identifier.
   final int taskid;
+
+  /// User identifier.
+  final int userid;
 
   @override
   void dispose() async {
@@ -105,6 +108,7 @@ class TaskPageViewModel extends ChangeNotifier {
                             '/task',
                             arguments: {
                               'taskid': taskid,
+                              'userid': userid,
                             },
                           )
                         : null;
@@ -118,6 +122,7 @@ class TaskPageViewModel extends ChangeNotifier {
                   '/task',
                   arguments: {
                     'taskid': taskid,
+                    'userid': userid,
                   },
                 )
               : null;
@@ -129,6 +134,7 @@ class TaskPageViewModel extends ChangeNotifier {
                 '/task',
                 arguments: {
                   'taskid': taskid,
+                  'userid': userid,
                 },
               )
             : null;
@@ -140,6 +146,7 @@ class TaskPageViewModel extends ChangeNotifier {
               '/task',
               arguments: {
                 'taskid': taskid,
+                'userid': userid,
               },
             )
           : null;
