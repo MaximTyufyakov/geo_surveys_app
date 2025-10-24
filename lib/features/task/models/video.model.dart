@@ -35,6 +35,16 @@ class VideoModel {
   /// Local video file.
   File? file;
 
+  // S3 init.
+  final _s3 = S3(
+    region: dotenv.env['S3_REGION'] as String,
+    endpointUrl: dotenv.env['S3_URL'] as String,
+    credentials: AwsClientCredentials(
+      accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
+      secretKey: dotenv.env['S3_SECRET_KEY'] as String,
+    ),
+  );
+
   /// Save video info in database and file in storage.
   Future<String> save() async {
     /// If did not save later.
@@ -59,21 +69,11 @@ class VideoModel {
       /// File exists.
       if (file != null) {
         try {
-          // S3 init.
-          final s3 = S3(
-            region: dotenv.env['S3_REGION'] as String,
-            endpointUrl: dotenv.env['S3_URL'] as String,
-            credentials: AwsClientCredentials(
-              accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
-              secretKey: dotenv.env['S3_SECRET_KEY'] as String,
-            ),
-          );
-
           // URL generated.
           url = '${const Uuid().v4()}.mp4';
 
           // Loading file.
-          await s3.putObject(
+          await _s3.putObject(
             bucket: dotenv.env['S3_BUCKET_NAME'] as String,
             key: url!,
             body: await file!.readAsBytes(),
@@ -167,18 +167,8 @@ class VideoModel {
     /// The file is saved in cloud.
     if (url != null) {
       try {
-        // S3 init.
-        final s3 = S3(
-          region: dotenv.env['S3_REGION'] as String,
-          endpointUrl: dotenv.env['S3_URL'] as String,
-          credentials: AwsClientCredentials(
-            accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
-            secretKey: dotenv.env['S3_SECRET_KEY'] as String,
-          ),
-        );
-
         // Delete file.
-        await s3.deleteObject(
+        await _s3.deleteObject(
           bucket: dotenv.env['S3_BUCKET_NAME'] as String,
           key: url!,
         );
