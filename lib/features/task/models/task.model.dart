@@ -37,10 +37,10 @@ class TaskModel {
   final String title;
 
   /// The text task description.
-  final String description;
+  final String? description;
 
   /// The task geographic coordinates.
-  final PgPoint coordinates;
+  final PgPoint? coordinates;
 
   /// The completed flag.
   bool completed;
@@ -99,8 +99,8 @@ class TaskModel {
       TaskModel component = TaskModel._create(
         taskid: response.data[0][0] as int,
         title: response.data[0][1] as String,
-        description: response.data[0][2] as String,
-        coordinates: response.data[0][3] as PgPoint,
+        description: response.data[0][2] as String?,
+        coordinates: response.data[0][3] as PgPoint?,
         completed: response.data[0][4] as bool,
         report: ReportModel(text: response.data[0][5] as String? ?? ''),
         saved: true,
@@ -271,18 +271,29 @@ class TaskModel {
         }
 
         /// Task update.
-        await geosurveysDb.table('task').update(
-          update: {
+        String query = '''UPDATE task
+                          SET 
+                            completed = ${PostgreSQLFormat.id('completed', type: PostgreSQLDataType.boolean)},
+                            report = ${PostgreSQLFormat.id('report', type: PostgreSQLDataType.text)}
+                          WHERE
+                            taskid = ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)}
+                          RETURNING (taskid)''';
+        var result = await geosurveysDb.query(
+          query,
+          substitutionValues: {
             'completed': completedCheck,
             'report': report.text,
+            'taskid': taskid,
           },
-          where: Where(
-            'taskid',
-            WhereOperator.isEqual,
-            taskid,
-          ),
         );
+        // No answer (task was deleted).
+        if ((result as List).isEmpty) {
+          throw StateError('Ошибка: задание удалено.');
+        }
       } catch (e) {
+        if (e is StateError) {
+          return Future.error(e.message);
+        }
         return Future.error('Ошибка при обращении к базе данных.');
       }
       try {
