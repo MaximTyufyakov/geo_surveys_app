@@ -7,6 +7,7 @@ Uses the MVVM patern and features-first approach.
 ## To do
 
 - Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
+- Map.
 - Errors log.
 
 ## Features
