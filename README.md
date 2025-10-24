@@ -8,7 +8,7 @@ Uses the MVVM patern and features-first approach.
 
 - Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
 - Map.
-- Errors log.
+- S3 and DB model to common file.
 
 ## Features
 
@@ -37,7 +37,7 @@ Uses the MVVM patern and features-first approach.
 
   1.  You need to connect your computer and phone to the same network (?);
   2.  Add the line
-      "host all all ip.ip.ip.ip/24 scram-sha-256"
+      "host all all ip.ip.ip.1/24 scram-sha-256"
       to the pg_hba.conf (change the ip);
   3.  Open port 5432 (default);
   4.  Change a host in DbModel (ip.ip.ip.ip).\
