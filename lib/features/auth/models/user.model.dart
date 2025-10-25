@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:bcrypt/bcrypt.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:postgres_dart/postgres_dart.dart';
@@ -65,8 +68,18 @@ class UserModel {
       } else {
         return Future.error('Неверный логин или пароль.');
       }
+    } on PostgreSQLException {
+      return Future.error('Ошибка: запрос к базе данных отклонён.');
+    } on SocketException {
+      return Future.error('Ошибка: нет соеденинения с базой данных.');
+    } on TimeoutException {
+      return Future.error(
+          'Ошибка: время ожидания подключения к базе данных истекло.');
+    } on TypeError {
+      return Future.error(
+          'Ошибка: из базы данных получен неправильный тип данных.');
     } catch (e) {
-      return Future.error('Ошибка при обращении к базе данных.');
+      return Future.error('Неизвестная ошибка при обращении к базе данных.');
     }
   }
 }

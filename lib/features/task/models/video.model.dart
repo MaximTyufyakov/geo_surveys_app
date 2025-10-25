@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:aws_s3_api/s3-2006-03-01.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -146,8 +147,18 @@ class VideoModel {
       videoid = result[0][0] as int?;
 
       return 'Успешно.';
+    } on PostgreSQLException {
+      return Future.error('Ошибка: запрос к базе данных отклонён.');
+    } on SocketException {
+      return Future.error('Ошибка: нет соеденинения с базой данных.');
+    } on TimeoutException {
+      return Future.error(
+          'Ошибка: время ожидания подключения к базе данных истекло.');
+    } on TypeError {
+      return Future.error(
+          'Ошибка: из базы данных получен неправильный тип данных.');
     } catch (e) {
-      return Future.error('Ошибка при обращении к базе данных.');
+      return Future.error('Неизвестная ошибка при обращении к базе данных.');
     }
   }
 
@@ -225,8 +236,15 @@ class VideoModel {
               ),
             );
         return 'Успешно.';
+      } on PostgreSQLException {
+        return Future.error('Ошибка: запрос к базе данных отклонён.');
+      } on SocketException {
+        return Future.error('Ошибка: нет соеденинения с базой данных.');
+      } on TimeoutException {
+        return Future.error(
+            'Ошибка: время ожидания подключения к базе данных истекло.');
       } catch (e) {
-        return Future.error('Ошибка при обращении к базе данных.');
+        return Future.error('Неизвестная ошибка при обращении к базе данных.');
       }
     } else {
       return 'Видео уже удалено из базы данных.';
