@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:aws_s3_api/s3-2006-03-01.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:postgres_dart/postgres_dart.dart';
@@ -113,17 +114,8 @@ class VideoModel {
   /// Save video info in database.
   Future<String> _saveInDB() async {
     try {
-      PostgresDb geosurveysDb = PostgresDb(
-        host: dotenv.env['DB_HOST'] as String,
-        databaseName: dotenv.env['DB_NAME'] as String,
-        username: dotenv.env['DB_USERNAME'] as String,
-        password: dotenv.env['DB_PASSWORD'] as String,
-        queryTimeoutInSeconds:
-            int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-        timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-      );
-      if (geosurveysDb.db.isClosed) {
-        await geosurveysDb.open();
+      if (Databases.geosurveys.db.isClosed) {
+        await Databases.geosurveys.open();
       }
 
       String query = '''INSERT INTO video (taskid, title, url, path)
@@ -134,7 +126,7 @@ class VideoModel {
                           ${PostgreSQLFormat.id('path', type: PostgreSQLDataType.text)}
                         )
                         RETURNING (videoid)''';
-      var result = await geosurveysDb.query(
+      var result = await Databases.geosurveys.query(
         query,
         substitutionValues: {
           'taskid': parent.taskid,
@@ -216,19 +208,10 @@ class VideoModel {
     /// If saved in db.
     if (videoid != null) {
       try {
-        PostgresDb geosurveysDb = PostgresDb(
-          host: dotenv.env['DB_HOST'] as String,
-          databaseName: dotenv.env['DB_NAME'] as String,
-          username: dotenv.env['DB_USERNAME'] as String,
-          password: dotenv.env['DB_PASSWORD'] as String,
-          queryTimeoutInSeconds:
-              int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-          timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-        );
-        if (geosurveysDb.db.isClosed) {
-          await geosurveysDb.open();
+        if (Databases.geosurveys.db.isClosed) {
+          await Databases.geosurveys.open();
         }
-        await geosurveysDb.table('video').delete(
+        await Databases.geosurveys.table('video').delete(
               Where(
                 'videoid',
                 WhereOperator.isEqual,

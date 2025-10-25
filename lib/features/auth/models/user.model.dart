@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bcrypt/bcrypt.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
 /// A model with user data and logic.
@@ -29,19 +29,10 @@ class UserModel {
   /// or incorrect login or password entry.
   static Future<UserModel> tryLogin(String login, String password) async {
     try {
-      PostgresDb geosurveysDb = PostgresDb(
-        host: dotenv.env['DB_HOST'] as String,
-        databaseName: dotenv.env['DB_NAME'] as String,
-        username: dotenv.env['DB_USERNAME'] as String,
-        password: dotenv.env['DB_PASSWORD'] as String,
-        queryTimeoutInSeconds:
-            int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-        timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-      );
-      if (geosurveysDb.db.isClosed) {
-        await geosurveysDb.open();
+      if (Databases.geosurveys.db.isClosed) {
+        await Databases.geosurveys.open();
       }
-      DbResponse response = await geosurveysDb.table('user').select(
+      DbResponse response = await Databases.geosurveys.table('user').select(
         columns: [
           Column('userid'),
           Column('login'),

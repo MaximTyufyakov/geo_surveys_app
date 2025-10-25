@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/report.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
@@ -69,17 +69,8 @@ class TaskModel {
   static Future<TaskModel> create(
       {required int taskid, required int userid}) async {
     try {
-      PostgresDb geosurveysDb = PostgresDb(
-        host: dotenv.env['DB_HOST'] as String,
-        databaseName: dotenv.env['DB_NAME'] as String,
-        username: dotenv.env['DB_USERNAME'] as String,
-        password: dotenv.env['DB_PASSWORD'] as String,
-        queryTimeoutInSeconds:
-            int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-        timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-      );
-      if (geosurveysDb.db.isClosed) {
-        await geosurveysDb.open();
+      if (Databases.geosurveys.db.isClosed) {
+        await Databases.geosurveys.open();
       }
 
       /// User_task check.
@@ -89,7 +80,7 @@ class TaskModel {
                             ${PostgreSQLFormat.id('userid', type: PostgreSQLDataType.bigInteger)} AND
                                 taskid = 
                             ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)};''';
-      var result = await geosurveysDb.query(
+      var result = await Databases.geosurveys.query(
         query,
         substitutionValues: {
           'userid': userid,
@@ -102,7 +93,7 @@ class TaskModel {
         return Future.error('Ошибка: доступ был запрещён.');
       }
 
-      DbResponse response = await geosurveysDb.table('task').select(
+      DbResponse response = await Databases.geosurveys.table('task').select(
         columns: [
           Column('taskid'),
           Column('title'),
@@ -153,19 +144,10 @@ class TaskModel {
   /// Throws a [Future.error] with [String] message if database fails.
   static Future<List<PointModel>> _getPoints({required int taskid}) async {
     try {
-      PostgresDb geosurveysDb = PostgresDb(
-        host: dotenv.env['DB_HOST'] as String,
-        databaseName: dotenv.env['DB_NAME'] as String,
-        username: dotenv.env['DB_USERNAME'] as String,
-        password: dotenv.env['DB_PASSWORD'] as String,
-        queryTimeoutInSeconds:
-            int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-        timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-      );
-      if (geosurveysDb.db.isClosed) {
-        await geosurveysDb.open();
+      if (Databases.geosurveys.db.isClosed) {
+        await Databases.geosurveys.open();
       }
-      DbResponse response = await geosurveysDb.table('point').select(
+      DbResponse response = await Databases.geosurveys.table('point').select(
         columns: [
           Column('pointid'),
           Column('taskid'),
@@ -214,19 +196,10 @@ class TaskModel {
   /// Throws a [Future.error] with [String] message if database fails.
   static Future<List<VideoModel>> _getVideos({required int taskid}) async {
     try {
-      PostgresDb geosurveysDb = PostgresDb(
-        host: dotenv.env['DB_HOST'] as String,
-        databaseName: dotenv.env['DB_NAME'] as String,
-        username: dotenv.env['DB_USERNAME'] as String,
-        password: dotenv.env['DB_PASSWORD'] as String,
-        queryTimeoutInSeconds:
-            int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-        timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-      );
-      if (geosurveysDb.db.isClosed) {
-        await geosurveysDb.open();
+      if (Databases.geosurveys.db.isClosed) {
+        await Databases.geosurveys.open();
       }
-      DbResponse response = await geosurveysDb.table('video').select(
+      DbResponse response = await Databases.geosurveys.table('video').select(
         columns: [
           Column('videoid'),
           Column('taskid'),
@@ -310,17 +283,8 @@ class TaskModel {
     if (!saved) {
       completed = completedCheck;
       try {
-        PostgresDb geosurveysDb = PostgresDb(
-          host: dotenv.env['DB_HOST'] as String,
-          databaseName: dotenv.env['DB_NAME'] as String,
-          username: dotenv.env['DB_USERNAME'] as String,
-          password: dotenv.env['DB_PASSWORD'] as String,
-          queryTimeoutInSeconds:
-              int.parse(dotenv.env['DB_QUERY_TIMEOUT'] as String),
-          timeoutInSeconds: int.parse(dotenv.env['DB_TIMEOUT'] as String),
-        );
-        if (geosurveysDb.db.isClosed) {
-          await geosurveysDb.open();
+        if (Databases.geosurveys.db.isClosed) {
+          await Databases.geosurveys.open();
         }
 
         /// Task update.
@@ -331,7 +295,7 @@ class TaskModel {
                           WHERE
                             taskid = ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)}
                           RETURNING (taskid);''';
-        var result = await geosurveysDb.query(
+        var result = await Databases.geosurveys.query(
           query,
           substitutionValues: {
             'completed': completedCheck,

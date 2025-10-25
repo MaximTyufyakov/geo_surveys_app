@@ -8,7 +8,6 @@ Uses the MVVM patern and features-first approach.
 
 - Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
 - Map.
-- S3 and DB model to common file.
 
 ## Features
 
