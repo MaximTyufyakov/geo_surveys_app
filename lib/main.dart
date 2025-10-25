@@ -20,12 +20,25 @@ class MainApp extends StatelessWidget {
     super.key,
   });
 
+  /// Main Color.
   static const _primaryColor = Colors.deepOrange;
+
+  /// Display text color.
   static const _displayColor = Colors.brown;
+
+  /// Scaffold background color.
   static final _scaffoldColor = _primaryColor[50];
+
+  /// App background color.
   static final _appBarColor = _primaryColor[100];
+
+  /// On element tap color.
   static const _splashColor = Color.fromARGB(121, 177, 139, 103);
+
+  /// Buttons background color.
   static const _buttonBColor = Color.fromARGB(121, 206, 162, 120);
+
+  /// Buttons text and icon color.
   static const _buttonFColor = Colors.black54;
 
   @override

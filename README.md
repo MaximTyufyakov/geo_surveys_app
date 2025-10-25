@@ -27,7 +27,12 @@ Uses the MVVM patern and features-first approach.
 
 - You can view and complete the task on the TaskPage.
 - It has a bottom navigation and three widgets (task, report, videos).
-- It takes you to the TasksPage.
+- It takes you to the TasksPage and VideoShootPage.
+
+### video_shoot
+
+- You can shoot video on this page.
+- It takes you to the TaskPage.
 
 ## Database administration
 
@@ -35,7 +40,7 @@ Uses the MVVM patern and features-first approach.
 
 - For closed network (real device):
 
-  1.  You need to connect your computer and phone to the same network (?);
+  1.  You need to connect your computer and phone to the same network;
   2.  Add the line
       "host all all ip.ip.ip.1/24 scram-sha-256"
       to the pg_hba.conf (change the ip);
