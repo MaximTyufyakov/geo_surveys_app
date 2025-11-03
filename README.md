@@ -9,7 +9,6 @@ Uses the MVVM patern and features-first approach.
 - Local DB (load to the smartphone on demand, try load to the DB e.g. once every hour).
 - Map.
 - REST API for db: backend or BaaS (supabase). (?)
-- postgres_dart -> postrges. (?)
 - RefreshIndicator.
 
 ## Features
