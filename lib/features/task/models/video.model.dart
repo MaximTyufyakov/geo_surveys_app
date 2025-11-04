@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:aws_s3_api/s3-2006-03-01.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:postgres_dart/postgres_dart.dart';
+import 'package:postgres/postgres.dart';
 import 'package:uuid/uuid.dart';
 
 /// The video model.
@@ -114,21 +115,18 @@ class VideoModel {
   /// Save video info in database.
   Future<String> _saveInDB() async {
     try {
-      if (Databases.geosurveys.db.isClosed) {
-        await Databases.geosurveys.open();
-      }
+      final conn = await Connection.open(
+        GeosurveysDB.endpoint,
+        settings: GeosurveysDB.settings,
+      );
 
-      String query = '''INSERT INTO video (taskid, title, url, path)
-                        VALUES (
-                          ${PostgreSQLFormat.id('taskid', type: PostgreSQLDataType.bigInteger)},
-                          ${PostgreSQLFormat.id('title', type: PostgreSQLDataType.varChar)},
-                          ${PostgreSQLFormat.id('url', type: PostgreSQLDataType.text)},
-                          ${PostgreSQLFormat.id('path', type: PostgreSQLDataType.text)}
-                        )
-                        RETURNING (videoid)''';
-      var result = await Databases.geosurveys.query(
-        query,
-        substitutionValues: {
+      Result result = await conn.execute(
+        Sql.named(
+          ''' INSERT INTO video (taskid, title, url, path)
+              VALUES (@taskid, @title, @url, @path)
+              RETURNING (videoid);''',
+        ),
+        parameters: {
           'taskid': parent.taskid,
           'title': title,
           'url': url,
@@ -136,11 +134,11 @@ class VideoModel {
         },
       );
 
+      await conn.close();
+
       videoid = result[0][0] as int?;
 
       return 'Успешно.';
-    } on PostgreSQLException {
-      return Future.error('Ошибка: запрос к базе данных отклонён.');
     } on SocketException {
       return Future.error('Ошибка: нет соеденинения с базой данных.');
     } on TimeoutException {
@@ -150,6 +148,10 @@ class VideoModel {
       return Future.error(
           'Ошибка: из базы данных получен неправильный тип данных.');
     } catch (e) {
+      if (e is ServerException) {
+        log(e.message);
+        return Future.error('Ошибка: запрос к базе данных отклонён.');
+      }
       return Future.error('Неизвестная ошибка при обращении к базе данных.');
     }
   }
@@ -208,25 +210,34 @@ class VideoModel {
     /// If saved in db.
     if (videoid != null) {
       try {
-        if (Databases.geosurveys.db.isClosed) {
-          await Databases.geosurveys.open();
-        }
-        await Databases.geosurveys.table('video').delete(
-              Where(
-                'videoid',
-                WhereOperator.isEqual,
-                videoid!,
-              ),
-            );
+        final conn = await Connection.open(
+          GeosurveysDB.endpoint,
+          settings: GeosurveysDB.settings,
+        );
+
+        await conn.execute(
+          Sql.named(
+            ''' DELETE FROM video
+                WHERE videoid = @videoid;''',
+          ),
+          parameters: {
+            'videoid': videoid,
+          },
+        );
+
+        await conn.close();
+
         return 'Успешно.';
-      } on PostgreSQLException {
-        return Future.error('Ошибка: запрос к базе данных отклонён.');
       } on SocketException {
         return Future.error('Ошибка: нет соеденинения с базой данных.');
       } on TimeoutException {
         return Future.error(
             'Ошибка: время ожидания подключения к базе данных истекло.');
       } catch (e) {
+        if (e is ServerException) {
+          log(e.message);
+          return Future.error('Ошибка: запрос к базе данных отклонён.');
+        }
         return Future.error('Неизвестная ошибка при обращении к базе данных.');
       }
     } else {

@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
-import 'package:postgres_dart/postgres_dart.dart';
+import 'package:postgres/postgres.dart';
 
 /// A model with all tasks.
 ///
@@ -26,50 +27,50 @@ class TasksModel {
   /// Throws a [Future.error] with [String] message if database fails.
   static Future<TasksModel> create(int userid) async {
     try {
-      if (Databases.geosurveys.db.isClosed) {
-        await Databases.geosurveys.open();
-      }
-
-      DbResponse utResponse =
-          await Databases.geosurveys.table('user_task').select(
-        columns: [
-          Column('taskid'),
-        ],
-        where: Where(
-          'userid',
-          WhereOperator.isEqual,
-          userid,
-        ),
+      final conn = await Connection.open(
+        GeosurveysDB.endpoint,
+        settings: GeosurveysDB.settings,
       );
+
+      Result utResponse = await conn.execute(
+        Sql.named(
+          ''' SELECT taskid
+              FROM user_task
+              WHERE userid = @userid;''',
+        ),
+        parameters: {
+          'userid': userid,
+        },
+      );
+
       List<BaseTaskModel> tasksList = [];
-      for (List<dynamic> d in utResponse.data) {
-        DbResponse tResponse = await Databases.geosurveys.table('task').select(
-          columns: [
-            Column('taskid'),
-            Column('title'),
-            Column('completed'),
-          ],
-          where: Where(
-            'taskid',
-            WhereOperator.isEqual,
-            d[0] as int,
+      for (List<dynamic> d in utResponse) {
+        Result tResponse = await conn.execute(
+          Sql.named(
+            ''' SELECT taskid, title, completed
+              FROM task
+              WHERE taskid = @taskid;''',
           ),
+          parameters: {
+            'taskid': d[0] as int,
+          },
         );
+
         tasksList.add(BaseTaskModel(
-          taskid: tResponse.data[0][0] as int,
-          title: tResponse.data[0][1] as String,
-          completed: tResponse.data[0][2] as bool,
+          taskid: tResponse[0][0] as int,
+          title: tResponse[0][1] as String,
+          completed: tResponse[0][2] as bool,
           userid: userid,
         ));
       }
+
+      await conn.close();
 
       TasksModel component = TasksModel._create(
         tasks: tasksList,
       );
 
       return component;
-    } on PostgreSQLException {
-      return Future.error('Ошибка: запрос к базе данных отклонён.');
     } on SocketException {
       return Future.error('Ошибка: нет соеденинения с базой данных.');
     } on TimeoutException {
@@ -79,6 +80,10 @@ class TasksModel {
       return Future.error(
           'Ошибка: из базы данных получен неправильный тип данных.');
     } catch (e) {
+      if (e is ServerException) {
+        log(e.message);
+        return Future.error('Ошибка: запрос к базе данных отклонён.');
+      }
       return Future.error('Неизвестная ошибка при обращении к базе данных.');
     }
   }

@@ -364,26 +364,18 @@ packages:
     dependency: transitive
     description:
       name: pool
-      sha256: "20fe868b6314b322ea036ba325e6fc0711a22948856475e2c2b6306e8ab39c2a"
+      sha256: "978783255c543aa3586a1b3c21f6e9d720eb315376a915872c61ef8b5c20177d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.1"
+    version: "1.5.2"
   postgres:
-    dependency: transitive
-    description:
-      name: postgres
-      sha256: f8e4f14734d096277f77ed5dddefcbc1ce18f8f7db5b7ff4b5dd6df2d9db2730
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.6.4"
-  postgres_dart:
     dependency: "direct main"
     description:
-      name: postgres_dart
-      sha256: "4ef33de611436c7976c28d7122a972f30bf3abd52ba2268bba04e6b85879247f"
+      name: postgres
+      sha256: "013c6dc668eaab9771c4d3f5fc3e87ed4b3cd4ab3587ac6943cc1f38509ff723"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.3"
+    version: "3.5.7"
   provider:
     dependency: "direct main"
     description:
@@ -497,10 +489,10 @@ packages:
     dependency: transitive
     description:
       name: unorm_dart
-      sha256: "8e3870a1caa60bde8352f9597dd3535d8068613269444f8e35ea8925ec84c1f5"
+      sha256: "0c69186b03ca6addab0774bcc0f4f17b88d4ce78d9d4d8f0619e30a99ead58e7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.1+1"
+    version: "0.3.2"
   uuid:
     dependency: "direct main"
     description:

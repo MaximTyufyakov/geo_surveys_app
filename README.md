@@ -10,6 +10,7 @@ Uses the MVVM patern and features-first approach.
 - Map.
 - REST API for db: backend or BaaS (supabase). (?)
 - RefreshIndicator.
+- Video orientation.
 
 ## Features
 

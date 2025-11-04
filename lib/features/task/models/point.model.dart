@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
-import 'package:postgres_dart/postgres_dart.dart';
+import 'package:postgres/postgres.dart';
 
 /// The task point model.
 ///
@@ -37,28 +38,36 @@ class PointModel {
 
   Future<String> comletedUpdate() async {
     try {
-      if (Databases.geosurveys.db.isClosed) {
-        await Databases.geosurveys.open();
-      }
-      await Databases.geosurveys.table('point').update(
-        update: {
-          'completed': completed,
-        },
-        where: Where(
-          'pointid',
-          WhereOperator.isEqual,
-          pointid,
-        ),
+      final conn = await Connection.open(
+        GeosurveysDB.endpoint,
+        settings: GeosurveysDB.settings,
       );
+
+      await conn.execute(
+        Sql.named(
+          ''' UPDATE point
+              SET completed = @completed
+              WHERE pointid = @pointid;''',
+        ),
+        parameters: {
+          'completed': completed,
+          'pointid': pointid,
+        },
+      );
+
+      await conn.close();
+
       return ('Успешно');
-    } on PostgreSQLException {
-      return Future.error('Ошибка: запрос к базе данных отклонён.');
     } on SocketException {
       return Future.error('Ошибка: нет соеденинения с базой данных.');
     } on TimeoutException {
       return Future.error(
           'Ошибка: время ожидания подключения к базе данных истекло.');
     } catch (e) {
+      if (e is ServerException) {
+        log(e.message);
+        return Future.error('Ошибка: запрос к базе данных отклонён.');
+      }
       return Future.error('Неизвестная ошибка при обращении к базе данных.');
     }
   }
