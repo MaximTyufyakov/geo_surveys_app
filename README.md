@@ -68,8 +68,12 @@ Uses the MVVM patern and features-first approach.
   SET password = crypt('password', gen_salt('bf'))
   WHERE login = 'login';
 
-## Build
+## Update
 
+- Flutter SDK upgrade: flutter upgrade
 - Gradle version: android/gradle/wrapper/gradle-wrapper.properties distributionUrl;
-- Gradle plugin version: android/gradle/settings.gradle "dev.flutter.flutter-gradle-plugin" and "com.android.application";
+- Android gradle plugin version: android/gradle/settings.gradle "com.android.application";
 - Kotlin version: android/gradle/build.gradle ext.kotlin_version; android/gradle/settings.gradle "org.jetbrains.kotlin.android"
+- Java version: flutter config --jdk-dir="path/to/jdk"
+- Check compatibility: flutter analyze --suggestions
+- Packages upgrade: flutter pub upgrade
