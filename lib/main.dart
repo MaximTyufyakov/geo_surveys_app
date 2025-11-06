@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
@@ -7,8 +6,6 @@ import 'package:geo_surveys_app/features/video_shoot/pages/video_shoot.page.dart
 
 /// Main entry point to the app.
 void main() async {
-  /// Load dotenv.
-  await dotenv.load(fileName: 'assets/.env');
   runApp(
     const MainApp(),
   );
