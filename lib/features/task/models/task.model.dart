@@ -79,7 +79,7 @@ class TaskModel {
         Sql.named(
           ''' SELECT *
               FROM user_task
-              WHERE userid = @userid AND taskid = @taskid;''',
+              WHERE user_id = @userid AND task_id = @taskid;''',
         ),
         parameters: {
           'userid': userid,
@@ -94,9 +94,9 @@ class TaskModel {
 
       Result response = await conn.execute(
         Sql.named(
-          ''' SELECT taskid, title, description, coordinates, completed, report
+          ''' SELECT task_id, title, description, coordinates, completed, report
               FROM task
-              WHERE taskid = @taskid;''',
+              WHERE task_id = @taskid;''',
         ),
         parameters: {
           'taskid': taskid,
@@ -149,9 +149,9 @@ class TaskModel {
 
       Result response = await conn.execute(
         Sql.named(
-          ''' SELECT pointid, taskid, number, description, completed
+          ''' SELECT point_id, task_id, number, description, completed
               FROM point
-              WHERE taskid = @taskid
+              WHERE task_id = @taskid
               ORDER BY number ASC;''',
         ),
         parameters: {
@@ -201,9 +201,9 @@ class TaskModel {
 
       Result response = await conn.execute(
         Sql.named(
-          ''' SELECT videoid, taskid, title, url, path
+          ''' SELECT video_id, task_id, title, url
               FROM video
-              WHERE taskid = @taskid
+              WHERE task_id = @taskid
               ORDER BY title ASC;''',
         ),
         parameters: {
@@ -219,7 +219,7 @@ class TaskModel {
           videoid: d[0] as int,
           title: d[2] as String,
           url: d[3] as String?,
-          file: (d[4] as String?) == null ? null : File(d[4] as String),
+          file: null,
         ));
       }
       return result;
@@ -291,8 +291,8 @@ class TaskModel {
           Sql.named(
             ''' UPDATE task
                 SET completed = @completed, report = @report
-                WHERE taskid = @taskid
-                RETURNING (taskid);''',
+                WHERE task_id = @taskid
+                RETURNING (task_id);''',
           ),
           parameters: {
             'completed': completedCheck,

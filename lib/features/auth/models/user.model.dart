@@ -36,7 +36,7 @@ class UserModel {
 
       Result response = await conn.execute(
         Sql.named(
-          ''' SELECT userid, login, password
+          ''' SELECT user_id, login, password
               FROM "user"
               WHERE login = @login;''',
         ),
