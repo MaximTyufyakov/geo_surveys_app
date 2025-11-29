@@ -34,9 +34,9 @@ class TasksModel {
 
       Result utResponse = await conn.execute(
         Sql.named(
-          ''' SELECT taskid
+          ''' SELECT task_id
               FROM user_task
-              WHERE userid = @userid;''',
+              WHERE user_id = @userid;''',
         ),
         parameters: {
           'userid': userid,
@@ -47,9 +47,9 @@ class TasksModel {
       for (List<dynamic> d in utResponse) {
         Result tResponse = await conn.execute(
           Sql.named(
-            ''' SELECT taskid, title, completed
+            ''' SELECT task_id, title, completed
               FROM task
-              WHERE taskid = @taskid;''',
+              WHERE task_id = @taskid;''',
           ),
           parameters: {
             'taskid': d[0] as int,

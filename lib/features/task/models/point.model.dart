@@ -47,7 +47,7 @@ class PointModel {
         Sql.named(
           ''' UPDATE point
               SET completed = @completed
-              WHERE pointid = @pointid;''',
+              WHERE point_id = @pointid;''',
         ),
         parameters: {
           'completed': completed,

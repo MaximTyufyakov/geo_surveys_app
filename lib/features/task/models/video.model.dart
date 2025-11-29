@@ -21,7 +21,7 @@ class VideoModel {
     required this.title,
     required this.url,
     required this.file,
-  });
+  }) : _format = file?.path.split('.').last;
 
   /// Parent model.
   late TaskModel parent;
@@ -31,6 +31,9 @@ class VideoModel {
 
   /// The video name.
   String title;
+
+  /// The video format.
+  final String? _format;
 
   /// The video url in cloud.
   String? url;
@@ -73,14 +76,16 @@ class VideoModel {
       if (file != null) {
         try {
           // URL generated.
-          url = '${const Uuid().v4()}.mp4';
+          url = '${const Uuid().v4()}.$_format';
+
+          // String b64 = base64Encode(await file!.readAsBytes());
 
           // Loading file.
           await _s3.putObject(
             bucket: dotenv.env['S3_BUCKET_NAME'] as String,
             key: url!,
             body: await file!.readAsBytes(),
-            contentType: 'video/mp4',
+            contentType: 'video/$_format',
           );
 
           return ('Успешно.');
@@ -104,7 +109,7 @@ class VideoModel {
       final Directory videosDir = Directory('${docDir.path}/videos');
       await videosDir.create(recursive: true);
       final String videoPath =
-          '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4';
+          '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.$_format';
       file = await file!.rename(videoPath);
       return ('Успешно.');
     } else {
@@ -122,15 +127,14 @@ class VideoModel {
 
       Result result = await conn.execute(
         Sql.named(
-          ''' INSERT INTO video (taskid, title, url, path)
-              VALUES (@taskid, @title, @url, @path)
-              RETURNING (videoid);''',
+          ''' INSERT INTO video (task_id, title, url)
+              VALUES (@taskid, @title, @url)
+              RETURNING (video_id);''',
         ),
         parameters: {
           'taskid': parent.taskid,
           'title': title,
           'url': url,
-          'path': file?.path,
         },
       );
 
@@ -218,7 +222,7 @@ class VideoModel {
         await conn.execute(
           Sql.named(
             ''' DELETE FROM video
-                WHERE videoid = @videoid;''',
+                WHERE video_id = @videoid;''',
           ),
           parameters: {
             'videoid': videoid,
