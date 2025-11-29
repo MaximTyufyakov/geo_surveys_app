@@ -78,6 +78,8 @@ class VideoModel {
           // URL generated.
           url = '${const Uuid().v4()}.$_format';
 
+          // String b64 = base64Encode(await file!.readAsBytes());
+
           // Loading file.
           await _s3.putObject(
             bucket: dotenv.env['S3_BUCKET_NAME'] as String,
