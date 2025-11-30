@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:aws_s3_api/s3-2006-03-01.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:postgres/postgres.dart';
@@ -40,16 +38,6 @@ class VideoModel {
 
   /// Local video file.
   File? file;
-
-  // S3 init.
-  final _s3 = S3(
-    region: dotenv.env['S3_REGION'] as String,
-    endpointUrl: dotenv.env['S3_URL'] as String,
-    credentials: AwsClientCredentials(
-      accessKey: dotenv.env['S3_ACCESS_KEY'] as String,
-      secretKey: dotenv.env['S3_SECRET_KEY'] as String,
-    ),
-  );
 
   /// Save video info in database and file in storage.
   Future<String> save() async {

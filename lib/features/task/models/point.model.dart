@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:geo_surveys_app/common/models/databases.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:postgres/postgres.dart';
 
