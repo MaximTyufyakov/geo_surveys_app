@@ -66,9 +66,10 @@ class TaskWidget extends StatelessWidget {
                         color: Theme.of(context).primaryColorDark,
                       ),
                       SelectableText(
-                        provider.model.coordinates != null
-                            ? '''${provider.model.coordinates!.latitude}°, ${provider.model.coordinates!.longitude}°'''
-                            : 'Нет данных.',
+                        '''
+                        ${provider.model.latitude != null ? '${provider.model.latitude}°' : 'Н/Д'}, 
+                        ${provider.model.longitude != null ? '${provider.model.longitude}°' : 'Н/Д'}.
+                        ''',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(

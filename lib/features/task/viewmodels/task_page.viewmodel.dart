@@ -6,8 +6,8 @@ import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
 /// A ViewModel of the task page.
 class TaskPageViewModel extends ChangeNotifier {
-  TaskPageViewModel({required this.taskid, required this.userid})
-      : model = TaskModel.create(taskid: taskid, userid: userid);
+  TaskPageViewModel({required this.taskid})
+      : model = TaskModel.create(taskid: taskid);
 
   /// Model with task.
   final Future<TaskModel> model;
@@ -15,16 +15,13 @@ class TaskPageViewModel extends ChangeNotifier {
   /// Task identifier.
   final int taskid;
 
-  /// User identifier.
-  final int userid;
-
   @override
   void dispose() async {
     /// Delete unsaved in db videos.
     await model.then((value) async {
       for (VideoModel video in value.videos + value.deletedVideos) {
         if (video.videoid == null) {
-          await video.delete();
+          await video.deleteFileLocal();
         }
       }
     }).catchError((err) {});
@@ -108,7 +105,6 @@ class TaskPageViewModel extends ChangeNotifier {
                             '/task',
                             arguments: {
                               'taskid': taskid,
-                              'userid': userid,
                             },
                           )
                         : null;
@@ -122,7 +118,6 @@ class TaskPageViewModel extends ChangeNotifier {
                   '/task',
                   arguments: {
                     'taskid': taskid,
-                    'userid': userid,
                   },
                 )
               : null;
@@ -134,7 +129,6 @@ class TaskPageViewModel extends ChangeNotifier {
                 '/task',
                 arguments: {
                   'taskid': taskid,
-                  'userid': userid,
                 },
               )
             : null;
@@ -146,7 +140,6 @@ class TaskPageViewModel extends ChangeNotifier {
               '/task',
               arguments: {
                 'taskid': taskid,
-                'userid': userid,
               },
             )
           : null;

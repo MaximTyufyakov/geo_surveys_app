@@ -45,6 +45,10 @@ class TasksModel {
           tasks: tasksList,
         );
 
+        // Forbidden
+      } else if (response.statusCode == 403) {
+        return Future.error('Нет доступа.');
+
         // Error.
       } else {
         return Future.error('Ошибка при обращении к серверу.');

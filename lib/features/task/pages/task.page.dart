@@ -43,7 +43,6 @@ class _TaskPageState extends State<TaskPage> {
     return ChangeNotifierProvider<TaskPageViewModel>(
       create: (BuildContext context) => TaskPageViewModel(
         taskid: _arguments['taskid'] as int,
-        userid: _arguments['userid'] as int,
       ),
       child: Consumer<TaskPageViewModel>(
         builder: (context, provider, child) => Scaffold(

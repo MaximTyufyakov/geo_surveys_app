@@ -51,7 +51,6 @@ class VideosViewModel extends ChangeNotifier {
         final VideoModel video = VideoModel(
           videoid: null,
           title: newTitleController.text,
-          url: null,
           file: videoFile,
         );
         model.addVideo(video);
