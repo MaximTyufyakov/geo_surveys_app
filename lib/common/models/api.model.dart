@@ -1,31 +1,16 @@
 import 'package:dio/dio.dart';
 
+/// Model for work with API.
 class ApiModel {
-  final dio = Dio(
+  // Dio with default options.
+  static final dio = Dio(
     BaseOptions(
-      baseUrl: const String.fromEnvironment(
-        'SOME_VAR',
-      ),
-      connectTimeout: Duration(seconds: 5),
-      receiveTimeout: Duration(seconds: 3),
+      baseUrl: const String.fromEnvironment('API_URL'),
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {
+        'Authorization': '',
+      },
     ),
-  ); // With default `Options`.
-
-  void configureDio() {
-    // Set default configs
-    dio.options.baseUrl = 'https://api.pub.dev';
-    dio.options.connectTimeout = Duration(seconds: 5);
-    dio.options.receiveTimeout = Duration(seconds: 3);
-
-    // Or create `Dio` with a `BaseOptions` instance.
-    final options = BaseOptions(
-      baseUrl: 'https://api.pub.dev',
-      connectTimeout: Duration(seconds: 5),
-      receiveTimeout: Duration(seconds: 3),
-    );
-    final anotherDio = Dio(options);
-
-    // Or clone the existing `Dio` instance with all fields.
-    final clonedDio = dio.clone();
-  }
+  );
 }

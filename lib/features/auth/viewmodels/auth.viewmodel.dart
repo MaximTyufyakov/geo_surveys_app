@@ -19,10 +19,7 @@ class AuthViewModel extends ChangeNotifier {
   final passwordController = TextEditingController();
 
   /// User model.
-  late Future<UserModel> model = Future.value(UserModel(
-    login: '',
-    userid: 0,
-  ));
+  late Future<UserModel> model = Future.value(UserModel());
 
   /// Check login and password.
   void tryLogin() async {
@@ -45,9 +42,6 @@ class AuthViewModel extends ChangeNotifier {
           await Navigator.pushNamed(
             context,
             '/tasks',
-            arguments: {
-              'userid': value.userid,
-            },
           );
         }
       },
