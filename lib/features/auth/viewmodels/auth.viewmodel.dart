@@ -23,7 +23,7 @@ class AuthViewModel extends ChangeNotifier {
 
   /// Check login and password.
   void tryLogin() async {
-    /// Database query and check.
+    // Password check.
     model = UserModel.tryLogin(
       loginController.text,
       passwordController.text,
@@ -31,14 +31,15 @@ class AuthViewModel extends ChangeNotifier {
 
     notifyListeners();
 
+    // Ok.
     await model.then(
       (value) async {
         if (context.mounted) {
-          /// Reset password and login
+          // Reset password and login
           loginController.text = '';
           passwordController.text = '';
 
-          /// Open new page.
+          // Open new page.
           await Navigator.pushNamed(
             context,
             '/tasks',

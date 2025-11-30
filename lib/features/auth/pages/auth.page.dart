@@ -22,7 +22,7 @@ class _AuthPageState extends State<AuthPage> {
             body: Padding(
               padding: const EdgeInsets.all(8),
               child: Center(
-                /// Form width.
+                // Form width.
                 child: SizedBox(
                   width: 300.0,
                   child: Column(
@@ -37,7 +37,7 @@ class _AuthPageState extends State<AuthPage> {
                         height: 30,
                       ),
 
-                      /// Login.
+                      // Login.
                       TextField(
                         decoration: const InputDecoration(hintText: 'Логин'),
                         controller: provider.loginController,
@@ -46,14 +46,14 @@ class _AuthPageState extends State<AuthPage> {
                         height: 5,
                       ),
 
-                      /// Password.
+                      // Password.
                       TextField(
                         controller: provider.passwordController,
                         obscureText: !passwordVisible,
                         decoration: InputDecoration(
                           hintText: 'Пароль',
 
-                          /// Display and hide the password.
+                          // Display and hide the password.
                           suffixIcon: IconButton(
                             icon: Icon(passwordVisible
                                 ? Icons.visibility_off
@@ -85,11 +85,11 @@ class _AuthPageState extends State<AuthPage> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
-                            /// Ok.
+                            // Ok.
                             if (snapshot.hasData) {
                               return const Text('');
 
-                              /// Error.
+                              // Error.
                             } else if (snapshot.hasError) {
                               return Text(
                                 '${snapshot.error}',
@@ -104,7 +104,7 @@ class _AuthPageState extends State<AuthPage> {
                             }
                           }
 
-                          /// Loading.
+                          // Loading.
                           return const CircularProgressIndicator();
                         },
                       ),
