@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-
-import 'package:geo_surveys_app/common/models/databases.model.dart';
+import 'package:dio/dio.dart';
+import 'package:geo_surveys_app/common/models/api.model.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
-import 'package:postgres/postgres.dart';
 
 /// A model with all tasks.
 ///
@@ -21,56 +19,36 @@ class TasksModel {
   /// Public factory.
   /// Retrieves all tasks from the database.
   ///
-  /// The [userid] parameter is the user ID.
-  ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  static Future<TasksModel> create(int userid) async {
+  static Future<TasksModel> create() async {
     try {
-      final conn = await Connection.open(
-        GeosurveysDB.endpoint,
-        settings: GeosurveysDB.settings,
+      // Api response.
+      Response<Map<String, String>> response = await ApiModel.dio.get(
+        '/tasks/all',
       );
 
-      Result utResponse = await conn.execute(
-        Sql.named(
-          ''' SELECT task_id
-              FROM user_task
-              WHERE user_id = @userid;''',
-        ),
-        parameters: {
-          'userid': userid,
-        },
-      );
+      // Ok.
+      if (response.statusCode == 200) {
+        // Create list.
+        List<BaseTaskModel> tasksList = [];
+        for (Map<String, String> task
+            in response.data!['tasks'] as List<Map<String, String>>) {
+          tasksList.add(BaseTaskModel(
+            taskid: task['task_id'] as int,
+            title: task['title'] as String,
+            completed: task['completed'] as bool,
+          ));
+        }
 
-      List<BaseTaskModel> tasksList = [];
-      for (List<dynamic> d in utResponse) {
-        Result tResponse = await conn.execute(
-          Sql.named(
-            ''' SELECT task_id, title, completed
-              FROM task
-              WHERE task_id = @taskid;''',
-          ),
-          parameters: {
-            'taskid': d[0] as int,
-          },
+        return TasksModel._create(
+          tasks: tasksList,
         );
 
-        tasksList.add(BaseTaskModel(
-          taskid: tResponse[0][0] as int,
-          title: tResponse[0][1] as String,
-          completed: tResponse[0][2] as bool,
-          userid: userid,
-        ));
+        // Error.
+      } else {
+        return Future.error('Ошибка при обращении к серверу.');
       }
-
-      await conn.close();
-
-      TasksModel component = TasksModel._create(
-        tasks: tasksList,
-      );
-
-      return component;
     } on SocketException {
       return Future.error('Ошибка: нет соеденинения с базой данных.');
     } on TimeoutException {
@@ -80,10 +58,6 @@ class TasksModel {
       return Future.error(
           'Ошибка: из базы данных получен неправильный тип данных.');
     } catch (e) {
-      if (e is ServerException) {
-        log(e.message);
-        return Future.error('Ошибка: запрос к базе данных отклонён.');
-      }
       return Future.error('Неизвестная ошибка при обращении к базе данных.');
     }
   }

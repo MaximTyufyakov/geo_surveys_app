@@ -8,7 +8,6 @@ class BaseTaskModel {
     required this.taskid,
     required this.title,
     required this.completed,
-    required this.userid,
   });
 
   /// The task identifier.
@@ -19,9 +18,6 @@ class BaseTaskModel {
 
   /// The completed flag.
   bool completed;
-
-  /// The user identifier.
-  int userid;
 
   /// Update completed flag if it is not null.
   ///

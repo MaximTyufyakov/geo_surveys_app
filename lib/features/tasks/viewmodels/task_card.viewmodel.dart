@@ -20,7 +20,6 @@ class TaskCardViewModel extends ChangeNotifier {
       '/task',
       arguments: {
         'taskid': model.taskid,
-        'userid': model.userid,
       },
     ) as bool?;
     model.completedUpdate(completed);
