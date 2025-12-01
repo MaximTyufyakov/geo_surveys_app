@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/models/api.model.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
@@ -24,45 +23,36 @@ class TasksModel {
   static Future<TasksModel> create() async {
     try {
       // Api response.
-      Response<Map<String, String>> response = await ApiModel.dio.get(
+      Response<Map<String, dynamic>> response = await ApiModel.dio.get(
         '/tasks/all',
+        options: Options(
+          validateStatus: (status) => status == 200 || status == 403,
+        ),
       );
 
-      // Ok.
-      if (response.statusCode == 200) {
-        // Create list.
-        List<BaseTaskModel> tasksList = [];
-        for (Map<String, String> task
-            in response.data!['tasks'] as List<Map<String, String>>) {
-          tasksList.add(BaseTaskModel(
-            taskid: task['task_id'] as int,
-            title: task['title'] as String,
-            completed: task['completed'] as bool,
-          ));
-        }
-
-        return TasksModel._create(
-          tasks: tasksList,
-        );
+      switch (response.statusCode) {
+        // Ok.
+        case 200:
+          // Create list.
+          return TasksModel._create(
+            tasks: (response.data!['tasks'] as List<dynamic>)
+                .map((task) => BaseTaskModel(
+                      taskid: task['task_id'] as int,
+                      title: task['title'] as String,
+                      completed: task['completed'] as bool,
+                    ))
+                .toList(),
+          );
 
         // Forbidden
-      } else if (response.statusCode == 403) {
-        return Future.error('Нет доступа.');
+        case 403:
+          return Future.error('Нет доступа.');
 
-        // Error.
-      } else {
-        return Future.error('Ошибка при обращении к серверу.');
+        default:
+          return Future.error('Ошибка при обращении к серверу.');
       }
-    } on SocketException {
-      return Future.error('Ошибка: нет соеденинения с базой данных.');
-    } on TimeoutException {
-      return Future.error(
-          'Ошибка: время ожидания подключения к базе данных истекло.');
-    } on TypeError {
-      return Future.error(
-          'Ошибка: из базы данных получен неправильный тип данных.');
-    } catch (e) {
-      return Future.error('Неизвестная ошибка при обращении к базе данных.');
+    } on DioException {
+      return Future.error('Не удаётся получить данные с сервера.');
     }
   }
 }
