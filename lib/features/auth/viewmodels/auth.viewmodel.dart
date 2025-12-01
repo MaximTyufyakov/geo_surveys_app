@@ -19,15 +19,20 @@ class AuthViewModel extends ChangeNotifier {
   final passwordController = TextEditingController();
 
   /// User model.
-  late Future<UserModel> model = Future.value(UserModel());
+  Future<UserModel> model = Future.value(UserModel());
 
   /// Check login and password.
   void tryLogin() async {
-    // Password check.
-    model = UserModel.tryLogin(
-      loginController.text,
-      passwordController.text,
-    );
+    // Empty check.
+    if (loginController.text.isEmpty || passwordController.text.isEmpty) {
+      model = Future.error('Введите логин и пароль.');
+    } else {
+      // Login and password check.
+      model = UserModel.tryLogin(
+        loginController.text,
+        passwordController.text,
+      );
+    }
 
     notifyListeners();
 
