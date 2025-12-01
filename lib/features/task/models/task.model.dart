@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/models/api.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
@@ -71,32 +70,27 @@ class TaskModel {
   static Future<TaskModel> create({required int taskid}) async {
     try {
       // Api response.
-      Response<Map<String, String>> response = await ApiModel.dio.get(
+      Response<Map<String, dynamic>> response = await ApiModel.dio.get(
         '/tasks/$taskid',
+        options: Options(
+          validateStatus: (status) => status == 200 || status == 403,
+        ),
       );
 
-      // Ok.
-      if (response.statusCode == 200) {
-        return parseTask(response);
+      switch (response.statusCode) {
+        // Ok.
+        case 200:
+          return parseTask(response);
 
         // Forbidden
-      } else if (response.statusCode == 403) {
-        return Future.error('Нет доступа.');
+        case 403:
+          return Future.error('Нет доступа.');
 
-        // Error.
-      } else {
-        return Future.error('Ошибка при обращении к серверу.');
+        default:
+          return Future.error('Ошибка при обращении к серверу.');
       }
-    } on SocketException {
-      return Future.error('Ошибка: нет соеденинения с базой данных.');
-    } on TimeoutException {
-      return Future.error(
-          'Ошибка: время ожидания подключения к базе данных истекло.');
-    } on TypeError {
-      return Future.error(
-          'Ошибка: из базы данных получен неправильный тип данных.');
-    } catch (e) {
-      return Future.error('Неизвестная ошибка при обращении к базе данных.');
+    } on DioException {
+      return Future.error('Не удаётся получить данные с сервера.');
     }
   }
 
@@ -104,21 +98,21 @@ class TaskModel {
   ///
   /// The [response] parameter is the task response.
   /// Returns a [TaskModel].
-  static TaskModel parseTask(Response<Map<String, String>> response) {
-    Map<String, String> taskResponse =
-        response.data!['task'] as Map<String, String>;
+  static TaskModel parseTask(Response<Map<String, dynamic>> response) {
+    Map<String, dynamic> taskResponse =
+        response.data!['task'] as Map<String, dynamic>;
 
     // Create task model.
     TaskModel component = TaskModel._create(
       taskid: taskResponse['task_id'] as int,
       title: taskResponse['title'] as String,
-      description: taskResponse['description'],
+      description: taskResponse['description'] as String?,
       latitude: taskResponse['latitude'] as double?,
       longitude: taskResponse['longitude'] as double?,
       completed: taskResponse['completed'] as bool,
-      report: ReportModel(text: taskResponse['report'] ?? ''),
+      report: ReportModel(text: taskResponse['report'] as String? ?? ''),
       saved: true,
-      points: (taskResponse['points'] as List<Map<String, String>>)
+      points: (response.data!['points'] as List<dynamic>)
           .map((pointResponse) => PointModel(
                 pointid: pointResponse['point_id'] as int,
                 number: pointResponse['number'] as int,
@@ -126,7 +120,7 @@ class TaskModel {
                 completed: pointResponse['completed'] as bool,
               ))
           .toList(),
-      videos: (taskResponse['videos'] as List<Map<String, String>>)
+      videos: (response.data!['videos'] as List<dynamic>)
           .map((videoResponse) => VideoModel(
                 videoid: videoResponse['video_id'] as int,
                 title: videoResponse['title'] as String,
@@ -174,11 +168,11 @@ class TaskModel {
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails or
   /// no update.
-  Future<String> save() async {
+  Future<TaskModel> save() async {
     if (!saved) {
       try {
         // Api response.
-        Response<Map<String, String>> response = await ApiModel.dio.put(
+        Response<Map<String, dynamic>> response = await ApiModel.dio.put(
           '/tasks/save',
           data: {
             'task_id': taskid,
@@ -193,9 +187,9 @@ class TaskModel {
             // Videos with file.
             'createdVideos': videos
                 .where((video) => video.file != null)
-                .map((video) async => {
-                      'title': video,
-                      'file': base64Encode(await video.file!.readAsBytes()),
+                .map((video) => {
+                      'title': video.title,
+                      'file': base64Encode(video.file!.readAsBytesSync()),
                       'format': video.format
                     })
                 .toList(),
@@ -203,43 +197,42 @@ class TaskModel {
             'deletedVideos':
                 deletedVideos.map((video) => video.videoid).toList(),
           },
+          options: Options(
+            validateStatus: (status) => status == 201 || status == 403,
+          ),
         );
 
-        // Clean deletedVideos list.
-        deletedVideos.clear();
-
-        // Ok.
-        if (response.statusCode == 200) {
-          return 'Успешно. ${_completedCheck().$2}';
+        switch (response.statusCode) {
+          // Update.
+          case 201:
+            // Clean deletedVideos list.
+            deletedVideos.clear();
+            // Delete local saved videos.
+            for (VideoModel video
+                in videos.where((video) => video.file != null).toList()) {
+              await video.deleteFileLocal();
+            }
+            return parseTask(response);
 
           // Forbidden
-        } else if (response.statusCode == 403) {
-          return Future.error('Нет доступа.');
+          case 403:
+            return Future.error('Нет доступа.');
 
-          // Error.
-        } else {
-          return Future.error('Ошибка при обращении к серверу.');
+          default:
+            return Future.error('Ошибка при обращении к серверу.');
         }
-      } on SocketException {
-        return Future.error('Ошибка: нет соеденинения с базой данных.');
-      } on TimeoutException {
-        return Future.error(
-            'Ошибка: время ожидания подключения к базе данных истекло.');
-      } on TypeError {
-        return Future.error(
-            'Ошибка: из базы данных получен неправильный тип данных.');
-      } catch (e) {
-        return Future.error('Неизвестная ошибка при обращении к базе данных.');
+      } on DioException {
+        return Future.error('Не удаётся получить данные с сервера.');
       }
     } else {
-      return 'Нет изменений. ${_completedCheck().$2}';
+      return Future.error('Нет изменений. ${completedCheck().$2}');
     }
   }
 
   /// Check task completed (all points completed, add video).
   ///
   /// Returns a true if task completed else false and message.
-  (bool, String) _completedCheck() {
+  (bool, String) completedCheck() {
     for (PointModel point in points) {
       if (!point.completed) {
         return (false, 'Для завершения задания окончите все пункты.');

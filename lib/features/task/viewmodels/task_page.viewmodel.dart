@@ -10,7 +10,7 @@ class TaskPageViewModel extends ChangeNotifier {
       : model = TaskModel.create(taskid: taskid);
 
   /// Model with task.
-  final Future<TaskModel> model;
+  Future<TaskModel> model;
 
   /// Task identifier.
   final int taskid;
@@ -152,9 +152,11 @@ class TaskPageViewModel extends ChangeNotifier {
       context: context,
       builder: (context) => FutureDialog(
         futureContent: model.then(
-          (value) => value.save().then(
-                Text.new,
-              ),
+          (value) => value.save().then((newTask) {
+            // Updated task from api.
+            model = Future.value(newTask);
+            return Text('Успешно. ${newTask.completedCheck().$2}');
+          }).catchError((Object err) => Text(err.toString())),
         ),
         title: 'Сохранение',
         greenTitle: 'Ок',
