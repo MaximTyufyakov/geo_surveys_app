@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/models/api.model.dart';
 
@@ -14,38 +13,33 @@ class UserModel {
   static Future<UserModel> tryLogin(String login, String password) async {
     try {
       // Api response.
-      Response<Map<String, String>> response = await ApiModel.dio.post(
+      Response<Map<String, dynamic>> response = await ApiModel.dio.post(
         '/users/auth',
         data: {
           'login': login,
           'password': password,
         },
+        options: Options(
+          validateStatus: (status) => status == 201 || status == 401,
+        ),
       );
 
-      // Token create.
-      if (response.statusCode == 201) {
-        ApiModel.dio.options.headers['Authorization'] =
-            'Bearer ${response.data!['token']}';
-        return UserModel();
+      switch (response.statusCode) {
+        // Token create.
+        case 201:
+          ApiModel.dio.options.headers['Authorization'] =
+              'Bearer ${response.data!['token']}';
+          return UserModel();
 
         // Unauthorized.
-      } else if (response.statusCode == 401) {
-        return Future.error('Неверный логин или пароль.');
+        case 401:
+          return Future.error('Неверный логин или пароль.');
 
-        // Another error.
-      } else {
-        return Future.error('Ошибка при обращении к серверу.');
+        default:
+          return Future.error('Ошибка при обращении к серверу.');
       }
-    } on SocketException {
-      return Future.error('Ошибка: нет соеденинения с базой данных.');
-    } on TimeoutException {
-      return Future.error(
-          'Ошибка: время ожидания подключения к базе данных истекло.');
-    } on TypeError {
-      return Future.error(
-          'Ошибка: из базы данных получен неправильный тип данных.');
-    } catch (e) {
-      return Future.error('Неизвестная ошибка при обращении к базе данных.');
+    } on DioException {
+      return Future.error('Не удаётся получить данные с сервера.');
     }
   }
 }
