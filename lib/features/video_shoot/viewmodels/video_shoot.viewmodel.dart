@@ -29,16 +29,6 @@ class VideoShootViewModel extends ChangeNotifier {
     }
   }
 
-  /// ViewModel dispose.
-  @override
-  void dispose() async {
-    // Dispose of the controller when the widget is disposed.
-    await controller.then((value) {
-      value.dispose();
-    }).catchError((err) {});
-    super.dispose();
-  }
-
   /// Opens a page with information about task.
   void exit(File video, BuildContext context) {
     Navigator.pop(
