@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/task_card.viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -7,21 +8,28 @@ import 'package:provider/provider.dart';
 ///
 /// The [provider] parameter is the task card ViewModel.
 class TaskCard extends StatelessWidget {
-  TaskCard({super.key, required BaseTaskModel task})
-      : provider = TaskCardViewModel(model: task);
+  const TaskCard({super.key, required this.task});
 
-  final TaskCardViewModel provider;
+  final BaseTaskModel task;
 
   @override
   Widget build(BuildContext context) =>
       ChangeNotifierProvider<TaskCardViewModel>(
-        create: (BuildContext context) => provider,
+        create: (BuildContext context) => TaskCardViewModel(
+            model: task,
+            openTaskPage: () async => await Navigator.of(context).push(
+                  MaterialPageRoute<TaskPage>(
+                    builder: (context) => TaskPage(
+                      taskid: task.taskid,
+                    ),
+                  ),
+                ) as bool?),
         child: Consumer<TaskCardViewModel>(
           builder: (context, provider, child) => Card(
             /// To click.
             child: InkWell(
               onTap: () async {
-                provider.openTask(context);
+                provider.openTask();
               },
 
               /// Content.

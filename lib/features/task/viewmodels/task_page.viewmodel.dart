@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
-import 'package:geo_surveys_app/common/widgets/dialogs/unsaved_dialog.widget.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
 /// A ViewModel of the task page.
 class TaskPageViewModel extends ChangeNotifier {
-  TaskPageViewModel({required this.taskid})
-      : model = TaskModel.create(taskid: taskid);
+  TaskPageViewModel({
+    required this.taskid,
+    required this.unsavedDialog,
+    required this.goBack,
+    required this.saveDialog,
+    required this.reopenTask,
+  }) : model = TaskModel.create(taskid: taskid);
 
   /// Model with task.
   Future<TaskModel> model;
 
   /// Task identifier.
   final int taskid;
+
+  /// Show unsaved dialog.
+  final ValueGetter<Future<bool?>> unsavedDialog;
+
+  /// Go to previous page.
+  final ValueSetter<bool?> goBack;
+
+  /// Show saving dialog.
+  final ValueSetter<Future<List<String>>> saveDialog;
+
+  /// Reload page.
+  final ValueSetter<int> reopenTask;
 
   @override
   void dispose() async {
@@ -29,138 +44,66 @@ class TaskPageViewModel extends ChangeNotifier {
   }
 
   /// Exit to previous page.
-  void exit(BuildContext context) async {
+  void exit() async {
     await model.then((value) async {
       if (!value.saved) {
-        bool? ret = context.mounted
-            ? await showDialog<bool>(
-                context: context,
-                builder: (context) => UnsavedDialog(),
-              )
-            : null;
+        bool? ret = await unsavedDialog();
 
         /// Save = true;
         /// Unsave = false;
         /// Close = null.
         if (ret == true) {
-          context.mounted
-              ? await save(context).then((sValue) {
-                  if (value.saved) {
-                    context.mounted
-                        ? Navigator.pop(
-                            context,
-                            value.completed,
-                          )
-                        : null;
-                  }
-                })
-              : null;
+          await save().then((sValue) {
+            if (value.saved) {
+              goBack(value.completed);
+            }
+          });
         } else if (ret == false) {
-          context.mounted
-              ? Navigator.pop(
-                  context,
-                  value.completed,
-                )
-              : null;
+          goBack(value.completed);
         }
       } else {
-        context.mounted
-            ? Navigator.pop(
-                context,
-                value.completed,
-              )
-            : null;
+        goBack(value.completed);
       }
     }).catchError((err) {
-      context.mounted
-          ? Navigator.pop(
-              context,
-              null,
-            )
-          : null;
+      goBack(null);
     });
   }
 
   /// Reload the task page if the model is saved.
-  void reloadPage(BuildContext context) async {
+  void reloadPage() async {
     await model.then((value) async {
       if (!value.saved) {
-        bool? ret = context.mounted
-            ? await showDialog<bool>(
-                context: context,
-                builder: (context) => UnsavedDialog(),
-              )
-            : null;
+        bool? ret = await unsavedDialog();
 
         /// Save = true;
         /// Unsave = false;
         /// Close = null.
         if (ret == true) {
-          context.mounted
-              ? await save(context).then((sValue) async {
-                  if (value.saved) {
-                    context.mounted
-                        ? await Navigator.popAndPushNamed(
-                            context,
-                            '/task',
-                            arguments: {
-                              'taskid': taskid,
-                            },
-                          )
-                        : null;
-                  }
-                })
-              : null;
+          await save().then((sValue) async {
+            if (value.saved) {
+              reopenTask(taskid);
+            }
+          });
         } else if (ret == false) {
-          context.mounted
-              ? await Navigator.popAndPushNamed(
-                  context,
-                  '/task',
-                  arguments: {
-                    'taskid': taskid,
-                  },
-                )
-              : null;
+          reopenTask(taskid);
         }
       } else {
-        context.mounted
-            ? await Navigator.popAndPushNamed(
-                context,
-                '/task',
-                arguments: {
-                  'taskid': taskid,
-                },
-              )
-            : null;
+        reopenTask(taskid);
       }
     }).catchError((err) async {
-      context.mounted
-          ? await Navigator.popAndPushNamed(
-              context,
-              '/task',
-              arguments: {
-                'taskid': taskid,
-              },
-            )
-          : null;
+      reopenTask(taskid);
     });
   }
 
   /// Save task data.
-  Future<void> save(BuildContext context) async {
-    await showDialog<bool>(
-      context: context,
-      builder: (context) => FutureDialog(
-        futureContent: model.then(
-          (value) => value.save().then((newTask) {
-            // Updated task from api.
-            model = Future.value(newTask);
-            return Text('Успешно. ${newTask.completedCheck().$2}');
-          }).catchError((Object err) => Text(err.toString())),
-        ),
-        title: 'Сохранение',
-        greenTitle: 'Ок',
-        redTitle: null,
+  Future<void> save() async {
+    saveDialog(
+      model.then(
+        (value) => value.save().then((newTask) {
+          // Updated task from api.
+          model = Future.value(newTask);
+          return ['Успешно.', newTask.completedCheck().$2];
+        }).catchError((Object err) => [err.toString()]),
       ),
     );
   }

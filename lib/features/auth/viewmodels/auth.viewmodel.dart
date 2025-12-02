@@ -6,11 +6,11 @@ import 'package:geo_surveys_app/features/auth/models/user.model.dart';
 /// The [context] parameter is the context of the auth page.
 class AuthViewModel extends ChangeNotifier {
   AuthViewModel({
-    required this.context,
+    required this.openTasksPage,
   });
 
-  /// Context of the auth page.
-  final BuildContext context;
+  /// CallBack from page.
+  final VoidCallback openTasksPage;
 
   /// Controller for login.
   final loginController = TextEditingController();
@@ -23,7 +23,7 @@ class AuthViewModel extends ChangeNotifier {
 
   /// Check login and password.
   void tryLogin() async {
-    // Empty check.
+    /// Empty check.
     if (loginController.text.isEmpty || passwordController.text.isEmpty) {
       model = Future.error('Введите логин и пароль.');
     } else {
@@ -36,20 +36,15 @@ class AuthViewModel extends ChangeNotifier {
 
     notifyListeners();
 
-    // Ok.
+    /// Ok.
     await model.then(
       (value) async {
-        if (context.mounted) {
-          // Reset password and login
-          loginController.text = '';
-          passwordController.text = '';
+        /// Reset password and login
+        loginController.text = '';
+        passwordController.text = '';
 
-          // Open new page.
-          await Navigator.pushNamed(
-            context,
-            '/tasks',
-          );
-        }
+        /// Open new page.
+        openTasksPage();
       },
     ).catchError((err) {});
   }

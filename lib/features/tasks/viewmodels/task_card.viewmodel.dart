@@ -5,23 +5,20 @@ import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 ///
 /// The [model] parameter is the task model.
 class TaskCardViewModel extends ChangeNotifier {
-  TaskCardViewModel({required this.model});
+  TaskCardViewModel({
+    required this.model,
+    required this.openTaskPage,
+  });
 
   /// Model with task.
   final BaseTaskModel model;
 
+  /// Open task page.
+  final ValueGetter<Future<bool?>> openTaskPage;
+
   /// Opens a page with information about task.
-  ///
-  ///  The [task] parameter is the tapped task.
-  ///  The [context] parameter is the widget context.
-  void openTask(BuildContext context) async {
-    final bool? completed = await Navigator.pushNamed(
-      context,
-      '/task',
-      arguments: {
-        'taskid': model.taskid,
-      },
-    ) as bool?;
+  void openTask() async {
+    final bool? completed = await openTaskPage();
     model.completedUpdate(completed);
     notifyListeners();
   }

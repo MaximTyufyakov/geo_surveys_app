@@ -1,23 +1,42 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/widgets/dialogs/text_dialog.widget.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/videos.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/video_card.widget.dart';
+import 'package:geo_surveys_app/features/video_shoot/pages/video_shoot.page.dart';
 import 'package:provider/provider.dart';
 
 /// A widget with task videos.
 class VideosWidget extends StatelessWidget {
-  VideosWidget({
+  const VideosWidget({
     super.key,
-    required TaskModel task,
-  }) : provider = VideosViewModel(model: task);
+    required this.task,
+  });
 
-  /// Videos ViewModel.
-  final VideosViewModel provider;
+  final TaskModel task;
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<VideosViewModel>(
-        create: (BuildContext context) => provider,
+        create: (BuildContext context) => VideosViewModel(
+          model: task,
+          errorDialog: (text) async => await showDialog<bool>(
+            context: context,
+            builder: (context) => TextDialog(
+              title: 'Ошибка',
+              text: text,
+              greenTitle: 'Ок',
+              redTitle: null,
+            ),
+          ),
+          openVideoShootPage: () async => await Navigator.of(context).push(
+            MaterialPageRoute<VideoShootPage>(
+              builder: (context) => const VideoShootPage(),
+            ),
+          ) as File?,
+        ),
         child: Consumer<VideosViewModel>(
           builder: (context, provider, child) {
             /// Video cards.
@@ -56,7 +75,7 @@ class VideosWidget extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () {
-                        provider.videoCreate(context);
+                        provider.videoCreate();
                       },
                       icon: const Icon(Icons.add_a_photo),
                       color: Colors.lightGreen[500],

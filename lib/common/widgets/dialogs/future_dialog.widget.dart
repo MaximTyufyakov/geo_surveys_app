@@ -7,24 +7,27 @@ import 'package:geo_surveys_app/common/widgets/dialogs/abstract_dialog.widget.da
 /// If title is null, there will be no button.
 ///
 /// The [title] parameter is a dialog name.
-/// The [futureContent] parameter is the [Future] content of the dialog.
+/// The [futureText] parameter is the [Future] content (Strings) of the dialog.
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
 class FutureDialog extends AbstractDialog {
   FutureDialog({
     super.key,
     required super.title,
-    required this.futureContent,
+    required this.futureText,
     required super.greenTitle,
     required super.redTitle,
   }) : super(
           content: FutureBuilder(
-            future: futureContent,
+            future: futureText,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 /// Data is received.
                 if (snapshot.hasData) {
-                  return snapshot.data!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: snapshot.data!.map(Text.new).toList(),
+                  );
 
                   /// Error.
                 } else if (snapshot.hasError) {
@@ -44,5 +47,5 @@ class FutureDialog extends AbstractDialog {
         );
 
   /// Content of the dialog.
-  final Future<Widget> futureContent;
+  final Future<List<String>> futureText;
 }

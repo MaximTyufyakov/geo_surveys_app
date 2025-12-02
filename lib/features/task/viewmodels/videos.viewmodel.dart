@@ -1,8 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/common/widgets/dialogs/abstract_dialog.widget.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
@@ -10,6 +8,8 @@ import 'package:geo_surveys_app/features/task/models/video.model.dart';
 class VideosViewModel extends ChangeNotifier {
   VideosViewModel({
     required this.model,
+    required this.errorDialog,
+    required this.openVideoShootPage,
   });
 
   /// Task model.
@@ -20,48 +20,34 @@ class VideosViewModel extends ChangeNotifier {
     text: '',
   );
 
+  /// Show error.
+  final ValueSetter<List<String>> errorDialog;
+
+  final ValueGetter<Future<File?>> openVideoShootPage;
+
   @override
   void notifyListeners() {
     super.notifyListeners();
   }
 
   /// Open page with camera and add new video in the list.
-  void videoCreate(BuildContext context) async {
+  void videoCreate() async {
     // Without front and back spaces.
     String title = newTitleController.text.trim();
 
     // The title does not exist.
     if (title == '') {
-      await showDialog<bool>(
-        context: context,
-        builder: (context) => AbstractDialog(
-          title: 'Ошибка',
-          content: const Text('Название видео пустое.'),
-          greenTitle: 'Ок',
-          redTitle: null,
-        ),
-      );
+      errorDialog(const ['Название видео пустое.']);
       return;
 
       // The title does not unique.
     } else if (!uniqueTitle(title)) {
-      await showDialog<bool>(
-        context: context,
-        builder: (context) => AbstractDialog(
-          title: 'Ошибка',
-          content: const Text('Название видео не уникально.'),
-          greenTitle: 'Ок',
-          redTitle: null,
-        ),
-      );
+      errorDialog(const ['Название видео не уникально.']);
       return;
 
       // The title exist and unique.
     } else {
-      final File? videoFile = await Navigator.pushNamed(
-        context,
-        '/video_shoot',
-      ) as File?;
+      final File? videoFile = await openVideoShootPage();
 
       // The video returned.
       if (videoFile != null) {

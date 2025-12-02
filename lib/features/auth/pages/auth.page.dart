@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/auth/viewmodels/auth.viewmodel.dart';
+import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
 import 'package:provider/provider.dart';
 
 /// The page with a login form.
@@ -15,14 +16,20 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<AuthViewModel>(
         create: (context) => AuthViewModel(
-          context: context,
+          openTasksPage: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<TasksPage>(
+                builder: (context) => const TasksPage(),
+              ),
+            );
+          },
         ),
         child: Consumer<AuthViewModel>(
           builder: (context, provider, child) => Scaffold(
             body: Padding(
               padding: const EdgeInsets.all(8),
               child: Center(
-                // Form width.
+                /// Form width.
                 child: SizedBox(
                   width: 300.0,
                   child: Column(
@@ -37,7 +44,7 @@ class _AuthPageState extends State<AuthPage> {
                         height: 30,
                       ),
 
-                      // Login.
+                      /// Login.
                       TextField(
                         decoration: const InputDecoration(hintText: 'Логин'),
                         controller: provider.loginController,
@@ -46,14 +53,14 @@ class _AuthPageState extends State<AuthPage> {
                         height: 5,
                       ),
 
-                      // Password.
+                      /// Password.
                       TextField(
                         controller: provider.passwordController,
                         obscureText: !passwordVisible,
                         decoration: InputDecoration(
                           hintText: 'Пароль',
 
-                          // Display and hide the password.
+                          /// Display and hide the password.
                           suffixIcon: IconButton(
                             icon: Icon(passwordVisible
                                 ? Icons.visibility_off
@@ -85,11 +92,11 @@ class _AuthPageState extends State<AuthPage> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
-                            // Ok.
+                            /// Ok.
                             if (snapshot.hasData) {
                               return const Text('');
 
-                              // Error.
+                              /// Error.
                             } else if (snapshot.hasError) {
                               return Text(
                                 '${snapshot.error}',
@@ -104,7 +111,7 @@ class _AuthPageState extends State<AuthPage> {
                             }
                           }
 
-                          // Loading.
+                          /// Loading.
                           return const CircularProgressIndicator();
                         },
                       ),

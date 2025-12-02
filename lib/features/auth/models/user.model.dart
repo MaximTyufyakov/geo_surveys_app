@@ -12,7 +12,7 @@ class UserModel {
   /// or incorrect login or password entry.
   static Future<UserModel> tryLogin(String login, String password) async {
     try {
-      // Api response.
+      /// Api response.
       Response<Map<String, dynamic>> response = await ApiModel.dio.post(
         '/users/auth',
         data: {
@@ -25,13 +25,13 @@ class UserModel {
       );
 
       switch (response.statusCode) {
-        // Token create.
+        /// Token create.
         case 201:
           ApiModel.dio.options.headers['Authorization'] =
               'Bearer ${response.data!['token']}';
           return UserModel();
 
-        // Unauthorized.
+        /// Unauthorized.
         case 401:
           return Future.error('Неверный логин или пароль.');
 
