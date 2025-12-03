@@ -22,7 +22,7 @@ class VideosWidget extends StatelessWidget {
   Widget build(BuildContext context) => ChangeNotifierProvider<VideosViewModel>(
         create: (BuildContext context) => VideosViewModel(
           model: task,
-          errorDialog: (text) async => await showDialog<bool>(
+          errorDialog: (text) => showDialog<bool>(
             context: context,
             builder: (context) => TextDialog(
               title: 'Ошибка',
@@ -31,11 +31,11 @@ class VideosWidget extends StatelessWidget {
               redTitle: null,
             ),
           ),
-          openVideoShootPage: () async => await Navigator.of(context).push(
-            MaterialPageRoute<VideoShootPage>(
+          openVideoShootPage: () => Navigator.of(context).push(
+            MaterialPageRoute<File>(
               builder: (context) => const VideoShootPage(),
             ),
-          ) as File?,
+          ),
         ),
         child: Consumer<VideosViewModel>(
           builder: (context, provider, child) {
