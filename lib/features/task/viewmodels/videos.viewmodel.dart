@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
+import 'package:geo_surveys_app/features/task/utils/geolocation.util.dart';
+import 'package:geolocator/geolocator.dart';
 
 /// A ViewModel of the video.
 class VideosViewModel extends ChangeNotifier {
@@ -10,6 +12,7 @@ class VideosViewModel extends ChangeNotifier {
     required this.model,
     required this.errorDialog,
     required this.openVideoShootPage,
+    required this.geolocationDialog,
   });
 
   /// Task model.
@@ -23,7 +26,11 @@ class VideosViewModel extends ChangeNotifier {
   /// Show error.
   final ValueSetter<List<String>> errorDialog;
 
+  /// Open camera page.
   final ValueGetter<Future<File?>> openVideoShootPage;
+
+  /// Show geolocation.
+  final Future<void> Function(Future<List<String>>) geolocationDialog;
 
   @override
   void notifyListeners() {
@@ -47,18 +54,29 @@ class VideosViewModel extends ChangeNotifier {
 
       // The title exist and unique.
     } else {
-      final File? videoFile = await openVideoShootPage();
+      Future<Position> coordinates = GeolocationUtil.getGeolocation();
+      await geolocationDialog(coordinates.then((coordinates) => [
+            'Успешно.',
+            'Ваши координаты: ${coordinates.latitude}, ${coordinates.longitude}.'
+          ]));
 
-      // The video returned.
-      if (videoFile != null) {
-        final VideoModel video = VideoModel(
-          videoid: null,
-          title: title,
-          file: videoFile,
-        );
-        model.addVideo(video);
-        notifyListeners();
-      }
+      await coordinates.then((coordinates) async {
+        final File? videoFile = await openVideoShootPage();
+
+        // The video returned.
+        if (videoFile != null) {
+          model.addVideo(
+            VideoModel(
+              videoid: null,
+              title: title,
+              file: videoFile,
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+            ),
+          );
+          notifyListeners();
+        }
+      }).catchError((err) {});
     }
   }
 

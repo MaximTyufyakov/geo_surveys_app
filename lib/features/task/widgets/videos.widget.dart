@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/text_dialog.widget.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
@@ -34,6 +35,16 @@ class VideosWidget extends StatelessWidget {
           openVideoShootPage: () => Navigator.of(context).push(
             MaterialPageRoute<File>(
               builder: (context) => const VideoShootPage(),
+            ),
+          ),
+          geolocationDialog: (Future<List<String>> futureText) =>
+              showDialog<bool>(
+            context: context,
+            builder: (context) => FutureDialog(
+              futureText: futureText,
+              title: 'Определение местоположения',
+              greenTitle: 'Ок',
+              redTitle: null,
             ),
           ),
         ),

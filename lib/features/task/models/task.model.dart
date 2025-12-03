@@ -125,6 +125,8 @@ class TaskModel {
                 videoid: videoResponse['video_id'] as int,
                 title: videoResponse['title'] as String,
                 file: null,
+                latitude: null,
+                longitude: null,
               ))
           .toList(),
     ).._setParent();

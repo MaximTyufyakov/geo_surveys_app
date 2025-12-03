@@ -13,6 +13,8 @@ class VideoModel {
     required this.videoid,
     required this.title,
     required this.file,
+    required this.latitude,
+    required this.longitude,
   }) : format = file?.path.split('.').last;
 
   /// Parent model.
