@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/auth/viewmodels/auth.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
@@ -18,13 +16,11 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<AuthViewModel>(
         create: (context) => AuthViewModel(
-          openTasksPage: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<Void>(
-                builder: (context) => const TasksPage(),
-              ),
-            );
-          },
+          openTasksPage: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => const TasksPage(),
+            ),
+          ),
         ),
         child: Consumer<AuthViewModel>(
           builder: (context, provider, child) => Scaffold(

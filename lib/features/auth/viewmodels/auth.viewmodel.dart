@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/auth/models/user.model.dart';
+import 'package:geo_surveys_app/features/auth/models/auth.model.dart';
 
 /// A ViewModel of the auth page.
 ///
@@ -10,7 +10,7 @@ class AuthViewModel extends ChangeNotifier {
   });
 
   /// CallBack from page.
-  final VoidCallback openTasksPage;
+  final ValueGetter<Future<void>> openTasksPage;
 
   /// Controller for login.
   final loginController = TextEditingController();
@@ -18,8 +18,8 @@ class AuthViewModel extends ChangeNotifier {
   /// Controller for password.
   final passwordController = TextEditingController();
 
-  /// User model.
-  Future<UserModel> model = Future.value(UserModel());
+  /// Auth model.
+  Future<AuthModel> model = Future.value(AuthModel());
 
   /// Check login and password.
   void tryLogin() async {
@@ -28,7 +28,7 @@ class AuthViewModel extends ChangeNotifier {
       model = Future.error('Введите логин и пароль.');
     } else {
       // Login and password check.
-      model = UserModel.tryLogin(
+      model = AuthModel.tryLogin(
         loginController.text,
         passwordController.text,
       );
@@ -44,7 +44,11 @@ class AuthViewModel extends ChangeNotifier {
         passwordController.text = '';
 
         /// Open new page.
-        openTasksPage();
+        await openTasksPage();
+        // Clear token.
+        await model.then((value) {
+          value.removeToken();
+        });
       },
     ).catchError((err) {});
   }

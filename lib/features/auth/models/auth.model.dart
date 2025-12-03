@@ -2,15 +2,15 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/models/api.model.dart';
 
-/// A model with user data and logic.
-class UserModel {
+/// A model with Auth logic.
+class AuthModel {
   /// Check login and password.
   ///
   /// Returns a [Future] that completes when the response is successful and
   /// correct login or password entry.
   /// Throws a [Future.error] with [String] message if database fails
   /// or incorrect login or password entry.
-  static Future<UserModel> tryLogin(String login, String password) async {
+  static Future<AuthModel> tryLogin(String login, String password) async {
     try {
       /// Api response.
       Response<Map<String, dynamic>> response = await ApiModel.dio.post(
@@ -29,7 +29,7 @@ class UserModel {
         case 201:
           ApiModel.dio.options.headers['Authorization'] =
               'Bearer ${response.data!['token']}';
-          return UserModel();
+          return AuthModel();
 
         /// Unauthorized.
         case 401:
@@ -41,5 +41,9 @@ class UserModel {
     } on DioException {
       return Future.error('Не удаётся получить данные с сервера.');
     }
+  }
+
+  void removeToken() {
+    ApiModel.dio.options.headers['Authorization'] = '';
   }
 }
