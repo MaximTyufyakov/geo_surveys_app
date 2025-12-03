@@ -56,16 +56,6 @@ class _TaskPageState extends State<TaskPage> {
               redTitle: null,
             ),
           ),
-          // reopenTask: (int taskid) {
-          //   Navigator.of(context).pop();
-          //   Navigator.of(context).push(
-          //     MaterialPageRoute<TaskPage>(
-          //       builder: (context) => TaskPage(
-          //         taskid: taskid,
-          //       ),
-          //     ),
-          //   );
-          // },
         ),
         child: Consumer<TaskPageViewModel>(
           builder: (context, provider, child) => Scaffold(
