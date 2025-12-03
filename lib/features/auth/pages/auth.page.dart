@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/auth/viewmodels/auth.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
@@ -18,7 +20,7 @@ class _AuthPageState extends State<AuthPage> {
         create: (context) => AuthViewModel(
           openTasksPage: () {
             Navigator.of(context).push(
-              MaterialPageRoute<TasksPage>(
+              MaterialPageRoute<Void>(
                 builder: (context) => const TasksPage(),
               ),
             );

@@ -9,7 +9,7 @@ class TaskPageViewModel extends ChangeNotifier {
     required this.unsavedDialog,
     required this.goBack,
     required this.saveDialog,
-    required this.reopenTask,
+    // required this.reopenTask,
   }) : model = TaskModel.create(taskid: taskid);
 
   /// Model with task.
@@ -25,10 +25,7 @@ class TaskPageViewModel extends ChangeNotifier {
   final ValueSetter<bool?> goBack;
 
   /// Show saving dialog.
-  final ValueSetter<Future<List<String>>> saveDialog;
-
-  /// Reload page.
-  final ValueSetter<int> reopenTask;
+  final Future<void> Function(Future<List<String>>) saveDialog;
 
   @override
   void dispose() async {
@@ -53,11 +50,10 @@ class TaskPageViewModel extends ChangeNotifier {
         /// Unsave = false;
         /// Close = null.
         if (ret == true) {
-          await save().then((sValue) {
-            if (value.saved) {
-              goBack(value.completed);
-            }
-          });
+          await save();
+          if (value.saved) {
+            goBack(value.completed);
+          }
         } else if (ret == false) {
           goBack(value.completed);
         }
@@ -79,31 +75,33 @@ class TaskPageViewModel extends ChangeNotifier {
         /// Unsave = false;
         /// Close = null.
         if (ret == true) {
-          await save().then((sValue) async {
-            if (value.saved) {
-              reopenTask(taskid);
-            }
-          });
+          await save();
+          if (value.saved) {
+            model = TaskModel.create(taskid: taskid);
+            notifyListeners();
+          }
         } else if (ret == false) {
-          reopenTask(taskid);
+          model = TaskModel.create(taskid: taskid);
+          notifyListeners();
         }
       } else {
-        reopenTask(taskid);
+        model = TaskModel.create(taskid: taskid);
+        notifyListeners();
       }
     }).catchError((err) async {
-      reopenTask(taskid);
+      model = TaskModel.create(taskid: taskid);
+      notifyListeners();
     });
   }
 
   /// Save task data.
   Future<void> save() async {
-    saveDialog(
+    await saveDialog(
       model.then(
-        (value) => value.save().then((newTask) {
-          // Updated task from api.
-          model = Future.value(newTask);
-          return ['Успешно.', newTask.completedCheck().$2];
-        }).catchError((Object err) => [err.toString()]),
+        (value) => value
+            .save()
+            .then((sValue) => ['Успешно.', value.completedCheck().$2])
+            .catchError((Object err) => [err.toString()]),
       ),
     );
   }

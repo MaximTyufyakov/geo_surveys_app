@@ -23,11 +23,7 @@ class TasksPage extends StatelessWidget {
               actions: [
                 /// Page reload.
                 IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(MaterialPageRoute<TasksPage>(
-                        builder: (context) => const TasksPage()));
-                  },
+                  onPressed: () => provider.reload(),
                   icon: const Icon(Icons.replay_outlined),
                 ),
               ],

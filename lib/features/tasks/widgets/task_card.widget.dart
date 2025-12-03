@@ -16,19 +16,20 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) =>
       ChangeNotifierProvider<TaskCardViewModel>(
         create: (BuildContext context) => TaskCardViewModel(
-            model: task,
-            openTaskPage: () async => await Navigator.of(context).push(
-                  MaterialPageRoute<TaskPage>(
-                    builder: (context) => TaskPage(
-                      taskid: task.taskid,
-                    ),
-                  ),
-                ) as bool?),
+          model: task,
+          openTaskPage: () => Navigator.of(context).push(
+            MaterialPageRoute<bool>(
+              builder: (context) => TaskPage(
+                taskid: task.taskid,
+              ),
+            ),
+          ),
+        ),
         child: Consumer<TaskCardViewModel>(
           builder: (context, provider, child) => Card(
             /// To click.
             child: InkWell(
-              onTap: () async {
+              onTap: () {
                 provider.openTask();
               },
 

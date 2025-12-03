@@ -35,14 +35,14 @@ class TaskModel {
   final int taskid;
 
   /// The task name.
-  final String title;
+  String title;
 
   /// The text task description.
-  final String? description;
+  String? description;
 
   /// The task geographic coordinates.
-  final double? latitude;
-  final double? longitude;
+  double? latitude;
+  double? longitude;
 
   /// The completed flag.
   bool completed;
@@ -132,6 +132,25 @@ class TaskModel {
     return component;
   }
 
+  void _copyWith(TaskModel copy) {
+    title = copy.title;
+    description = copy.description;
+    latitude = copy.latitude;
+    longitude = copy.longitude;
+    completed = copy.completed;
+    report = copy.report;
+    points
+      ..clear()
+      ..addAll(copy.points);
+    videos
+      ..clear()
+      ..addAll(copy.videos);
+    deletedVideos
+      ..clear()
+      ..addAll(copy.deletedVideos);
+    saved = copy.saved;
+  }
+
   /// Set task as a parent for childs.
   void _setParent() {
     report.parent = this;
@@ -168,7 +187,7 @@ class TaskModel {
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails or
   /// no update.
-  Future<TaskModel> save() async {
+  Future<void> save() async {
     if (!saved) {
       try {
         // Api response.
@@ -212,7 +231,9 @@ class TaskModel {
                 in videos.where((video) => video.file != null).toList()) {
               await video.deleteFileLocal();
             }
-            return parseTask(response);
+            // Update object.
+            _copyWith(parseTask(response));
+            return;
 
           // Forbidden
           case 403:

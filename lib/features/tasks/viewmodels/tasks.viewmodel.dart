@@ -6,5 +6,10 @@ class TasksViewModel extends ChangeNotifier {
   TasksViewModel() : model = TasksModel.create();
 
   /// Model with all tasks.
-  final Future<TasksModel> model;
+  Future<TasksModel> model;
+
+  void reload() {
+    model = TasksModel.create();
+    notifyListeners();
+  }
 }

@@ -40,15 +40,14 @@ class _TaskPageState extends State<TaskPage> {
       ChangeNotifierProvider<TaskPageViewModel>(
         create: (BuildContext context) => TaskPageViewModel(
           taskid: widget.taskid,
-          unsavedDialog: () async => await showDialog<bool>(
+          unsavedDialog: () => showDialog<bool>(
             context: context,
             builder: (context) => UnsavedDialog(),
           ),
           goBack: (bool? completed) => Navigator.of(context).pop(
             completed,
           ),
-          saveDialog: (Future<List<String>> futureText) async =>
-              await showDialog<bool>(
+          saveDialog: (Future<List<String>> futureText) => showDialog<bool>(
             context: context,
             builder: (context) => FutureDialog(
               futureText: futureText,
@@ -57,16 +56,16 @@ class _TaskPageState extends State<TaskPage> {
               redTitle: null,
             ),
           ),
-          reopenTask: (int taskid) {
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute<TaskPage>(
-                builder: (context) => TaskPage(
-                  taskid: taskid,
-                ),
-              ),
-            );
-          },
+          // reopenTask: (int taskid) {
+          //   Navigator.of(context).pop();
+          //   Navigator.of(context).push(
+          //     MaterialPageRoute<TaskPage>(
+          //       builder: (context) => TaskPage(
+          //         taskid: taskid,
+          //       ),
+          //     ),
+          //   );
+          // },
         ),
         child: Consumer<TaskPageViewModel>(
           builder: (context, provider, child) => Scaffold(
@@ -83,7 +82,7 @@ class _TaskPageState extends State<TaskPage> {
               actions: [
                 /// Page reload.
                 IconButton(
-                  onPressed: () async {
+                  onPressed: () {
                     provider.reloadPage();
                   },
                   icon: const Icon(Icons.replay_outlined),
@@ -91,8 +90,8 @@ class _TaskPageState extends State<TaskPage> {
 
                 /// Save.
                 IconButton(
-                  onPressed: () async {
-                    await provider.save();
+                  onPressed: () {
+                    provider.save();
                   },
                   icon: const Icon(Icons.save),
                 ),
