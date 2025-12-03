@@ -6,17 +6,24 @@ class VideoCardViewModel extends ChangeNotifier {
   VideoCardViewModel({
     required this.model,
     required this.videosUpd,
+    required this.deleteDialog,
   });
 
   /// Model with video.
   final VideoModel model;
 
+  final ValueGetter<Future<bool?>> deleteDialog;
+
   /// Update VideosWiddget.
   final void Function() videosUpd;
 
   /// When delete button click
-  void delete() {
-    model.deleteFromTask();
-    videosUpd();
+  void delete() async {
+    await deleteDialog().then((del) {
+      if (del == true) {
+        model.deleteFromTask();
+        videosUpd();
+      }
+    });
   }
 }
