@@ -19,16 +19,22 @@ class VideoModel {
   late TaskModel parent;
 
   /// The video identifier.
-  int? videoid;
+  final int? videoid;
 
   /// The video name.
-  String title;
+  final String title;
 
   /// The video format.
   final String? format;
 
   /// Local video file.
   File? file;
+
+  /// Start geographic latitude.
+  double? latitude;
+
+  /// Start geographic longitude.
+  double? longitude;
 
   // /// Rename video file, delete from tmpDir and save in docDir.
   // Future<String> _saveFileLocal() async {
@@ -63,8 +69,9 @@ class VideoModel {
     }
   }
 
-  /// Delete this video from task model.
-  void deleteFromTask() {
+  /// Delete file and video from task model.
+  void deleteFromTask() async {
+    await deleteFileLocal();
     parent.deleteVideo(this);
   }
 }

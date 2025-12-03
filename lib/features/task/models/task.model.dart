@@ -56,8 +56,8 @@ class TaskModel {
   /// The list of videos.
   final List<VideoModel> videos;
 
-  /// The list of deleted videos.
-  final List<VideoModel> deletedVideos = [];
+  /// The list of deleted videos id.
+  final List<int> deletedVideosId = [];
 
   /// The saved flag.
   bool saved;
@@ -145,9 +145,9 @@ class TaskModel {
     videos
       ..clear()
       ..addAll(copy.videos);
-    deletedVideos
+    deletedVideosId
       ..clear()
-      ..addAll(copy.deletedVideos);
+      ..addAll(copy.deletedVideosId);
     saved = copy.saved;
   }
 
@@ -178,7 +178,9 @@ class TaskModel {
   /// Delete a video from the main list and add in the deleted list.
   void deleteVideo(VideoModel video) {
     videos.remove(video);
-    deletedVideos.add(video);
+    if (video.videoid != null) {
+      deletedVideosId.add(video.videoid!);
+    }
     makeUnsaved();
   }
 
@@ -213,8 +215,7 @@ class TaskModel {
                     })
                 .toList(),
             // Deleted videos id.
-            'deletedVideos':
-                deletedVideos.map((video) => video.videoid).toList(),
+            'deletedVideos': deletedVideosId,
           },
           options: Options(
             validateStatus: (status) => status == 201 || status == 403,
@@ -225,13 +226,12 @@ class TaskModel {
           // Update.
           case 201:
             // Clean deletedVideos list.
-            deletedVideos.clear();
-            // Delete local saved videos.
-            for (VideoModel video
-                in videos.where((video) => video.file != null).toList()) {
+            deletedVideosId.clear();
+            // Delete files of saved videos.
+            for (VideoModel video in videos) {
               await video.deleteFileLocal();
             }
-            // Update object.
+            // Update task object.
             _copyWith(parseTask(response));
             return;
 
@@ -263,5 +263,13 @@ class TaskModel {
       return (false, 'Для завершения задания прикрепите видео.');
     }
     return (true, 'Задание завершено.');
+  }
+
+  /// Delete videofiles from local storage.
+  /// If it not saved.
+  void deleteUnsavedVideoFiles() async {
+    for (VideoModel video in videos.where((v) => v.videoid == null)) {
+      await video.deleteFileLocal();
+    }
   }
 }

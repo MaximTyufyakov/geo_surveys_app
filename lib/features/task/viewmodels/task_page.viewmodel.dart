@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
-import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
 /// A ViewModel of the task page.
 class TaskPageViewModel extends ChangeNotifier {
@@ -31,11 +30,7 @@ class TaskPageViewModel extends ChangeNotifier {
   void dispose() async {
     /// Delete unsaved in db videos.
     await model.then((value) async {
-      for (VideoModel video in value.videos + value.deletedVideos) {
-        if (video.videoid == null) {
-          await video.deleteFileLocal();
-        }
-      }
+      value.deleteUnsavedVideoFiles();
     }).catchError((err) {});
     super.dispose();
   }
