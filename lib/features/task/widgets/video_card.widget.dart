@@ -37,9 +37,18 @@ class VideoCardWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: ListTile(
-                    title: Text(
+                    title: SelectableText(
                       provider.model.title,
                       style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SelectableText(
+                          '''${provider.model.latitude}, ${provider.model.longitude}''',
+                          style: Theme.of(context).textTheme.bodySmall!,
+                        )
+                      ],
                     ),
                   ),
                 ),

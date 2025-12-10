@@ -74,6 +74,9 @@ class MainApp extends StatelessWidget {
             bodyMedium: TextStyle(
               fontSize: 16,
             ),
+            bodySmall: TextStyle(
+              fontSize: 14,
+            ),
           ),
 
           /// Buttons styles.

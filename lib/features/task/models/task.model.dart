@@ -125,8 +125,8 @@ class TaskModel {
                 videoid: videoResponse['video_id'] as int,
                 title: videoResponse['title'] as String,
                 file: null,
-                latitude: null,
-                longitude: null,
+                latitude: videoResponse['latitude'] as double,
+                longitude: videoResponse['longitude'] as double,
               ))
           .toList(),
     ).._setParent();
@@ -213,7 +213,9 @@ class TaskModel {
                 .map((video) => {
                       'title': video.title,
                       'file': base64Encode(video.file!.readAsBytesSync()),
-                      'format': video.format
+                      'format': video.format,
+                      'latitude': video.latitude,
+                      'longitude': video.longitude,
                     })
                 .toList(),
             // Deleted videos id.

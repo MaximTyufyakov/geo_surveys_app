@@ -45,20 +45,16 @@ class TaskCard extends StatelessWidget {
                   children: [
                     provider.model.completed
                         ? Text('Завершено',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Colors.green,
-                                ))
+                            style:
+                                Theme.of(context).textTheme.bodySmall!.copyWith(
+                                      color: Colors.green,
+                                    ))
                         : Text(
                             'Не завершено',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Colors.red,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall!.copyWith(
+                                      color: Colors.red,
+                                    ),
                           ),
                   ],
                 ),

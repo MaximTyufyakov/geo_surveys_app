@@ -33,10 +33,10 @@ class VideoModel {
   File? file;
 
   /// Start geographic latitude.
-  double? latitude;
+  double latitude;
 
   /// Start geographic longitude.
-  double? longitude;
+  double longitude;
 
   // /// Rename video file, delete from tmpDir and save in docDir.
   // Future<String> _saveFileLocal() async {
