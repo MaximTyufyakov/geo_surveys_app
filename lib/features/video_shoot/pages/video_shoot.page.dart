@@ -33,7 +33,7 @@ class VideoShootPage extends StatelessWidget {
                     return Column(
                       children: [
                         Expanded(
-                          flex: 5,
+                          flex: 6,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
