@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
@@ -16,52 +15,41 @@ class TasksPage extends StatelessWidget {
         child: Consumer<TasksViewModel>(
           builder: (context, provider, child) => Scaffold(
             appBar: AppBar(
+              automaticallyImplyLeading: false,
               title: Text(
                 'Задания',
                 style: Theme.of(context).textTheme.displayMedium,
               ),
-              actions: [
-                /// Page reload.
-                IconButton(
-                  onPressed: () => provider.reload(),
-                  icon: const Icon(Icons.replay_outlined),
-                ),
-              ],
             ),
-            body: FutureBuilder(
-              future: provider.model,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  /// Data from the database is received.
-                  if (snapshot.hasData) {
-                    final List<Widget> taskCards = [];
-                    for (BaseTaskModel task in snapshot.data!.tasks) {
-                      taskCards.add(
-                        TaskCard(
-                          task: task,
-                        ),
+            body: RefreshIndicator(
+              onRefresh: () async {
+                provider.reload();
+              },
+              child: FutureBuilder(
+                future: provider.model,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.tasks.isEmpty) {
+                        return const MessageWidget(mes: 'Нет заданий.');
+                      } else {
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(8),
+                          itemCount: snapshot.data!.tasks.length,
+                          itemBuilder: (context, index) =>
+                              TaskCard(task: snapshot.data!.tasks[index]),
+                        );
+                      }
+                    } else {
+                      return MessageWidget(
+                        mes: snapshot.error.toString(),
                       );
                     }
-                    return Padding(
-                      padding: const EdgeInsets.all(8),
-
-                      /// Scrolling and cards.
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: taskCards,
-                        ),
-                      ),
-                    );
-
-                    /// Error.
-                  } else if (snapshot.hasError) {
-                    return MessageWidget(mes: snapshot.error.toString());
+                  } else {
+                    return const LoadingWidget();
                   }
-                }
-
-                /// Loading.
-                return const LoadingWidget();
-              },
+                },
+              ),
             ),
           ),
         ),

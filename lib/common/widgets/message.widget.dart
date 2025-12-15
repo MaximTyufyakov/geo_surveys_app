@@ -10,17 +10,26 @@ class MessageWidget extends StatelessWidget {
   final String mes;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(8),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(mes,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge),
-            ],
+  Widget build(BuildContext context) =>
+      // For scroll in ListView (Refresh).
+      CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(mes,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyLarge),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       );
 }
