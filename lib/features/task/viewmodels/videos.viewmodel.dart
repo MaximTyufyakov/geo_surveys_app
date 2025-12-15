@@ -47,6 +47,11 @@ class VideosViewModel extends ChangeNotifier {
       errorDialog(const ['Название видео пустое.']);
       return;
 
+      // The title > 100.
+    } else if (title.length > 100) {
+      errorDialog(const ['Название видео не должно превышать 100 символов.']);
+      return;
+
       // The title does not unique.
     } else if (!uniqueTitle(title)) {
       errorDialog(const ['Название видео не уникально.']);
@@ -74,6 +79,9 @@ class VideosViewModel extends ChangeNotifier {
               longitude: coordinates.longitude,
             ),
           );
+
+          // Clear title.
+          newTitleController.text = '';
           notifyListeners();
         }
       }).catchError((err) {});
