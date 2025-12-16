@@ -15,6 +15,7 @@ dependencies:
   geolocator: ^14.0.2
   path_provider: ^2.1.5
   provider: ^6.1.5
+  yandex_maps_mapkit_lite: ^4.26.1-beta
 
 dev_dependencies:
   flutter_test:
