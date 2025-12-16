@@ -130,12 +130,17 @@ class MainApp extends StatelessWidget {
             backgroundColor: _appBarColor,
             selectedItemColor: _primaryColor,
           ),
+          popupMenuTheme: PopupMenuThemeData(color: _scaffoldColor),
+
           progressIndicatorTheme: const ProgressIndicatorThemeData(
             color: _primaryColor,
           ),
         ),
 
         /// Init page.
-        home: const AuthPage(),
+        initialRoute: '/auth',
+        routes: {
+          '/auth': (context) => const AuthPage(),
+        },
       );
 }

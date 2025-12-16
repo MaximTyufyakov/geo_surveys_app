@@ -20,6 +20,63 @@ class TasksPage extends StatelessWidget {
                 'Задания',
                 style: Theme.of(context).textTheme.displayMedium,
               ),
+              actions: [
+                // Menu (...)
+                PopupMenuButton(
+                  itemBuilder: (context) => [
+                    // Map.
+                    PopupMenuItem(
+                      value: 1,
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.wifi_off_outlined),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text('Оффлайн-режим')
+                        ],
+                      ),
+                    ),
+                    // Map.
+                    PopupMenuItem(
+                      value: 1,
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.map),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text('Открыть карту')
+                        ],
+                      ),
+                    ),
+                    // Exit.
+                    PopupMenuItem(
+                      value: 2,
+                      onTap: () {
+                        Navigator.of(context).popUntil(
+                          ModalRoute.withName(
+                            '/auth',
+                          ),
+                        );
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(Icons.logout),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text('Выход')
+                        ],
+                      ),
+                    ),
+                  ],
+                  // Смещение ниже шапки
+                  // offset: const Offset(0, 60),
+                ),
+              ],
             ),
             body: RefreshIndicator(
               onRefresh: () async {
