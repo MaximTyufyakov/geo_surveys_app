@@ -3,13 +3,14 @@ import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
 /// A ViewModel of the task page.
 class TaskPageViewModel extends ChangeNotifier {
-  TaskPageViewModel({
-    required this.taskid,
-    required this.unsavedDialog,
-    required this.goBack,
-    required this.saveDialog,
-    // required this.reopenTask,
-  }) : model = TaskModel.create(taskid: taskid);
+  TaskPageViewModel(
+      {required this.taskid,
+      required this.unsavedDialog,
+      required this.goBack,
+      required this.saveDialog
+      // required this.reopenTask,
+      })
+      : model = TaskModel.create(taskid: taskid);
 
   /// Model with task.
   Future<TaskModel> model;
@@ -36,7 +37,7 @@ class TaskPageViewModel extends ChangeNotifier {
   }
 
   /// Exit to previous page.
-  void exit() async {
+  void toPrevPage() async {
     await model.then((value) async {
       if (!value.saved) {
         bool? ret = await unsavedDialog();
@@ -59,6 +60,28 @@ class TaskPageViewModel extends ChangeNotifier {
       goBack(null);
     });
   }
+
+  /// Exit to login page.
+  Future<bool> logout() async => await model.then((value) async {
+        if (!value.saved) {
+          bool? ret = await unsavedDialog();
+
+          /// Save = true;
+          /// Unsave = false;
+          /// Close = null.
+          if (ret == true) {
+            await save();
+            if (value.saved) {
+              return true;
+            }
+          } else if (ret == false) {
+            return true;
+          }
+          return false;
+        } else {
+          return true;
+        }
+      }).catchError((err) => true);
 
   /// Reload the task page if the model is saved.
   void reloadPage() async {

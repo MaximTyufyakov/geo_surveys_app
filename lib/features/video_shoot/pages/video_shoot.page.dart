@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
-import 'package:geo_surveys_app/common/widgets/message.widget.dart';
+import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/video_shoot/viewmodels/video_shoot.viewmodel.dart';
 import 'package:provider/provider.dart';
 
@@ -74,8 +74,9 @@ class VideoShootPage extends StatelessWidget {
                       ],
                     );
                   } else if (snapshot.hasError) {
-                    return MessageWidget(
+                    return ScrollMessageWidget(
                       mes: snapshot.error.toString(),
+                      icon: Icons.error,
                     );
                   }
                 }

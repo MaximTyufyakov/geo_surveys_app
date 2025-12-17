@@ -19,15 +19,18 @@ class ReportWidget extends StatelessWidget {
   Widget build(BuildContext context) => ChangeNotifierProvider<ReportViewModel>(
         create: (BuildContext context) => provider,
         child: Consumer<ReportViewModel>(
-          builder: (context, provider, child) => TextField(
-            decoration: const InputDecoration(
-              hintText: 'Здесь можно написать отчёт о выполненной работе.',
+          builder: (context, provider, child) => Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Здесь можно написать отчёт о выполненной работе.',
+              ),
+              controller: provider.reportController,
+              onChanged: (action) {
+                provider.onTextChange();
+              },
+              maxLines: 25,
             ),
-            controller: provider.reportController,
-            onChanged: (action) {
-              provider.onTextChange();
-            },
-            maxLines: 100,
           ),
         ),
       );

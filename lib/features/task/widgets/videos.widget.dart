@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/text_dialog.widget.dart';
+import 'package:geo_surveys_app/common/widgets/message.widget.dart';
+import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/videos.viewmodel.dart';
@@ -61,40 +63,50 @@ class VideosWidget extends StatelessWidget {
                 ),
               );
             }
-            return Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: videoCards,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          hintText: 'Название видео',
-                        ),
-                        controller: provider.newTitleController,
-                        maxLines: 1,
+            return Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: videoCards.isEmpty
+                            ? [
+                                const MessageWidget(
+                                  mes: 'Нет видео.',
+                                  icon: Icons.video_library,
+                                )
+                              ]
+                            : videoCards,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        provider.videoCreate();
-                      },
-                      icon: const Icon(Icons.add_a_photo),
-                      color: Colors.lightGreen[500],
-                      iconSize: 30,
-                    ),
-                  ],
-                )
-              ],
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            hintText: 'Название видео',
+                          ),
+                          controller: provider.newTitleController,
+                          maxLines: 1,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          provider.videoCreate();
+                        },
+                        icon: const Icon(Icons.add_a_photo),
+                        color: Colors.lightGreen[500],
+                        iconSize: 30,
+                      ),
+                    ],
+                  )
+                ],
+              ),
             );
           },
         ),

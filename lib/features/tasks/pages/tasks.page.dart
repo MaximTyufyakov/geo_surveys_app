@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
-import 'package:geo_surveys_app/common/widgets/message.widget.dart';
+import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
+import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
@@ -20,62 +21,11 @@ class TasksPage extends StatelessWidget {
                 'Задания',
                 style: Theme.of(context).textTheme.displayMedium,
               ),
-              actions: [
+              actions: const [
                 // Menu (...)
-                PopupMenuButton(
-                  itemBuilder: (context) => [
-                    // Map.
-                    PopupMenuItem(
-                      value: 1,
-                      onTap: () {},
-                      child: const Row(
-                        children: [
-                          Icon(Icons.wifi_off_outlined),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('Оффлайн-режим')
-                        ],
-                      ),
-                    ),
-                    // Map.
-                    PopupMenuItem(
-                      value: 1,
-                      onTap: () {},
-                      child: const Row(
-                        children: [
-                          Icon(Icons.map),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('Открыть карту')
-                        ],
-                      ),
-                    ),
-                    // Exit.
-                    PopupMenuItem(
-                      value: 2,
-                      onTap: () {
-                        Navigator.of(context).popUntil(
-                          ModalRoute.withName(
-                            '/auth',
-                          ),
-                        );
-                      },
-                      child: const Row(
-                        children: [
-                          Icon(Icons.logout),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('Выход')
-                        ],
-                      ),
-                    ),
-                  ],
-                  // Смещение ниже шапки
-                  // offset: const Offset(0, 60),
-                ),
+                PopupMenuWidget(
+                  beforeExit: null,
+                )
               ],
             ),
             body: RefreshIndicator(
@@ -86,9 +36,16 @@ class TasksPage extends StatelessWidget {
                 future: provider.model,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    /// Data.
                     if (snapshot.hasData) {
+                      /// Tasks empty.
                       if (snapshot.data!.tasks.isEmpty) {
-                        return const MessageWidget(mes: 'Нет заданий.');
+                        return const ScrollMessageWidget(
+                          mes: 'Нет заданий.',
+                          icon: Icons.notes,
+                        );
+
+                        /// Tasks.
                       } else {
                         return ListView.builder(
                           padding: const EdgeInsets.all(8),
@@ -97,14 +54,18 @@ class TasksPage extends StatelessWidget {
                               TaskCard(task: snapshot.data!.tasks[index]),
                         );
                       }
-                    } else {
-                      return MessageWidget(
+
+                      /// Error.
+                    } else if (snapshot.hasError) {
+                      return ScrollMessageWidget(
                         mes: snapshot.error.toString(),
+                        icon: Icons.error,
                       );
                     }
-                  } else {
-                    return const LoadingWidget();
                   }
+
+                  /// Loading.
+                  return const LoadingWidget();
                 },
               ),
             ),

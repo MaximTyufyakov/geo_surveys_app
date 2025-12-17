@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/unsaved_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
-import 'package:geo_surveys_app/common/widgets/message.widget.dart';
+import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
+import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/task_page.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
@@ -23,11 +24,6 @@ class TaskPage extends StatefulWidget {
 class _TaskPageState extends State<TaskPage> {
   /// The selected index of BottomNavigationBar.
   int _selectedIndex = 0;
-
-  /// The widgets on the page.
-  late TaskWidget taskWidget;
-  late ReportWidget reportWidget;
-  late VideosWidget videosWidget;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -66,18 +62,10 @@ class _TaskPageState extends State<TaskPage> {
               ),
               leading: BackButton(
                 onPressed: () {
-                  provider.exit();
+                  provider.toPrevPage();
                 },
               ),
               actions: [
-                /// Page reload.
-                IconButton(
-                  onPressed: () {
-                    provider.reloadPage();
-                  },
-                  icon: const Icon(Icons.replay_outlined),
-                ),
-
                 /// Save.
                 IconButton(
                   onPressed: () {
@@ -85,48 +73,63 @@ class _TaskPageState extends State<TaskPage> {
                   },
                   icon: const Icon(Icons.save),
                 ),
+
+                // Menu (...)
+                PopupMenuWidget(
+                  beforeExit: () async => await provider.logout(),
+                )
               ],
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(8),
+            body: RefreshIndicator(
+              onRefresh: () async {
+                provider.reloadPage();
+              },
               child: FutureBuilder(
-                  future: provider.model,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      /// Data from the database is received.
-                      if (snapshot.hasData) {
-                        /// Initialization of widgets.
-
+                future: provider.model,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    /// Data.
+                    if (snapshot.hasData) {
+                      switch (_selectedIndex) {
                         /// Task.
-                        taskWidget = TaskWidget(
-                          task: snapshot.data!,
-                        );
+                        case 0:
+                          return SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: TaskWidget(task: snapshot.data!),
+                          );
 
                         /// Report.
-                        reportWidget = ReportWidget(
-                          report: snapshot.data!.report,
-                        );
+                        case 1:
+                          return SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: ReportWidget(report: snapshot.data!.report),
+                          );
 
                         /// Videos.
-                        videosWidget = VideosWidget(
-                          task: snapshot.data!,
-                        );
+                        case 2:
+                          return VideosWidget(task: snapshot.data!);
 
-                        return [
-                          taskWidget,
-                          reportWidget,
-                          videosWidget,
-                        ].elementAt(_selectedIndex);
-
-                        /// Error.
-                      } else if (snapshot.hasError) {
-                        return MessageWidget(mes: snapshot.error.toString());
+                        /// Task.
+                        default:
+                          return SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: TaskWidget(task: snapshot.data!),
+                          );
                       }
-                    }
 
-                    /// Loading.
-                    return const LoadingWidget();
-                  }),
+                      /// Error.
+                    } else if (snapshot.hasError) {
+                      return ScrollMessageWidget(
+                        mes: snapshot.error.toString(),
+                        icon: Icons.error,
+                      );
+                    }
+                  }
+
+                  /// Loading.
+                  return const LoadingWidget();
+                },
+              ),
             ),
             bottomNavigationBar: BottomNavigationBar(
               items: const <BottomNavigationBarItem>[
