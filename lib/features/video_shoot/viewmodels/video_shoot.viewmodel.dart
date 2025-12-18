@@ -14,6 +14,14 @@ class VideoShootViewModel extends ChangeNotifier {
   /// Opens a page with information about task.
   final ValueSetter<File> goBack;
 
+  @override
+  dispose() async {
+    await controller.then((value) {
+      value.dispose();
+    }).catchError((err) {});
+    super.dispose();
+  }
+
   /// Initialize camera controller.
   ///
   /// Return [Future] of the [CameraController] initialize.

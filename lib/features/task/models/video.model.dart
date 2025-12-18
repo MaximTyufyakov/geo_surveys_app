@@ -72,7 +72,7 @@ class VideoModel {
   }
 
   /// Delete file and video from task model.
-  void deleteFromTask() async {
+  Future<void> deleteFromTask() async {
     await deleteFileLocal();
     parent.deleteVideo(this);
   }

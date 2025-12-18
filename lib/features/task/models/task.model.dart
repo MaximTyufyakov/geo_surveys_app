@@ -80,7 +80,7 @@ class TaskModel {
       switch (response.statusCode) {
         // Ok.
         case 200:
-          return parseTask(response);
+          return TaskModel.parseTask(response);
 
         // Forbidden
         case 403:
@@ -98,7 +98,7 @@ class TaskModel {
   ///
   /// The [response] parameter is the task response.
   /// Returns a [TaskModel].
-  static TaskModel parseTask(Response<Map<String, dynamic>> response) {
+  factory TaskModel.parseTask(Response<Map<String, dynamic>> response) {
     Map<String, dynamic> taskResponse =
         response.data!['task'] as Map<String, dynamic>;
 
@@ -236,7 +236,8 @@ class TaskModel {
               await video.deleteFileLocal();
             }
             // Update task object.
-            _copyWith(parseTask(response));
+            _copyWith(TaskModel.parseTask(response));
+            // saved = true;
             return;
 
           // Forbidden

@@ -19,9 +19,9 @@ class VideoCardViewModel extends ChangeNotifier {
 
   /// When delete button click
   void delete() async {
-    await deleteDialog().then((del) {
+    await deleteDialog().then((del) async {
       if (del == true) {
-        model.deleteFromTask();
+        await model.deleteFromTask();
         videosUpd();
       }
     });
