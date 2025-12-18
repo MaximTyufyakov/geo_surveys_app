@@ -93,17 +93,11 @@ class _TaskPageState extends State<TaskPage> {
                       switch (_selectedIndex) {
                         /// Task.
                         case 0:
-                          return SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: TaskWidget(task: snapshot.data!),
-                          );
+                          return TaskWidget(task: snapshot.data!);
 
                         /// Report.
                         case 1:
-                          return SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: ReportWidget(report: snapshot.data!.report),
-                          );
+                          return ReportWidget(report: snapshot.data!.report);
 
                         /// Videos.
                         case 2:
@@ -111,10 +105,7 @@ class _TaskPageState extends State<TaskPage> {
 
                         /// Task.
                         default:
-                          return SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: TaskWidget(task: snapshot.data!),
-                          );
+                          return TaskWidget(task: snapshot.data!);
                       }
 
                       /// Error.
