@@ -1,16 +1,13 @@
 import 'package:dio/dio.dart';
 
-/// Model for work with API.
-class ApiModel {
-  // Dio with default options.
-  static final dio = Dio(
-    BaseOptions(
-      baseUrl: const String.fromEnvironment('API_URL'),
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      headers: {
-        'Authorization': '',
-      },
-    ),
-  );
-}
+// Dio with default options.
+final dio = Dio(
+  BaseOptions(
+    // Ignored for set base URL from env.
+    // ignore: avoid_redundant_argument_values
+    baseUrl: const String.fromEnvironment('API_URL'),
+    connectTimeout: const Duration(seconds: 10),
+
+    headers: {'Authorization': ''},
+  ),
+);

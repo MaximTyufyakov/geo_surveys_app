@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 
 /// A ViewModel of the video shoot page.
 class VideoShootViewModel extends ChangeNotifier {
-  VideoShootViewModel({
-    required this.goBack,
-  }) : controller = _initController();
+  VideoShootViewModel({required this.goBack}) : controller = _initController();
 
   /// The camera controller.
   Future<CameraController> controller;
@@ -15,10 +13,12 @@ class VideoShootViewModel extends ChangeNotifier {
   final ValueSetter<File> goBack;
 
   @override
-  dispose() async {
-    await controller.then((value) {
-      value.dispose();
-    }).catchError((err) {});
+  Future<void> dispose() async {
+    await controller
+        .then((value) {
+          value.dispose();
+        })
+        .catchError((err) {});
     super.dispose();
   }
 
@@ -30,10 +30,9 @@ class VideoShootViewModel extends ChangeNotifier {
       /// Create a CameraController.
       final cameras = await availableCameras();
       final CameraDescription camera = cameras.first;
-      CameraController localController = CameraController(
+      final CameraController localController = CameraController(
         camera,
         ResolutionPreset.medium,
-        enableAudio: true,
       );
       await localController.initialize();
       return localController;
@@ -44,15 +43,17 @@ class VideoShootViewModel extends ChangeNotifier {
 
   /// Press shoot button.
   Future<void> shootPressed() async {
-    await controller.then((value) async {
-      if (!value.value.isRecordingVideo) {
-        await value.startVideoRecording();
-        notifyListeners();
-      } else {
-        final XFile video = await value.stopVideoRecording();
-        notifyListeners();
-        goBack(File(video.path));
-      }
-    }).catchError((err) {});
+    await controller
+        .then((value) async {
+          if (!value.value.isRecordingVideo) {
+            await value.startVideoRecording();
+            notifyListeners();
+          } else {
+            final XFile video = await value.stopVideoRecording();
+            notifyListeners();
+            goBack(File(video.path));
+          }
+        })
+        .catchError((err) {});
   }
 }

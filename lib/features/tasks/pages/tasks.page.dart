@@ -12,64 +12,56 @@ class TasksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<TasksViewModel>(
-        create: (BuildContext context) => TasksViewModel(),
-        child: Consumer<TasksViewModel>(
-          builder: (context, provider, child) => Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: Text(
-                'Задания',
-                style: Theme.of(context).textTheme.displayMedium,
-              ),
-              actions: const [
-                // Menu (...)
-                PopupMenuWidget(
-                  beforeExit: null,
-                )
-              ],
-            ),
-            body: RefreshIndicator(
-              onRefresh: () async {
-                provider.reload();
-              },
-              child: FutureBuilder(
-                future: provider.model,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    /// Data.
-                    if (snapshot.hasData) {
-                      /// Tasks empty.
-                      if (snapshot.data!.tasks.isEmpty) {
-                        return const ScrollMessageWidget(
+    create: (BuildContext context) => TasksViewModel(),
+    child: Consumer<TasksViewModel>(
+      builder: (context, provider, child) => Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Задания',
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
+          actions: const [
+            // Menu (...)
+            PopupMenuWidget(logout: null),
+          ],
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async => await provider.reload(),
+          child: FutureBuilder(
+            future: provider.model,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                /// Data.
+                if (snapshot.hasData) {
+                  /// Tasks empty.
+                  return snapshot.data!.tasks.isEmpty
+                      ? const ScrollMessageWidget(
                           mes: 'Нет заданий.',
                           icon: Icons.notes,
-                        );
-
-                        /// Tasks.
-                      } else {
-                        return ListView.builder(
+                        )
+                      : ListView.builder(
                           padding: const EdgeInsets.all(8),
                           itemCount: snapshot.data!.tasks.length,
                           itemBuilder: (context, index) =>
                               TaskCard(task: snapshot.data!.tasks[index]),
                         );
-                      }
 
-                      /// Error.
-                    } else if (snapshot.hasError) {
-                      return ScrollMessageWidget(
-                        mes: snapshot.error.toString(),
-                        icon: Icons.error,
-                      );
-                    }
-                  }
+                  /// Error.
+                } else if (snapshot.hasError) {
+                  return ScrollMessageWidget(
+                    mes: snapshot.error.toString(),
+                    icon: Icons.error,
+                  );
+                }
+              }
 
-                  /// Loading.
-                  return const LoadingWidget();
-                },
-              ),
-            ),
+              /// Loading.
+              return const LoadingWidget();
+            },
           ),
         ),
-      );
+      ),
+    ),
+  );
 }

@@ -8,7 +8,8 @@ class TasksViewModel extends ChangeNotifier {
   /// Model with all tasks.
   Future<TasksModel> model;
 
-  void reload() {
+  Future<void> reload() async {
+    await model;
     model = TasksModel.create();
     notifyListeners();
   }

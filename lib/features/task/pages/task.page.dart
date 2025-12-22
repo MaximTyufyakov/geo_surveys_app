@@ -40,9 +40,7 @@ class _TaskPageState extends State<TaskPage> {
             context: context,
             builder: (context) => UnsavedDialog(),
           ),
-          goBack: (bool? completed) => Navigator.of(context).pop(
-            completed,
-          ),
+          goBack: (bool? completed) => Navigator.of(context).pop(completed),
           saveDialog: (Future<List<String>> futureText) => showDialog<bool>(
             context: context,
             builder: (context) => FutureDialog(
@@ -52,6 +50,8 @@ class _TaskPageState extends State<TaskPage> {
               redTitle: null,
             ),
           ),
+          goHome: () =>
+              Navigator.of(context).popUntil(ModalRoute.withName('/')),
         ),
         child: Consumer<TaskPageViewModel>(
           builder: (context, provider, child) => Scaffold(
@@ -61,29 +61,21 @@ class _TaskPageState extends State<TaskPage> {
                 style: Theme.of(context).textTheme.displayMedium,
               ),
               leading: BackButton(
-                onPressed: () {
-                  provider.toPrevPage();
-                },
+                onPressed: () async => await provider.toPrevPage(),
               ),
               actions: [
                 /// Save.
                 IconButton(
-                  onPressed: () {
-                    provider.save();
-                  },
+                  onPressed: () async => await provider.save(),
                   icon: const Icon(Icons.save),
                 ),
 
                 // Menu (...)
-                PopupMenuWidget(
-                  beforeExit: () async => await provider.logout(),
-                )
+                PopupMenuWidget(logout: () async => await provider.logout()),
               ],
             ),
             body: RefreshIndicator(
-              onRefresh: () async {
-                provider.reloadPage();
-              },
+              onRefresh: () async => await provider.reloadPage(),
               child: FutureBuilder(
                 future: provider.model,
                 builder: (context, snapshot) {
@@ -125,7 +117,9 @@ class _TaskPageState extends State<TaskPage> {
             bottomNavigationBar: BottomNavigationBar(
               items: const <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.task_alt), label: 'Задание'),
+                  icon: Icon(Icons.task_alt),
+                  label: 'Задание',
+                ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.edit_document),
                   label: 'Отчёт',

@@ -17,51 +17,51 @@ class VideoCardWidget extends StatelessWidget {
   final VoidCallback videosUpd;
 
   @override
-  Widget build(BuildContext context) =>
-      ChangeNotifierProvider<VideoCardViewModel>(
-        create: (BuildContext context) => VideoCardViewModel(
-          model: video,
-          videosUpd: videosUpd,
-          deleteDialog: () => showDialog<bool>(
-            context: context,
-            builder: (context) => TextDialog(
-                title: 'Удаление видео',
-                text: const ['Вы уверены?'],
-                greenTitle: 'Да',
-                redTitle: 'Нет'),
-          ),
+  Widget build(
+    BuildContext context,
+  ) => ChangeNotifierProvider<VideoCardViewModel>(
+    create: (BuildContext context) => VideoCardViewModel(
+      model: video,
+      videosUpd: videosUpd,
+      deleteDialog: () => showDialog<bool>(
+        context: context,
+        builder: (context) => TextDialog(
+          title: 'Удаление видео',
+          text: const ['Вы уверены?'],
+          greenTitle: 'Да',
+          redTitle: 'Нет',
         ),
-        child: Consumer<VideoCardViewModel>(
-          builder: (context, provider, child) => Card(
-            child: Row(
-              children: [
-                Expanded(
-                  child: ListTile(
-                    title: SelectableText(
-                      provider.model.title,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SelectableText(
-                          '''${provider.model.latitude}, ${provider.model.longitude}''',
-                          style: Theme.of(context).textTheme.bodySmall!,
-                        )
-                      ],
-                    ),
-                  ),
+      ),
+    ),
+    child: Consumer<VideoCardViewModel>(
+      builder: (context, provider, child) => Card(
+        child: Row(
+          children: [
+            Expanded(
+              child: ListTile(
+                title: SelectableText(
+                  provider.model.title,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                IconButton(
-                  onPressed: () {
-                    provider.delete();
-                  },
-                  icon: const Icon(Icons.delete),
-                  color: Colors.red[400],
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectableText(
+                      '''${provider.model.latitude}, ${provider.model.longitude}''',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+            IconButton(
+              onPressed: () => provider.delete(),
+              icon: const Icon(Icons.delete),
+              color: Colors.red[400],
+            ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 }

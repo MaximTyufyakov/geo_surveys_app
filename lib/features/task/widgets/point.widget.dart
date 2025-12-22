@@ -7,50 +7,49 @@ import 'package:provider/provider.dart';
 ///
 /// The [provider] parameter is a point view model.
 class PointWidget extends StatelessWidget {
-  PointWidget({
-    super.key,
-    required PointModel point,
-  }) : provider = PointViewModel(model: point);
+  PointWidget({super.key, required PointModel point})
+    : provider = PointViewModel(model: point);
 
   /// Point view model.
   final PointViewModel provider;
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<PointViewModel>(
-        create: (BuildContext context) => provider,
-        child: Consumer<PointViewModel>(
-          builder: (context, provider, child) => Column(
+    create: (BuildContext context) => provider,
+    child: Consumer<PointViewModel>(
+      builder: (context, provider, child) => Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  /// Number.
-                  Text('${provider.model.number}.',
-                      style: Theme.of(context).textTheme.bodyMedium),
-
-                  Checkbox(
-                      value: provider.model.completed,
-                      onChanged: (onChanged) => provider.onPointTap()),
-
-                  /// Description.
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SelectableText(
-                          provider.model.description,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          onTap: () => provider.onPointTap(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              /// Number.
+              Text(
+                '${provider.model.number}.',
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const Divider(
-                color: Colors.black26,
+
+              Checkbox(
+                value: provider.model.completed,
+                onChanged: (onChanged) => provider.onPointTap(),
+              ),
+
+              /// Description.
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectableText(
+                      provider.model.description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      onTap: () => provider.onPointTap(),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-      );
+          const Divider(),
+        ],
+      ),
+    ),
+  );
 }

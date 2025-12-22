@@ -19,9 +19,7 @@ class TaskCard extends StatelessWidget {
           model: task,
           openTaskPage: () => Navigator.of(context).push(
             MaterialPageRoute<bool>(
-              builder: (context) => TaskPage(
-                taskid: task.taskid,
-              ),
+              builder: (context) => TaskPage(taskid: task.taskid),
             ),
           ),
         ),
@@ -29,9 +27,7 @@ class TaskCard extends StatelessWidget {
           builder: (context, provider, child) => Card(
             /// To click.
             child: InkWell(
-              onTap: () {
-                provider.openTask();
-              },
+              onTap: () => provider.openTask(),
 
               /// Content.
               /// ListTile with a title and completed text.
@@ -43,19 +39,20 @@ class TaskCard extends StatelessWidget {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    provider.model.completed
-                        ? Text('Завершено',
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      color: Colors.green,
-                                    ))
-                        : Text(
-                            'Не завершено',
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      color: Colors.red,
-                                    ),
-                          ),
+                    if (provider.model.completed)
+                      Text(
+                        'Завершено',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall!.copyWith(color: Colors.green),
+                      )
+                    else
+                      Text(
+                        'Не завершено',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall!.copyWith(color: Colors.red),
+                      ),
                   ],
                 ),
               ),

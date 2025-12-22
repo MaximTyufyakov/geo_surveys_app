@@ -13,12 +13,9 @@ class AuthModel {
   static Future<AuthModel> tryLogin(String login, String password) async {
     try {
       /// Api response.
-      Response<Map<String, dynamic>> response = await ApiModel.dio.post(
+      final Response<Map<String, dynamic>> response = await dio.post(
         '/users/auth',
-        data: {
-          'login': login,
-          'password': password,
-        },
+        data: {'login': login, 'password': password},
         options: Options(
           validateStatus: (status) => status == 201 || status == 401,
         ),
@@ -27,7 +24,7 @@ class AuthModel {
       switch (response.statusCode) {
         /// Token create.
         case 201:
-          ApiModel.dio.options.headers['Authorization'] =
+          dio.options.headers['Authorization'] =
               'Bearer ${response.data!['token']}';
           return AuthModel();
 
@@ -39,11 +36,11 @@ class AuthModel {
           return Future.error('Ошибка при обращении к серверу.');
       }
     } on DioException {
-      return Future.error('Не удаётся получить данные с сервера.');
+      return Future.error('Ошибка при обращении к серверу.');
     }
   }
 
   void removeToken() {
-    ApiModel.dio.options.headers['Authorization'] = '';
+    dio.options.headers['Authorization'] = '';
   }
 }

@@ -5,9 +5,7 @@ import 'package:geo_surveys_app/features/auth/models/auth.model.dart';
 ///
 /// The [context] parameter is the context of the auth page.
 class AuthViewModel extends ChangeNotifier {
-  AuthViewModel({
-    required this.openTasksPage,
-  });
+  AuthViewModel({required this.openTasksPage});
 
   /// CallBack from page.
   final ValueGetter<Future<void>> openTasksPage;
@@ -22,34 +20,28 @@ class AuthViewModel extends ChangeNotifier {
   Future<AuthModel> model = Future.value(AuthModel());
 
   /// Check login and password.
-  void tryLogin() async {
+  Future<void> tryLogin() async {
     /// Empty check.
-    if (loginController.text.isEmpty || passwordController.text.isEmpty) {
-      model = Future.error('Введите логин и пароль.');
-    } else {
-      // Login and password check.
-      model = AuthModel.tryLogin(
-        loginController.text,
-        passwordController.text,
-      );
-    }
+    model = loginController.text.isEmpty || passwordController.text.isEmpty
+        ? Future.error('Введите логин и пароль.')
+        : AuthModel.tryLogin(loginController.text, passwordController.text);
 
     notifyListeners();
 
     /// Ok.
-    await model.then(
-      (value) async {
-        /// Reset password and login
-        loginController.text = '';
-        passwordController.text = '';
+    await model
+        .then((value) async {
+          /// Reset password and login
+          loginController.text = '';
+          passwordController.text = '';
 
-        /// Open new page.
-        await openTasksPage();
-        // Clear token.
-        await model.then((value) {
-          value.removeToken();
-        });
-      },
-    ).catchError((err) {});
+          /// Open new page.
+          await openTasksPage();
+          // Clear token.
+          await model.then((value) {
+            value.removeToken();
+          });
+        })
+        .catchError((err) {});
   }
 }

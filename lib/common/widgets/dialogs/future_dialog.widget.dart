@@ -18,33 +18,28 @@ class FutureDialog extends AbstractDialog {
     required super.greenTitle,
     required super.redTitle,
   }) : super(
-          content: FutureBuilder(
-            future: futureText,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                /// Data is received.
-                if (snapshot.hasData) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: snapshot.data!.map(Text.new).toList(),
-                  );
+         content: FutureBuilder(
+           future: futureText,
+           builder: (context, snapshot) {
+             if (snapshot.connectionState == ConnectionState.done) {
+               /// Data is received.
+               if (snapshot.hasData) {
+                 return Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: snapshot.data!.map(Text.new).toList(),
+                 );
 
-                  /// Error.
-                } else if (snapshot.hasError) {
-                  return Text(
-                    snapshot.error.toString(),
-                  );
-                }
-              }
+                 /// Error.
+               } else if (snapshot.hasError) {
+                 return Text(snapshot.error.toString());
+               }
+             }
 
-              /// Loading.
-              return Center(
-                child: CircularProgressIndicator(
-                    color: Theme.of(context).primaryColor),
-              );
-            },
-          ),
-        );
+             /// Loading.
+             return const Center(child: CircularProgressIndicator());
+           },
+         ),
+       );
 
   /// Content of the dialog.
   final Future<List<String>> futureText;

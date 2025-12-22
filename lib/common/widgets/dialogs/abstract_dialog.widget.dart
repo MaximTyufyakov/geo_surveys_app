@@ -10,12 +10,13 @@ import 'package:flutter/material.dart';
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
 class AbstractDialog extends StatelessWidget {
-  AbstractDialog(
-      {super.key,
-      required this.title,
-      required this.content,
-      required this.greenTitle,
-      required this.redTitle});
+  AbstractDialog({
+    super.key,
+    required this.title,
+    required this.content,
+    required this.greenTitle,
+    required this.redTitle,
+  });
 
   /// Dialog name.
   final String title;
@@ -38,14 +39,10 @@ class AbstractDialog extends StatelessWidget {
       buttons.add(
         FilledButton(
           style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(
-              Colors.lightGreen[200],
-            ),
+            backgroundColor: WidgetStateProperty.all(Colors.lightGreen[300]),
           ),
           child: Text(greenTitle!),
-          onPressed: () {
-            Navigator.pop(context, true);
-          },
+          onPressed: () => Navigator.pop(context, true),
         ),
       );
     }
@@ -53,14 +50,10 @@ class AbstractDialog extends StatelessWidget {
       buttons.add(
         FilledButton(
           style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all(
-              Colors.red[200],
-            ),
+            backgroundColor: WidgetStateProperty.all(Colors.red[300]),
           ),
           child: Text(redTitle!),
-          onPressed: () {
-            Navigator.pop(context, false);
-          },
+          onPressed: () => Navigator.pop(context, false),
         ),
       );
     }

@@ -7,33 +7,29 @@ import 'package:provider/provider.dart';
 ///
 /// The [provider] parameter is a report view model.
 class ReportWidget extends StatelessWidget {
-  ReportWidget({
-    super.key,
-    required ReportModel report,
-  }) : provider = ReportViewModel(model: report);
+  ReportWidget({super.key, required ReportModel report})
+    : provider = ReportViewModel(model: report);
 
   /// Report view model.
   final ReportViewModel provider;
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<ReportViewModel>(
-        create: (BuildContext context) => provider,
-        child: Consumer<ReportViewModel>(
-          builder: (context, provider, child) => ListView(
-            padding: const EdgeInsets.all(8),
-            children: [
-              TextField(
-                decoration: const InputDecoration(
-                  hintText: 'Здесь можно написать отчёт о выполненной работе.',
-                ),
-                controller: provider.reportController,
-                onChanged: (action) {
-                  provider.onTextChange();
-                },
-                maxLines: null,
-              ),
-            ],
+    create: (BuildContext context) => provider,
+    child: Consumer<ReportViewModel>(
+      builder: (context, provider, child) => ListView(
+        padding: const EdgeInsets.all(8),
+        children: [
+          TextField(
+            decoration: const InputDecoration(
+              hintText: 'Здесь можно написать отчёт о выполненной работе.',
+            ),
+            controller: provider.reportController,
+            onChanged: (action) => provider.onTextChange(),
+            maxLines: null,
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }

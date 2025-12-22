@@ -17,6 +17,46 @@ import 'package:geo_surveys_app/features/task/models/video.model.dart';
 /// The [points] parameter is the list of points that need to be completed.
 /// The [saved] parameter is the saved flag.
 class TaskModel {
+  /// Parse task from Response to TaskModel.
+  ///
+  /// The [response] parameter is the task response.
+  /// Returns a [TaskModel].
+  factory TaskModel.parseTask(Response<Map<String, dynamic>> response) {
+    final Map<String, dynamic> taskResponse =
+        response.data!['task'] as Map<String, dynamic>;
+
+    // Create task model.
+    return TaskModel._create(
+      taskid: taskResponse['task_id'] as int,
+      title: taskResponse['title'] as String,
+      description: taskResponse['description'] as String?,
+      latitude: (taskResponse['latitude'] as num?)?.toDouble(),
+      longitude: (taskResponse['longitude'] as num?)?.toDouble(),
+      completed: taskResponse['completed'] as bool,
+      report: ReportModel(text: taskResponse['report'] as String? ?? ''),
+      saved: true,
+      points: (response.data!['points'] as List<dynamic>).map((pointResponse) {
+        final point = pointResponse as Map<String, dynamic>;
+        return PointModel(
+          pointid: point['point_id'] as int,
+          number: point['number'] as int,
+          description: point['description'] as String,
+          completed: point['completed'] as bool,
+        );
+      }).toList(),
+      videos: (response.data!['videos'] as List<dynamic>).map((videoResponse) {
+        final video = videoResponse as Map<String, dynamic>;
+        return VideoModel(
+          videoid: video['video_id'] as int,
+          title: video['title'] as String,
+          file: null,
+          latitude: (video['latitude'] as num).toDouble(),
+          longitude: (video['longitude'] as num).toDouble(),
+        );
+      }).toList(),
+    ).._setParent();
+  }
+
   /// Private constructor.
   TaskModel._create({
     required this.taskid,
@@ -70,7 +110,7 @@ class TaskModel {
   static Future<TaskModel> create({required int taskid}) async {
     try {
       // Api response.
-      Response<Map<String, dynamic>> response = await ApiModel.dio.get(
+      final Response<Map<String, dynamic>> response = await dio.get(
         '/tasks/$taskid',
         options: Options(
           validateStatus: (status) => status == 200 || status == 403,
@@ -90,48 +130,8 @@ class TaskModel {
           return Future.error('Ошибка при обращении к серверу.');
       }
     } on DioException {
-      return Future.error('Не удаётся получить данные с сервера.');
+      return Future.error('Ошибка при обращении к серверу.');
     }
-  }
-
-  /// Parse task from Response to TaskModel.
-  ///
-  /// The [response] parameter is the task response.
-  /// Returns a [TaskModel].
-  factory TaskModel.parseTask(Response<Map<String, dynamic>> response) {
-    Map<String, dynamic> taskResponse =
-        response.data!['task'] as Map<String, dynamic>;
-
-    // Create task model.
-    TaskModel component = TaskModel._create(
-      taskid: taskResponse['task_id'] as int,
-      title: taskResponse['title'] as String,
-      description: taskResponse['description'] as String?,
-      latitude: taskResponse['latitude'] as double?,
-      longitude: taskResponse['longitude'] as double?,
-      completed: taskResponse['completed'] as bool,
-      report: ReportModel(text: taskResponse['report'] as String? ?? ''),
-      saved: true,
-      points: (response.data!['points'] as List<dynamic>)
-          .map((pointResponse) => PointModel(
-                pointid: pointResponse['point_id'] as int,
-                number: pointResponse['number'] as int,
-                description: pointResponse['description'] as String,
-                completed: pointResponse['completed'] as bool,
-              ))
-          .toList(),
-      videos: (response.data!['videos'] as List<dynamic>)
-          .map((videoResponse) => VideoModel(
-                videoid: videoResponse['video_id'] as int,
-                title: videoResponse['title'] as String,
-                file: null,
-                latitude: videoResponse['latitude'] as double,
-                longitude: videoResponse['longitude'] as double,
-              ))
-          .toList(),
-    ).._setParent();
-
-    return component;
   }
 
   void _copyWith(TaskModel copy) {
@@ -156,10 +156,10 @@ class TaskModel {
   /// Set task as a parent for childs.
   void _setParent() {
     report.parent = this;
-    for (PointModel point in points) {
+    for (final PointModel point in points) {
       point.parent = this;
     }
-    for (VideoModel video in videos) {
+    for (final VideoModel video in videos) {
       video.parent = this;
     }
   }
@@ -195,28 +195,32 @@ class TaskModel {
     if (!saved) {
       try {
         // Api response.
-        Response<Map<String, dynamic>> response = await ApiModel.dio.put(
+        final Response<Map<String, dynamic>> response = await dio.put(
           '/tasks/save',
           data: {
             'task_id': taskid,
             // All points.
             'updatedPoints': points
-                .map((point) => {
-                      'point_id': point.pointid,
-                      'completed': point.completed,
-                    })
+                .map(
+                  (point) => {
+                    'point_id': point.pointid,
+                    'completed': point.completed,
+                  },
+                )
                 .toList(),
             'report': report.text,
             // Videos with file.
             'createdVideos': videos
                 .where((video) => video.file != null)
-                .map((video) => {
-                      'title': video.title,
-                      'file': base64Encode(video.file!.readAsBytesSync()),
-                      'format': video.format,
-                      'latitude': video.latitude,
-                      'longitude': video.longitude,
-                    })
+                .map(
+                  (video) => {
+                    'title': video.title,
+                    'file': base64Encode(video.file!.readAsBytesSync()),
+                    'format': video.format,
+                    'latitude': video.latitude,
+                    'longitude': video.longitude,
+                  },
+                )
                 .toList(),
             // Deleted videos id.
             'deletedVideos': deletedVideosId,
@@ -232,7 +236,7 @@ class TaskModel {
             // Clean deletedVideos list.
             deletedVideosId.clear();
             // Delete files of saved videos.
-            for (VideoModel video in videos) {
+            for (final VideoModel video in videos) {
               await video.deleteFileLocal();
             }
             // Update task object.
@@ -248,7 +252,7 @@ class TaskModel {
             return Future.error('Ошибка при обращении к серверу.');
         }
       } on DioException {
-        return Future.error('Не удаётся получить данные с сервера.');
+        return Future.error('Ошибка при обращении к серверу.');
       }
     } else {
       return Future.error('Нет изменений. ${completedCheck().$2}');
@@ -259,7 +263,7 @@ class TaskModel {
   ///
   /// Returns a true if task completed else false and message.
   (bool, String) completedCheck() {
-    for (PointModel point in points) {
+    for (final PointModel point in points) {
       if (!point.completed) {
         return (false, 'Для завершения задания окончите все пункты.');
       }
@@ -272,8 +276,8 @@ class TaskModel {
 
   /// Delete videofiles from local storage.
   /// If it not saved.
-  void deleteUnsavedVideoFiles() async {
-    for (VideoModel video in videos.where((v) => v.videoid == null)) {
+  Future<void> deleteUnsavedVideoFiles() async {
+    for (final VideoModel video in videos.where((v) => v.videoid == null)) {
       await video.deleteFileLocal();
     }
   }

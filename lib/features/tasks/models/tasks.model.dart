@@ -8,9 +8,7 @@ import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 /// The [tasks] parameter is the list of tasks from database.
 class TasksModel {
   /// Private constructor
-  TasksModel._create({
-    required this.tasks,
-  });
+  TasksModel._create({required this.tasks});
 
   /// The list of tasks from database.
   final List<BaseTaskModel> tasks;
@@ -23,7 +21,7 @@ class TasksModel {
   static Future<TasksModel> create() async {
     try {
       // Api response.
-      Response<Map<String, dynamic>> response = await ApiModel.dio.get(
+      final Response<Map<String, dynamic>> response = await dio.get(
         '/tasks/all',
         options: Options(
           validateStatus: (status) => status == 200 || status == 403,
@@ -35,13 +33,14 @@ class TasksModel {
         case 200:
           // Create list.
           return TasksModel._create(
-            tasks: (response.data!['tasks'] as List<dynamic>)
-                .map((task) => BaseTaskModel(
-                      taskid: task['task_id'] as int,
-                      title: task['title'] as String,
-                      completed: task['completed'] as bool,
-                    ))
-                .toList(),
+            tasks: (response.data!['tasks'] as List<dynamic>).map((task) {
+              final taskMap = task as Map<String, dynamic>;
+              return BaseTaskModel(
+                taskid: taskMap['task_id'] as int,
+                title: taskMap['title'] as String,
+                completed: taskMap['completed'] as bool,
+              );
+            }).toList(),
           );
 
         // Forbidden
@@ -52,7 +51,7 @@ class TasksModel {
           return Future.error('Ошибка при обращении к серверу.');
       }
     } on DioException {
-      return Future.error('Не удаётся получить данные с сервера.');
+      return Future.error('Ошибка при обращении к серверу.');
     }
   }
 }
