@@ -2,145 +2,83 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 
 /// Main entry point to the app.
-void main() async {
-  runApp(
-    const MainApp(),
-  );
+void main() {
+  runApp(const MainApp());
 }
 
 /// Main widget.
 class MainApp extends StatelessWidget {
-  const MainApp({
-    super.key,
-  });
+  const MainApp({super.key});
+
+  /// Seed color.
+  static const _seedColor = Colors.orange;
 
   /// Main Color.
   static const _primaryColor = Colors.deepOrange;
 
-  /// Display text color.
-  static const _displayColor = Colors.brown;
-
-  /// Scaffold background color.
-  static final _scaffoldColor = _primaryColor[50];
-
   /// App background color.
-  static final _appBarColor = _primaryColor[100];
+  static final _appBarColorLight = _primaryColor[100];
+  static final _appBarColorDark = Colors.grey[850];
 
-  /// On element tap color.
-  static const _splashColor = Color.fromARGB(121, 177, 139, 103);
+  // Base theme (light and dark).
+  static ThemeData _baseTheme(Brightness brightness) => ThemeData(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: _seedColor,
+      primary: _primaryColor,
+      brightness: brightness,
+    ),
+    useMaterial3: true,
+    fontFamily: 'Vinque Rg',
 
-  /// Buttons background color.
-  static const _buttonBColor = Color.fromARGB(121, 206, 162, 120);
+    /// Text style hierarchy.
+    ///
+    /// Each style has 3 scale: large, medium and small.
+    ///
+    /// * display
+    /// * headline
+    /// * title
+    /// * body
+    /// * label
+    textTheme: const TextTheme(
+      /// Default text style.
+      displayMedium: TextStyle(fontSize: 26),
+      headlineMedium: TextStyle(fontSize: 20),
+      titleMedium: TextStyle(fontSize: 18),
+      bodyMedium: TextStyle(fontSize: 16),
+      bodySmall: TextStyle(fontSize: 14),
+    ),
 
-  /// Buttons text and icon color.
-  static const _buttonFColor = Colors.black54;
+    // Input style.
+    inputDecorationTheme: const InputDecorationTheme(
+      border: OutlineInputBorder(),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Геоконтролируемые съёмки',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primaryColor: _primaryColor,
-          primarySwatch: _primaryColor,
-          splashColor: _splashColor,
-          highlightColor: _splashColor,
-          fontFamily: 'Vinque Rg',
+    title: 'Геоконтролируемые съёмки',
+    debugShowCheckedModeBanner: false,
 
-          /// Text style hierarchy.
-          ///
-          /// Each style has 3 scale: large, medium and small.
-          ///
-          /// * display
-          /// * headline
-          /// * title
-          /// * body
-          /// * label
-          textTheme: const TextTheme(
-            /// Default text style.
-            displayMedium: TextStyle(
-              color: _displayColor,
-              fontSize: 24,
-            ),
-            displaySmall: TextStyle(
-              color: _displayColor,
-              fontSize: 20,
-            ),
-            headlineMedium: TextStyle(
-              fontSize: 20,
-            ),
-            titleMedium: TextStyle(
-              fontSize: 18,
-            ),
-            bodyMedium: TextStyle(
-              fontSize: 16,
-            ),
-            bodySmall: TextStyle(
-              fontSize: 14,
-            ),
-          ),
+    /// Light theme.
+    theme: _baseTheme(Brightness.light).copyWith(
+      /// Bars styles.
+      appBarTheme: AppBarTheme(backgroundColor: _appBarColorLight),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: _appBarColorLight,
+      ),
+    ),
 
-          /// Buttons styles.
-          filledButtonTheme: FilledButtonThemeData(
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(_buttonBColor),
-              foregroundColor: WidgetStateProperty.all<Color>(
-                _buttonFColor,
-              ),
-            ),
-          ),
-          iconButtonTheme: IconButtonThemeData(
-            style: ButtonStyle(
-              foregroundColor: WidgetStateProperty.all<Color>(
-                _buttonFColor,
-              ),
-            ),
-          ),
-          checkboxTheme: const CheckboxThemeData(
-            fillColor: WidgetStateProperty.fromMap(
-              <WidgetStatesConstraint, Color?>{
-                WidgetState.selected: _primaryColor,
-              },
-            ),
-          ),
+    /// Dark theme.
+    darkTheme: _baseTheme(Brightness.dark).copyWith(
+      /// Bars styles.
+      appBarTheme: AppBarTheme(backgroundColor: _appBarColorDark),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: _appBarColorDark,
+      ),
+    ),
 
-          /// Input styles.
-          inputDecorationTheme: const InputDecorationTheme(
-            border: OutlineInputBorder(),
-            fillColor: Colors.white,
-            filled: true,
-            suffixIconColor: _primaryColor,
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: _primaryColor,
-              ),
-            ),
-          ),
-          textSelectionTheme: TextSelectionThemeData(
-            cursorColor: _primaryColor,
-            selectionHandleColor: _primaryColor,
-            selectionColor: _primaryColor[100],
-          ),
-
-          /// Scaffold and navigation styles.
-          scaffoldBackgroundColor: _scaffoldColor,
-          appBarTheme: AppBarTheme(
-            backgroundColor: _appBarColor,
-          ),
-          bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: _appBarColor,
-            selectedItemColor: _primaryColor,
-          ),
-          popupMenuTheme: PopupMenuThemeData(color: _scaffoldColor),
-
-          progressIndicatorTheme: const ProgressIndicatorThemeData(
-            color: _primaryColor,
-          ),
-        ),
-
-        /// Init page.
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const AuthPage(),
-        },
-      );
+    /// Init page.
+    initialRoute: '/',
+    routes: {'/': (context) => const AuthPage()},
+  );
 }
