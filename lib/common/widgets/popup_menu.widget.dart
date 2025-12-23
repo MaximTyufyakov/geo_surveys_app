@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 class PopupMenuWidget extends StatelessWidget {
   const PopupMenuWidget({super.key, required this.logout});
 
-  /// Operations before exit.
-  /// Returns true if access exit.
-  final VoidCallback? logout;
+  /// Logout operation.
+  final VoidCallback logout;
 
   @override
   Widget build(BuildContext context) => PopupMenuButton(
@@ -38,9 +37,7 @@ class PopupMenuWidget extends StatelessWidget {
       // Exit.
       PopupMenuItem(
         value: 2,
-        onTap: () => logout != null
-            ? logout!()
-            : Navigator.of(context).popUntil(ModalRoute.withName('/')),
+        onTap: logout,
         child: const Row(
           children: [Icon(Icons.logout), SizedBox(width: 10), Text('Выход')],
         ),

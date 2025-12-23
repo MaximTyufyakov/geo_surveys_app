@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
+import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +13,12 @@ class TasksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<TasksViewModel>(
-    create: (BuildContext context) => TasksViewModel(),
+    create: (BuildContext context) => TasksViewModel(
+      goAuth: () => Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<void>(builder: (context) => const AuthPage()),
+        (route) => false, // Remove all previous routes.
+      ),
+    ),
     child: Consumer<TasksViewModel>(
       builder: (context, provider, child) => Scaffold(
         appBar: AppBar(
@@ -21,9 +27,9 @@ class TasksPage extends StatelessWidget {
             'Задания',
             style: Theme.of(context).textTheme.displayMedium,
           ),
-          actions: const [
+          actions: [
             // Menu (...)
-            PopupMenuWidget(logout: null),
+            PopupMenuWidget(logout: provider.logout),
           ],
         ),
         body: RefreshIndicator(

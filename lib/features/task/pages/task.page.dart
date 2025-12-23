@@ -4,6 +4,7 @@ import 'package:geo_surveys_app/common/widgets/dialogs/unsaved_dialog.widget.dar
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
+import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/task/viewmodels/task_page.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
@@ -50,8 +51,10 @@ class _TaskPageState extends State<TaskPage> {
               redTitle: null,
             ),
           ),
-          goHome: () =>
-              Navigator.of(context).popUntil(ModalRoute.withName('/')),
+          goAuth: () => Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute<void>(builder: (context) => const AuthPage()),
+            (route) => false, // Remove all previous routes.
+          ),
         ),
         child: Consumer<TaskPageViewModel>(
           builder: (context, provider, child) => Scaffold(

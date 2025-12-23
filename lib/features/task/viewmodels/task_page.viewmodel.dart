@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/models/api.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
 /// A ViewModel of the task page.
@@ -8,7 +9,7 @@ class TaskPageViewModel extends ChangeNotifier {
     required this.unsavedDialog,
     required this.goBack,
     required this.saveDialog,
-    required this.goHome,
+    required this.goAuth,
   }) : model = TaskModel.create(taskid: taskid);
 
   /// Model with task.
@@ -27,7 +28,7 @@ class TaskPageViewModel extends ChangeNotifier {
   final Future<void> Function(Future<List<String>>) saveDialog;
 
   /// Logout view.
-  VoidCallback goHome;
+  VoidCallback goAuth;
 
   @override
   Future<void> dispose() async {
@@ -110,16 +111,22 @@ class TaskPageViewModel extends ChangeNotifier {
           if (ret == true) {
             await save();
             if (value.saved) {
-              return goHome();
+              clearAuthorization();
+              return goAuth();
             }
           } else if (ret == false) {
-            return goHome();
+            clearAuthorization();
+            return goAuth();
           }
         } else {
-          return goHome();
+          clearAuthorization();
+          return goAuth();
         }
       })
-      .catchError((err) => goHome());
+      .catchError((err) {
+        clearAuthorization();
+        goAuth();
+      });
 
   /// Reload the task page if the model is saved.
   Future<void> reloadPage() async {

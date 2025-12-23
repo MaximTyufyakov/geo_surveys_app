@@ -78,7 +78,6 @@ class MainApp extends StatelessWidget {
     ),
 
     /// Init page.
-    initialRoute: '/',
-    routes: {'/': (context) => const AuthPage()},
+    home: const AuthPage(),
   );
 }

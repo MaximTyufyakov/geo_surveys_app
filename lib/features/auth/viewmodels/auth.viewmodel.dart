@@ -33,20 +33,6 @@ class AuthViewModel extends ChangeNotifier {
         .then((value) async {
           /// Open new page.
           await openTasksPage();
-          await logout();
-        })
-        .catchError((err) {});
-  }
-
-  Future<void> logout() async {
-    /// Reset password and login
-    loginController.text = '';
-    passwordController.text = '';
-
-    // Clear token.
-    await model
-        .then((value) {
-          value.removeToken();
         })
         .catchError((err) {});
   }

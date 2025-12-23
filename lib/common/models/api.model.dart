@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-// Dio with default options.
+/// Dio with default options.
 final dio = Dio(
   BaseOptions(
     // Ignored for set base URL from env.
@@ -11,3 +11,8 @@ final dio = Dio(
     headers: {'Authorization': ''},
   ),
 );
+
+/// Remove global token.
+void clearAuthorization() {
+  dio.options.headers['Authorization'] = '';
+}
