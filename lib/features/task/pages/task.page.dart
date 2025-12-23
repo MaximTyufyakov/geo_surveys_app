@@ -26,10 +26,18 @@ class _TaskPageState extends State<TaskPage> {
   /// The selected index of BottomNavigationBar.
   int _selectedIndex = 0;
 
+  /// Bottom navigation item tap.
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  /// Back sysstem button.
+  Future<void> _onPopInvoked(bool didPop, TaskPageViewModel provider) async {
+    if (!didPop) {
+      await provider.toPrevPage();
+    }
   }
 
   @override
@@ -77,44 +85,49 @@ class _TaskPageState extends State<TaskPage> {
                 PopupMenuWidget(logout: () async => await provider.logout()),
               ],
             ),
-            body: RefreshIndicator(
-              onRefresh: () async => await provider.reloadPage(),
-              child: FutureBuilder(
-                future: provider.model,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    /// Data.
-                    if (snapshot.hasData) {
-                      switch (_selectedIndex) {
-                        /// Task.
-                        case 0:
-                          return TaskWidget(task: snapshot.data!);
+            body: PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) =>
+                  _onPopInvoked(didPop, provider),
+              child: RefreshIndicator(
+                onRefresh: () async => await provider.reloadPage(),
+                child: FutureBuilder(
+                  future: provider.model,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      /// Data.
+                      if (snapshot.hasData) {
+                        switch (_selectedIndex) {
+                          /// Task.
+                          case 0:
+                            return TaskWidget(task: snapshot.data!);
 
-                        /// Report.
-                        case 1:
-                          return ReportWidget(report: snapshot.data!.report);
+                          /// Report.
+                          case 1:
+                            return ReportWidget(report: snapshot.data!.report);
 
-                        /// Videos.
-                        case 2:
-                          return VideosWidget(task: snapshot.data!);
+                          /// Videos.
+                          case 2:
+                            return VideosWidget(task: snapshot.data!);
 
-                        /// Task.
-                        default:
-                          return TaskWidget(task: snapshot.data!);
+                          /// Task.
+                          default:
+                            return TaskWidget(task: snapshot.data!);
+                        }
+
+                        /// Error.
+                      } else if (snapshot.hasError) {
+                        return ScrollMessageWidget(
+                          mes: snapshot.error.toString(),
+                          icon: Icons.error,
+                        );
                       }
-
-                      /// Error.
-                    } else if (snapshot.hasError) {
-                      return ScrollMessageWidget(
-                        mes: snapshot.error.toString(),
-                        icon: Icons.error,
-                      );
                     }
-                  }
 
-                  /// Loading.
-                  return const LoadingWidget();
-                },
+                    /// Loading.
+                    return const LoadingWidget();
+                  },
+                ),
               ),
             ),
             bottomNavigationBar: BottomNavigationBar(
