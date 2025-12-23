@@ -41,8 +41,11 @@ class TaskPageViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  /// Exit to previous page.
-  Future<void> saveAndExit() async {
+  /// Template for unsave dialog.
+  ///
+  /// Param [action] parameter is target activity after dialog.
+  /// Param [onError] parameter is activity on model error.
+  Future<void> _unsaveTemplate({required VoidCallback action}) async {
     await model
         .then((value) async {
           if (!value.saved) {
@@ -54,110 +57,46 @@ class TaskPageViewModel extends ChangeNotifier {
             if (ret == true) {
               await save();
               if (value.saved) {
-                goBack(value.completed);
-                notifyListeners();
+                action();
               }
             } else if (ret == false) {
-              goBack(value.completed);
-              notifyListeners();
+              action();
             }
           } else {
-            goBack(value.completed);
-            notifyListeners();
+            action();
           }
         })
         .catchError((err) {
-          goBack(null);
-          notifyListeners();
+          action();
         });
   }
 
   /// Exit to previous page.
   Future<void> toPrevPage() async {
-    await model
-        .then((value) async {
-          if (!value.saved) {
-            final bool? ret = await unsavedDialog();
-
-            /// Save = true;
-            /// Unsave = false;
-            /// Close = null.
-            if (ret == true) {
-              await save();
-              if (value.saved) {
-                goBack(value.completed);
-              }
-            } else if (ret == false) {
-              goBack(value.completed);
-            }
-          } else {
-            goBack(value.completed);
-          }
-        })
-        .catchError((err) {
-          goBack(null);
-        });
+    await _unsaveTemplate(
+      action: () async => goBack(
+        await model
+            .then<bool?>((value) => value.completed)
+            .catchError((err) => null),
+      ),
+    );
   }
 
   /// Exit to login page.
-  Future<void> logout() async => await model
-      .then((value) async {
-        if (!value.saved) {
-          final bool? ret = await unsavedDialog();
-
-          /// Save = true;
-          /// Unsave = false;
-          /// Close = null.
-          if (ret == true) {
-            await save();
-            if (value.saved) {
-              clearAuthorization();
-              return goAuth();
-            }
-          } else if (ret == false) {
-            clearAuthorization();
-            return goAuth();
-          }
-        } else {
-          clearAuthorization();
-          return goAuth();
-        }
-      })
-      .catchError((err) {
-        clearAuthorization();
-        goAuth();
-      });
+  Future<void> logout() async => await _unsaveTemplate(
+    action: () {
+      clearAuthorization();
+      goAuth();
+    },
+  );
 
   /// Reload the task page if the model is saved.
-  Future<void> reloadPage() async {
-    await model
-        .then((value) async {
-          if (!value.saved) {
-            final bool? ret = await unsavedDialog();
-
-            /// Save = true;
-            /// Unsave = false;
-            /// Close = null.
-            if (ret == true) {
-              await save();
-              if (value.saved) {
-                model = TaskModel.create(taskid: taskid);
-                notifyListeners();
-              }
-            } else if (ret == false) {
-              model = TaskModel.create(taskid: taskid);
-              notifyListeners();
-            }
-          } else {
-            model = TaskModel.create(taskid: taskid);
-            notifyListeners();
-          }
-        })
-        .catchError((err) {
-          model = TaskModel.create(taskid: taskid);
-          notifyListeners();
-        });
-  }
+  Future<void> reloadPage() async => await _unsaveTemplate(
+    action: () {
+      model = TaskModel.create(taskid: taskid);
+      notifyListeners();
+    },
+  );
 
   /// Save task data.
   Future<void> save() async {
