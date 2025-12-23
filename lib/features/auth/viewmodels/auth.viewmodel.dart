@@ -20,7 +20,7 @@ class AuthViewModel extends ChangeNotifier {
   Future<AuthModel> model = Future.value(AuthModel());
 
   /// Check login and password.
-  Future<void> tryLogin() async {
+  Future<void> login() async {
     /// Empty check.
     model = loginController.text.isEmpty || passwordController.text.isEmpty
         ? Future.error('Введите логин и пароль.')
@@ -31,16 +31,22 @@ class AuthViewModel extends ChangeNotifier {
     /// Ok.
     await model
         .then((value) async {
-          /// Reset password and login
-          loginController.text = '';
-          passwordController.text = '';
-
           /// Open new page.
           await openTasksPage();
-          // Clear token.
-          await model.then((value) {
-            value.removeToken();
-          });
+          await logout();
+        })
+        .catchError((err) {});
+  }
+
+  Future<void> logout() async {
+    /// Reset password and login
+    loginController.text = '';
+    passwordController.text = '';
+
+    // Clear token.
+    await model
+        .then((value) {
+          value.removeToken();
         })
         .catchError((err) {});
   }

@@ -66,7 +66,7 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                   const SizedBox(height: 5),
                   FilledButton.tonal(
-                    onPressed: () => provider.tryLogin(),
+                    onPressed: () => provider.login(),
                     child: const Text('Войти'),
                   ),
                   const SizedBox(height: 5),
