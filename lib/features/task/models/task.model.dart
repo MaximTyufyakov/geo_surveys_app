@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/models/api.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
@@ -141,16 +142,84 @@ class TaskModel {
     longitude = copy.longitude;
     completed = copy.completed;
     report = copy.report;
-    points
-      ..clear()
-      ..addAll(copy.points);
-    videos
-      ..clear()
-      ..addAll(copy.videos);
-    deletedVideosId
-      ..clear()
-      ..addAll(copy.deletedVideosId);
+
+    // 1. Обновляем существующие объекты вместо замены
+    _updatePoints(copy.points);
+    _updateVideos(copy.videos);
+
+    deletedVideosId.clear();
+
     saved = copy.saved;
+  }
+
+  void _updatePoints(List<PointModel> newPoints) {
+    final Map<int, PointModel> newPointsMap = {
+      for (final p in newPoints) p.pointid: p,
+    };
+
+    // Обновляем существующие
+    for (final point in points) {
+      final updatedPoint = newPointsMap[point.pointid];
+      if (updatedPoint != null) {
+        point
+          ..number = updatedPoint.number
+          ..description = updatedPoint.description
+          ..completed = updatedPoint.completed;
+        newPointsMap.remove(point.pointid);
+      }
+    }
+
+    // Добавляем новые
+    points.addAll(newPointsMap.values);
+
+    // Удаляем те, которых нет в новых данных
+    final newPointIds = newPoints.map((p) => p.pointid).toSet();
+    points.removeWhere((p) => !newPointIds.contains(p.pointid));
+  }
+
+  void _updateVideos(List<VideoModel> newVideos) {
+    final Map<int?, VideoModel> newVideosMap = {
+      for (final v in newVideos) v.videoid: v,
+    };
+
+    // Сохраняем локальные файлы
+    final Map<int?, File?> localFiles = {
+      for (final v in videos.where((v) => v.file != null)) v.videoid: v.file,
+    };
+
+    // Обновляем существующие
+    for (final video in videos) {
+      final updatedVideo = newVideosMap[video.videoid];
+      if (updatedVideo != null) {
+        video
+          ..title = updatedVideo.title
+          ..latitude = updatedVideo.latitude
+          ..longitude = updatedVideo.longitude
+          ..file = localFiles[video.videoid]; // Сохраняем локальный файл
+        newVideosMap.remove(video.videoid);
+      }
+    }
+
+    // Добавляем новые
+    final newVideoList = newVideosMap.values.map((v) {
+      // Если у нового видео есть локальный файл, сохраняем его
+      if (localFiles.containsKey(v.videoid)) {
+        return VideoModel(
+          videoid: v.videoid,
+          title: v.title,
+          file: localFiles[v.videoid],
+          latitude: v.latitude,
+          longitude: v.longitude,
+        )..parent = this;
+      }
+      return v..parent = this;
+    }).toList();
+
+    videos.addAll(newVideoList);
+
+    // Удаляем те, которых нет в новых данных
+    final newVideoIds = newVideos.map((v) => v.videoid).toSet();
+    videos.removeWhere((v) => !newVideoIds.contains(v.videoid));
   }
 
   /// Set task as a parent for childs.

@@ -162,5 +162,6 @@ class TaskPageViewModel extends ChangeNotifier {
             .catchError((Object err) => [err.toString()]),
       ),
     );
+    notifyListeners();
   }
 }

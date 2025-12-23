@@ -24,7 +24,7 @@ class VideoModel {
   final int? videoid;
 
   /// The video name.
-  final String title;
+  String title;
 
   /// The video format.
   final String? format;
@@ -64,7 +64,8 @@ class VideoModel {
         return 'Успешно.';
       } catch (e) {
         return Future.error(
-            'Ошибка при удалении видео из локального хранилища.');
+          'Ошибка при удалении видео из локального хранилища.',
+        );
       }
     } else {
       return 'Локальный файл уже удалён.';
