@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:geo_surveys_app/common/models/api.model.dart';
+import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/report.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';

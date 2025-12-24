@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/common/models/api.model.dart';
+import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
 /// A ViewModel of the task page.
@@ -44,7 +44,6 @@ class TaskPageViewModel extends ChangeNotifier {
   /// Template for unsave dialog.
   ///
   /// Param [action] parameter is target activity after dialog.
-  /// Param [onError] parameter is activity on model error.
   Future<void> _unsaveTemplate({required VoidCallback action}) async {
     await model
         .then((value) async {
@@ -85,7 +84,7 @@ class TaskPageViewModel extends ChangeNotifier {
   /// Exit to login page.
   Future<void> logout() async => await _unsaveTemplate(
     action: () {
-      clearAuthorization();
+      clearToken();
       goAuth();
     },
   );

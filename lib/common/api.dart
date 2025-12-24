@@ -12,7 +12,12 @@ final dio = Dio(
   ),
 );
 
+/// Save global token.
+void saveToken(String token) {
+  dio.options.headers['Authorization'] = 'Bearer $token';
+}
+
 /// Remove global token.
-void clearAuthorization() {
+void clearToken() {
   dio.options.headers['Authorization'] = '';
 }

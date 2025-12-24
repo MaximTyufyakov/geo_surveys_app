@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/common/models/api.model.dart';
+import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/tasks/models/tasks.model.dart';
 
 /// A ViewModel of the tasks page.
@@ -21,7 +21,7 @@ class TasksViewModel extends ChangeNotifier {
 
   /// Go to auth page with logout.
   void logout() {
-    clearAuthorization();
+    clearToken();
     goAuth();
   }
 }

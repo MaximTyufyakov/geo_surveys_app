@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/auth/viewmodels/auth.viewmodel.dart';
+import 'package:geo_surveys_app/features/auth/controllers/auth.provider.dart';
 import 'package:geo_surveys_app/features/tasks/pages/tasks.page.dart';
 import 'package:provider/provider.dart';
 
@@ -14,13 +14,13 @@ class _AuthPageState extends State<AuthPage> {
   bool passwordVisible = false;
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<AuthViewModel>(
-    create: (context) => AuthViewModel(
+  Widget build(BuildContext context) => ChangeNotifierProvider<AuthProvider>(
+    create: (context) => AuthProvider(
       openTasksPage: () => Navigator.of(
         context,
       ).push(MaterialPageRoute<void>(builder: (context) => const TasksPage())),
     ),
-    child: Consumer<AuthViewModel>(
+    child: Consumer<AuthProvider>(
       builder: (context, provider, child) => Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(8),
@@ -77,7 +77,7 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                   const SizedBox(height: 5),
                   FutureBuilder(
-                    future: provider.model,
+                    future: provider.message,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         /// Ok.

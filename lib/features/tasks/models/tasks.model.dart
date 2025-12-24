@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:geo_surveys_app/common/models/api.model.dart';
+import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 
 /// A model with all tasks.
