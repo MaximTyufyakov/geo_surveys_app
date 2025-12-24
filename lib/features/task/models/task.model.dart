@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/models/api.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
@@ -12,7 +11,6 @@ import 'package:geo_surveys_app/features/task/models/video.model.dart';
 /// The [taskid] parameter is the task identifier.
 /// The [title] parameter is the task name.
 /// The [description] parameter is the text task description.
-/// The [coordinates] parameter is the task geographic coordinates.
 /// The [completed] parameter is the completed flag.
 /// The [report] parameter is the report model.
 /// The [points] parameter is the list of points that need to be completed.
@@ -135,29 +133,35 @@ class TaskModel {
     }
   }
 
+  /// Update this task.
+  ///
+  /// Param [copy] is new model.
   void _copyWith(TaskModel copy) {
     title = copy.title;
     description = copy.description;
     latitude = copy.latitude;
     longitude = copy.longitude;
     completed = copy.completed;
-    report = copy.report;
+    report.text = copy.report.text;
 
-    // 1. Обновляем существующие объекты вместо замены
     _updatePoints(copy.points);
     _updateVideos(copy.videos);
 
-    deletedVideosId.clear();
+    deletedVideosId
+      ..clear()
+      ..addAll(copy.deletedVideosId);
 
     saved = copy.saved;
   }
 
+  /// Update points list.
   void _updatePoints(List<PointModel> newPoints) {
+    /// Create map {pointid: point}.
     final Map<int, PointModel> newPointsMap = {
-      for (final p in newPoints) p.pointid: p,
+      for (final point in newPoints) point.pointid: point,
     };
 
-    // Обновляем существующие
+    /// Update exist.
     for (final point in points) {
       final updatedPoint = newPointsMap[point.pointid];
       if (updatedPoint != null) {
@@ -169,22 +173,19 @@ class TaskModel {
       }
     }
 
-    // Добавляем новые
+    /// Add new.
     points.addAll(newPointsMap.values);
 
-    // Удаляем те, которых нет в новых данных
+    /// Delete.
     final newPointIds = newPoints.map((p) => p.pointid).toSet();
     points.removeWhere((p) => !newPointIds.contains(p.pointid));
   }
 
+  /// Update videos list.
   void _updateVideos(List<VideoModel> newVideos) {
+    /// Create map {videoid: video}.
     final Map<int?, VideoModel> newVideosMap = {
-      for (final v in newVideos) v.videoid: v,
-    };
-
-    // Сохраняем локальные файлы
-    final Map<int?, File?> localFiles = {
-      for (final v in videos.where((v) => v.file != null)) v.videoid: v.file,
+      for (final video in newVideos) video.videoid: video,
     };
 
     // Обновляем существующие
@@ -195,27 +196,14 @@ class TaskModel {
           ..title = updatedVideo.title
           ..latitude = updatedVideo.latitude
           ..longitude = updatedVideo.longitude
-          ..file = localFiles[video.videoid]; // Сохраняем локальный файл
+          ..file = updatedVideo.file;
         newVideosMap.remove(video.videoid);
       }
     }
 
-    // Добавляем новые
-    final newVideoList = newVideosMap.values.map((v) {
-      // Если у нового видео есть локальный файл, сохраняем его
-      if (localFiles.containsKey(v.videoid)) {
-        return VideoModel(
-          videoid: v.videoid,
-          title: v.title,
-          file: localFiles[v.videoid],
-          latitude: v.latitude,
-          longitude: v.longitude,
-        )..parent = this;
-      }
-      return v..parent = this;
-    }).toList();
-
-    videos.addAll(newVideoList);
+    for (final newVideo in newVideosMap.values) {
+      videos.add(newVideo..parent = this);
+    }
 
     // Удаляем те, которых нет в новых данных
     final newVideoIds = newVideos.map((v) => v.videoid).toSet();
@@ -277,7 +265,7 @@ class TaskModel {
                   },
                 )
                 .toList(),
-            'report': report.text,
+            'report': report.text.trim(),
             // Videos with file.
             'createdVideos': videos
                 .where((video) => video.file != null)
@@ -302,15 +290,12 @@ class TaskModel {
         switch (response.statusCode) {
           // Update.
           case 201:
-            // Clean deletedVideos list.
-            deletedVideosId.clear();
             // Delete files of saved videos.
             for (final VideoModel video in videos) {
               await video.deleteFileLocal();
             }
             // Update task object.
             _copyWith(TaskModel.parseTask(response));
-            // saved = true;
             return;
 
           // Forbidden
