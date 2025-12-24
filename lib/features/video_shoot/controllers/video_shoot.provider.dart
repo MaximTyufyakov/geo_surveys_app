@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
-/// A ViewModel of the video shoot page.
+/// A provider of the video shoot page.
 class VideoShootProvider extends ChangeNotifier {
   VideoShootProvider({required this.goBack})
     : cameraController = _initController();
