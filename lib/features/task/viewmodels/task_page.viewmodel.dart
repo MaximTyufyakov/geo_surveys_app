@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
@@ -37,7 +37,11 @@ class TaskPageViewModel extends ChangeNotifier {
         .then((value) async {
           await value.deleteUnsavedVideoFiles();
         })
-        .catchError((err) {});
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('TaskModel не получена: $err');
+          }
+        });
     super.dispose();
   }
 

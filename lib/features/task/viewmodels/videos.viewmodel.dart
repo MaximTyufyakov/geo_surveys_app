@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
@@ -89,7 +90,11 @@ class VideosViewModel extends ChangeNotifier {
               notifyListeners();
             }
           })
-          .catchError((err) {});
+          .catchError((Object err) {
+            if (kDebugMode) {
+              debugPrint('Ошибка получение геопозиции: $err');
+            }
+          });
     }
   }
 

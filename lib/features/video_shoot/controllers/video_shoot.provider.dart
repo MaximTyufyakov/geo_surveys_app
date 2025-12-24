@@ -20,7 +20,11 @@ class VideoShootProvider extends ChangeNotifier {
         .then((value) {
           value.dispose();
         })
-        .catchError((err) {});
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('Ошибка инициализации контроллера камеры: $err');
+          }
+        });
     super.dispose();
   }
 
