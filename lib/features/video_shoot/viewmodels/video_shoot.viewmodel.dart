@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 
 /// A ViewModel of the video shoot page.
 class VideoShootViewModel extends ChangeNotifier {
-  VideoShootViewModel({required this.goBack}) : controller = _initController();
+  VideoShootViewModel({required this.goBack})
+    : cameraController = _initController();
 
   /// The camera controller.
-  Future<CameraController> controller;
+  Future<CameraController> cameraController;
 
   /// Opens a page with information about task.
-  final ValueSetter<File> goBack;
+  final ValueSetter<File?> goBack;
 
   @override
   Future<void> dispose() async {
-    await controller
+    await cameraController
         .then((value) {
           value.dispose();
         })
@@ -43,7 +44,7 @@ class VideoShootViewModel extends ChangeNotifier {
 
   /// Press shoot button.
   Future<void> shootPressed() async {
-    await controller
+    await cameraController
         .then((value) async {
           if (!value.value.isRecordingVideo) {
             await value.startVideoRecording();
@@ -55,5 +56,21 @@ class VideoShootViewModel extends ChangeNotifier {
           }
         })
         .catchError((err) {});
+  }
+
+  /// Press back button.
+  Future<void> onExit() async {
+    await cameraController
+        .then((value) async {
+          if (!value.value.isRecordingVideo) {
+            goBack(null);
+          } else {
+            final XFile video = await value.stopVideoRecording();
+            goBack(File(video.path));
+          }
+        })
+        .catchError((err) {
+          goBack(null);
+        });
   }
 }

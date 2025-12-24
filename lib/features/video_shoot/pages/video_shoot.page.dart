@@ -9,6 +9,13 @@ import 'package:provider/provider.dart';
 class VideoShootPage extends StatelessWidget {
   const VideoShootPage({super.key});
 
+  /// Back sys tem button.
+  Future<void> _onPopInvoked(bool didPop, VideoShootViewModel provider) async {
+    if (!didPop) {
+      await provider.onExit();
+    }
+  }
+
   @override
   Widget build(
     BuildContext context,
@@ -19,56 +26,59 @@ class VideoShootPage extends StatelessWidget {
     child: Consumer<VideoShootViewModel>(
       builder: (context, provider, child) => Scaffold(
         backgroundColor: Colors.black,
-        // You must wait until the controller is initialized before
-        // displaying the camera preview. Use a FutureBuilder to display a
-        // loading spinner until the controller has finished initializing.
-        body: FutureBuilder<CameraController>(
-          future: provider.controller,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasData) {
-                return Column(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [CameraPreview(snapshot.data!)],
+
+        body: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) =>
+              _onPopInvoked(didPop, provider),
+          child: FutureBuilder<CameraController>(
+            future: provider.cameraController,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [CameraPreview(snapshot.data!)],
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            iconSize: 40,
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all<Color>(
-                                Colors.white,
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              iconSize: 40,
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.white,
+                                ),
+                                foregroundColor: WidgetStateProperty.all<Color>(
+                                  Colors.red,
+                                ),
                               ),
-                              foregroundColor: WidgetStateProperty.all<Color>(
-                                Colors.red,
-                              ),
+                              onPressed: () => provider.shootPressed(),
+                              icon: snapshot.data!.value.isRecordingVideo
+                                  ? const Icon(Icons.square)
+                                  : const Icon(Icons.circle),
                             ),
-                            onPressed: () => provider.shootPressed(),
-                            icon: snapshot.data!.value.isRecordingVideo
-                                ? const Icon(Icons.square)
-                                : const Icon(Icons.circle),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return MessageWidget(
-                  mes: snapshot.error.toString(),
-                  icon: Icons.error,
-                );
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return MessageWidget(
+                    mes: snapshot.error.toString(),
+                    icon: Icons.error,
+                  );
+                }
               }
-            }
-            return const LoadingWidget();
-          },
+              return const LoadingWidget();
+            },
+          ),
         ),
       ),
     ),
