@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/auth/controllers/auth.repository.dart';
 
-/// A ViewModel of the auth page.
+/// A provider of the auth page.
 class AuthProvider extends ChangeNotifier {
   AuthProvider({required this.openTasksPage});
 
@@ -22,7 +22,7 @@ class AuthProvider extends ChangeNotifier {
   /// Login message.
   Future<String> message = Future.value('');
 
-  /// Login in api.
+  /// Check input and login in api.
   Future<void> login() async {
     /// Check password and login before request.
     message = _validate();
@@ -60,6 +60,11 @@ class AuthProvider extends ChangeNotifier {
         });
   }
 
+  /// Check password and login.
+  ///
+  /// Returns [Future] value if valid.
+  ///
+  /// Throws a [Future.error] with [String] message if not valid.
   Future<String> _validate() async {
     /// Empty check.
     if (loginController.text.isEmpty || passwordController.text.isEmpty) {

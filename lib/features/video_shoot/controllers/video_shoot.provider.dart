@@ -27,6 +27,8 @@ class VideoShootProvider extends ChangeNotifier {
   /// Initialize camera controller.
   ///
   /// Return [Future] of the [CameraController] initialize.
+  ///
+  /// Throws a [Future.error] with [String] message if initialization failed.
   static Future<CameraController> _initController() async {
     try {
       /// Create a CameraController.
@@ -47,9 +49,12 @@ class VideoShootProvider extends ChangeNotifier {
   Future<void> shootPressed() async {
     await cameraController
         .then((value) async {
+          /// Start.
           if (!value.value.isRecordingVideo) {
             await value.startVideoRecording();
             notifyListeners();
+
+            /// Stop.
           } else {
             final XFile video = await value.stopVideoRecording();
             notifyListeners();
@@ -63,7 +68,7 @@ class VideoShootProvider extends ChangeNotifier {
         });
   }
 
-  /// Press back button.
+  /// Back button handler.
   Future<void> onExit() async {
     await cameraController
         .then((value) async {

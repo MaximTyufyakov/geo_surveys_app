@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/api.dart';
 
+/// A repository of /users endpoints.
 class AuthRepository {
   /// Check login and password.
   ///
   /// Returns a [Future] that completes when the response is successful and
   /// correct login or password entry.
+  ///
   /// Throws a [Future.error] with [String] message if database fails
   /// or incorrect login or password entry.
   Future<String> auth(String login, String password) async {
