@@ -8,7 +8,7 @@ class VideoShootProvider extends ChangeNotifier {
     : cameraController = _initController();
 
   /// The camera controller.
-  Future<CameraController> cameraController;
+  final Future<CameraController> cameraController;
 
   /// Opens a page with information about task.
   final ValueSetter<File?> goBack;
