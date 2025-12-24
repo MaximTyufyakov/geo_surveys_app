@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// A ViewModel of the video shoot page.
-class VideoShootViewModel extends ChangeNotifier {
-  VideoShootViewModel({required this.goBack})
+class VideoShootProvider extends ChangeNotifier {
+  VideoShootProvider({required this.goBack})
     : cameraController = _initController();
 
   /// The camera controller.
@@ -15,6 +16,7 @@ class VideoShootViewModel extends ChangeNotifier {
 
   @override
   Future<void> dispose() async {
+    /// Release camera controller.
     await cameraController
         .then((value) {
           value.dispose();
@@ -55,7 +57,11 @@ class VideoShootViewModel extends ChangeNotifier {
             goBack(File(video.path));
           }
         })
-        .catchError((err) {});
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('Ошибка инициализации контроллера камеры: $err');
+          }
+        });
   }
 
   /// Press back button.

@@ -2,15 +2,15 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/video_shoot/viewmodels/video_shoot.viewmodel.dart';
+import 'package:geo_surveys_app/features/video_shoot/controllers/video_shoot.provider.dart';
 import 'package:provider/provider.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class VideoShootPage extends StatelessWidget {
   const VideoShootPage({super.key});
 
-  /// Back sys tem button.
-  Future<void> _onPopInvoked(bool didPop, VideoShootViewModel provider) async {
+  /// Back system button push.
+  Future<void> _onPopInvoked(bool didPop, VideoShootProvider provider) async {
     if (!didPop) {
       await provider.onExit();
     }
@@ -19,11 +19,10 @@ class VideoShootPage extends StatelessWidget {
   @override
   Widget build(
     BuildContext context,
-  ) => ChangeNotifierProvider<VideoShootViewModel>(
-    create: (BuildContext context) => VideoShootViewModel(
-      goBack: (video) => Navigator.of(context).pop(video),
-    ),
-    child: Consumer<VideoShootViewModel>(
+  ) => ChangeNotifierProvider<VideoShootProvider>(
+    create: (BuildContext context) =>
+        VideoShootProvider(goBack: (video) => Navigator.of(context).pop(video)),
+    child: Consumer<VideoShootProvider>(
       builder: (context, provider, child) => Scaffold(
         backgroundColor: Colors.black,
 
