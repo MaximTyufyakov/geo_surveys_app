@@ -42,6 +42,9 @@ class _AuthPageState extends State<AuthPage> {
                   TextField(
                     decoration: const InputDecoration(hintText: 'Логин'),
                     controller: provider.loginController,
+
+                    /// Unfocus.
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   ),
                   const SizedBox(height: 5),
 
@@ -63,6 +66,9 @@ class _AuthPageState extends State<AuthPage> {
                             setState(() => passwordVisible = !passwordVisible),
                       ),
                     ),
+
+                    /// Unfocus.
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   ),
                   const SizedBox(height: 5),
                   FilledButton.tonal(

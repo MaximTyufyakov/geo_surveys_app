@@ -85,6 +85,9 @@ class VideosWidget extends StatelessWidget {
                         hintText: 'Название видео',
                       ),
                       controller: provider.newTitleController,
+
+                      /// Unfocus.
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
                     ),
                   ),
                   IconButton(

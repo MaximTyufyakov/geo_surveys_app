@@ -27,6 +27,9 @@ class ReportWidget extends StatelessWidget {
             controller: provider.reportController,
             onChanged: (action) => provider.onTextChange(),
             maxLines: null,
+
+            /// Unfocus.
+            onTapOutside: (event) => FocusScope.of(context).unfocus(),
           ),
         ],
       ),
