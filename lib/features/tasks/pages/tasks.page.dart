@@ -3,7 +3,8 @@ import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
-import 'package:geo_surveys_app/features/tasks/viewmodels/tasks.viewmodel.dart';
+import 'package:geo_surveys_app/features/task/pages/task.page.dart';
+import 'package:geo_surveys_app/features/tasks/controllers/tasks.provider.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
 import 'package:provider/provider.dart';
 
@@ -12,14 +13,17 @@ class TasksPage extends StatelessWidget {
   const TasksPage({super.key});
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<TasksViewModel>(
-    create: (BuildContext context) => TasksViewModel(
+  Widget build(BuildContext context) => ChangeNotifierProvider<TasksProvider>(
+    create: (BuildContext context) => TasksProvider(
       goAuth: () => Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute<void>(builder: (context) => const AuthPage()),
         (route) => false, // Remove all previous routes.
       ),
+      openTaskPage: (int taskId) => Navigator.of(context).push(
+        MaterialPageRoute<bool>(builder: (context) => TaskPage(taskid: taskId)),
+      ),
     ),
-    child: Consumer<TasksViewModel>(
+    child: Consumer<TasksProvider>(
       builder: (context, provider, child) => Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -33,24 +37,26 @@ class TasksPage extends StatelessWidget {
           ],
         ),
         body: RefreshIndicator(
-          onRefresh: () async => await provider.reload(),
+          onRefresh: () async => provider.reload(),
           child: FutureBuilder(
-            future: provider.model,
+            future: provider.tasks,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 /// Data.
                 if (snapshot.hasData) {
                   /// Tasks empty.
-                  return snapshot.data!.tasks.isEmpty
+                  return snapshot.data!.isEmpty
                       ? const ScrollMessageWidget(
                           mes: 'Нет заданий.',
                           icon: Icons.notes,
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.all(8),
-                          itemCount: snapshot.data!.tasks.length,
-                          itemBuilder: (context, index) =>
-                              TaskCard(task: snapshot.data!.tasks[index]),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) => TaskCard(
+                            task: snapshot.data![index],
+                            provider: provider,
+                          ),
                         );
 
                   /// Error.
