@@ -1,14 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
+import 'package:geo_surveys_app/common/widgets/dialogs/text_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/dialogs/unsaved_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
-import 'package:geo_surveys_app/features/task/viewmodels/task_page.viewmodel.dart';
+import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
 import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
+import 'package:geo_surveys_app/features/video_shoot/pages/video_shoot.page.dart';
 import 'package:provider/provider.dart';
 
 /// A page with BottomNavigationBar and task's widgets.
@@ -34,7 +38,7 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   /// Back system button.
-  Future<void> _onPopInvoked(bool didPop, TaskPageViewModel provider) async {
+  Future<void> _onPopInvoked(bool didPop, TaskPageProvider provider) async {
     if (!didPop) {
       await provider.toPrevPage();
     }
@@ -42,8 +46,8 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) =>
-      ChangeNotifierProvider<TaskPageViewModel>(
-        create: (BuildContext context) => TaskPageViewModel(
+      ChangeNotifierProvider<TaskPageProvider>(
+        create: (BuildContext context) => TaskPageProvider(
           taskid: widget.taskid,
           unsavedDialog: () => showDialog<bool>(
             context: context,
@@ -63,8 +67,41 @@ class _TaskPageState extends State<TaskPage> {
             MaterialPageRoute<void>(builder: (context) => const AuthPage()),
             (route) => false, // Remove all previous routes.
           ),
+          errorDialog: (text) => showDialog<bool>(
+            context: context,
+            builder: (context) => TextDialog(
+              title: 'Ошибка',
+              text: text,
+              greenTitle: 'Ок',
+              redTitle: null,
+            ),
+          ),
+          openVideoShootPage: () => Navigator.of(context).push(
+            MaterialPageRoute<File>(
+              builder: (context) => const VideoShootPage(),
+            ),
+          ),
+          geolocationDialog: (Future<List<String>> futureText) =>
+              showDialog<bool>(
+                context: context,
+                builder: (context) => FutureDialog(
+                  futureText: futureText,
+                  title: 'Определение местоположения',
+                  greenTitle: 'Ок',
+                  redTitle: null,
+                ),
+              ),
+          deleteDialog: () => showDialog<bool>(
+            context: context,
+            builder: (context) => TextDialog(
+              title: 'Удаление видео',
+              text: const ['Вы уверены?'],
+              greenTitle: 'Да',
+              redTitle: 'Нет',
+            ),
+          ),
         ),
-        child: Consumer<TaskPageViewModel>(
+        child: Consumer<TaskPageProvider>(
           builder: (context, provider, child) => Scaffold(
             appBar: AppBar(
               title: Text(
@@ -92,7 +129,7 @@ class _TaskPageState extends State<TaskPage> {
               child: RefreshIndicator(
                 onRefresh: () async => await provider.reloadPage(),
                 child: FutureBuilder(
-                  future: provider.model,
+                  future: provider.task,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       /// Data.
@@ -100,19 +137,31 @@ class _TaskPageState extends State<TaskPage> {
                         switch (_selectedIndex) {
                           /// Task.
                           case 0:
-                            return TaskWidget(task: snapshot.data!);
+                            return TaskWidget(
+                              task: snapshot.data!,
+                              provider: provider,
+                            );
 
                           /// Report.
                           case 1:
-                            return ReportWidget(report: snapshot.data!.report);
+                            return ReportWidget(
+                              report: snapshot.data!.report,
+                              provider: provider,
+                            );
 
                           /// Videos.
                           case 2:
-                            return VideosWidget(task: snapshot.data!);
+                            return VideosWidget(
+                              task: snapshot.data!,
+                              provider: provider,
+                            );
 
                           /// Task.
                           default:
-                            return TaskWidget(task: snapshot.data!);
+                            return TaskWidget(
+                              task: snapshot.data!,
+                              provider: provider,
+                            );
                         }
 
                         /// Error.

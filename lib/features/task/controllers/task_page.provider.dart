@@ -1,0 +1,434 @@
+import 'dart:collection';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/api.dart';
+import 'package:geo_surveys_app/features/task/controllers/task.repository.dart';
+import 'package:geo_surveys_app/features/task/models/point.model.dart';
+import 'package:geo_surveys_app/features/task/models/task.model.dart';
+import 'package:geo_surveys_app/features/task/models/video.model.dart';
+import 'package:geolocator/geolocator.dart';
+
+/// A provider of the task page.
+class TaskPageProvider extends ChangeNotifier {
+  TaskPageProvider({
+    required this.taskid,
+    required this.unsavedDialog,
+    required this.goBack,
+    required this.saveDialog,
+    required this.goAuth,
+    required this.errorDialog,
+    required this.geolocationDialog,
+    required this.openVideoShootPage,
+    required this.deleteDialog,
+  }) {
+    task = _repository.get(taskid: taskid);
+  }
+
+  /// Task identifier.
+  final int taskid;
+
+  /// The task repository.
+  final TaskRepository _repository = TaskRepository();
+
+  /// Model with task.
+  late Future<TaskModel> task;
+
+  /// Show unsaved dialog.
+  final ValueGetter<Future<bool?>> unsavedDialog;
+
+  /// Go to previous page.
+  final ValueSetter<bool?> goBack;
+
+  /// Show saving dialog.
+  final Future<void> Function(Future<List<String>>) saveDialog;
+
+  /// Logout view.
+  VoidCallback goAuth;
+
+  /// Show error.
+  final ValueSetter<List<String>> errorDialog;
+
+  /// Open camera page.
+  final ValueGetter<Future<File?>> openVideoShootPage;
+
+  /// Show geolocation.
+  final Future<void> Function(Future<List<String>>) geolocationDialog;
+
+  /// Video delete dialog.
+  final ValueGetter<Future<bool?>> deleteDialog;
+
+  @override
+  Future<void> dispose() async {
+    /// Delete unsaved in db videos.
+    await task
+        .then((value) async {
+          await deleteUnsavedVideoFiles();
+        })
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('TaskModel не получена: $err');
+          }
+        });
+    super.dispose();
+  }
+
+  /// Template for unsave dialog.
+  ///
+  /// Param [action] parameter is target activity after dialog.
+  Future<void> _unsaveTemplate({required VoidCallback action}) async {
+    await task
+        .then((value) async {
+          if (!value.saved) {
+            final bool? ret = await unsavedDialog();
+
+            /// Save = true;
+            /// Unsave = false;
+            /// Close = null.
+            if (ret == true) {
+              await save();
+              if (value.saved) {
+                action();
+              }
+            } else if (ret == false) {
+              action();
+            }
+          } else {
+            action();
+          }
+        })
+        .catchError((err) {
+          action();
+        });
+  }
+
+  /// Exit to previous page.
+  Future<void> toPrevPage() async {
+    await _unsaveTemplate(
+      action: () async => goBack(
+        await task
+            .then<bool?>((value) => value.completed)
+            .catchError((err) => null),
+      ),
+    );
+  }
+
+  /// Exit to login page.
+  Future<void> logout() async => await _unsaveTemplate(
+    action: () {
+      clearToken();
+      goAuth();
+    },
+  );
+
+  /// Reload the task page if the model is saved.
+  Future<void> reloadPage() async => await _unsaveTemplate(
+    action: () {
+      task = _repository.get(taskid: taskid);
+      notifyListeners();
+    },
+  );
+
+  /// Save task data.
+  Future<void> save() async {
+    /// Open dialog.
+    await saveDialog(
+      task.then((value) async {
+        /// Delete report spaces.
+        value.report.trim();
+        return value.saved
+            /// Saved.
+            ? ['Нет изменений.', await completedCheck()]
+            /// Not saved.
+            : _repository
+                  .save(
+                    task: value,
+                    updatedPoints: value.points,
+
+                    /// If local file exist.
+                    createdVideos: value.videos
+                        .where((video) => video.file != null)
+                        .toList(),
+                  )
+                  .then((sValue) async {
+                    // Delete local files of saved videos.
+                    for (final VideoModel video in value.videos) {
+                      await deleteFileLocal(file: video.file);
+                    }
+                    // Update task object.
+                    value.copyWith(copy: sValue);
+                    return ['Успешно.', await completedCheck()];
+                  })
+                  .catchError((Object err) => [err.toString()]);
+      }),
+    );
+    notifyListeners();
+  }
+
+  /// Add new video in the list.
+  Future<void> addVideo({required VideoModel video}) async => await task
+      .then((value) {
+        value.videos.add(video);
+        value.saved = false;
+      })
+      .catchError((Object err) {
+        if (kDebugMode) {
+          debugPrint('Невозможно добавить видео: $err');
+        }
+      });
+
+  /// Delete a video from the main list and add in the deleted list.
+  Future<void> deleteVideo({required VideoModel video}) async => await task
+      .then((value) {
+        value.videos.remove(video);
+        if (video.videoid != null) {
+          value.deletedVideosId.add(video.videoid!);
+        }
+        value.saved = false;
+      })
+      .catchError((Object err) {
+        if (kDebugMode) {
+          debugPrint('Невозможно удалить видео: $err');
+        }
+      });
+
+  /// Check task completed (all points completed, add video).
+  ///
+  /// Returns a true if task completed else false and message.
+  Future<String> completedCheck() async => await task
+      .then((value) {
+        for (final PointModel point in value.points) {
+          if (!point.completed) {
+            return 'Для завершения задания окончите все пункты.';
+          }
+        }
+        if (value.videos.isEmpty) {
+          return 'Для завершения задания прикрепите видео.';
+        }
+        return 'Задание завершено.';
+      })
+      .catchError((Object err) {
+        if (kDebugMode) {
+          debugPrint('Невозможно проверить состояние задания: $err');
+        }
+        return 'Невозможно проверить состояние задания.';
+      });
+
+  /// Delete videofiles from local storage.
+  /// If it not saved.
+  Future<void> deleteUnsavedVideoFiles() async {
+    await task
+        .then((value) async {
+          for (final VideoModel video in value.videos.where(
+            (v) => v.videoid == null,
+          )) {
+            await deleteFileLocal(file: video.file);
+          }
+        })
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('Невозможно удалить файлы видео: $err');
+          }
+        });
+  }
+
+  /// Tap on the point CheckBox.
+  Future<void> onPointTap({required PointModel point}) async {
+    await task
+        .then((value) {
+          point.completed = !point.completed;
+          value.saved = false;
+        })
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('Невозможно изменить пункт: $err');
+          }
+        });
+
+    notifyListeners();
+  }
+
+  /// On report text change.
+  Future<void> onReportChange({required String report}) async {
+    await task
+        .then((value) {
+          value
+            ..report = report
+            ..saved = false;
+        })
+        .catchError((Object err) {
+          if (kDebugMode) {
+            debugPrint('Невозможно изменить отчёт: $err');
+          }
+        });
+  }
+
+  // /// Rename video file, delete from tmpDir and save in docDir.
+  // Future<String> _saveFileLocal() async {
+  //   /// Video created.
+  //   if (file != null) {
+  //     final Directory docDir = await getApplicationDocumentsDirectory();
+  //     final Directory videosDir = Directory('${docDir.path}/videos');
+  //     await videosDir.create(recursive: true);
+  //     final String videoPath =
+  //         '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.$format';
+  //     file = await file!.rename(videoPath);
+  //     return ('Успешно.');
+  //   } else {
+  //     return Future.error('Ошибка. Файл не найден.');
+  //   }
+  // }
+
+  /// Delete video file from local storage.
+  Future<String> deleteFileLocal({required File? file}) async {
+    /// File exists.
+    if (file != null) {
+      try {
+        await file.delete();
+        file = null;
+        return 'Успешно.';
+      } catch (e) {
+        return Future.error(
+          'Ошибка при удалении видео из локального хранилища.',
+        );
+      }
+    } else {
+      return 'Локальный файл уже удалён.';
+    }
+  }
+
+  /// Delete file and video from task model.
+  Future<void> deleteFromTask({required VideoModel video}) async {
+    await deleteFileLocal(file: video.file);
+    await deleteVideo(video: video);
+  }
+
+  /// Open page with camera and add new video in the list.
+  Future<void> videoCreate({
+    required TaskModel task,
+    required String newTitle,
+  }) async {
+    // Without front and back spaces.
+    final String title = newTitle.trim();
+
+    // The title does not exist.
+    if (title == '') {
+      errorDialog(const ['Название видео пустое.']);
+      return;
+
+      // The title > 100.
+    } else if (title.length > 100) {
+      errorDialog(const ['Название видео не должно превышать 100 символов.']);
+      return;
+
+      // The title does not unique.
+    } else if (!uniqueTitle(title: title, task: task)) {
+      errorDialog(const ['Название видео не уникально.']);
+      return;
+
+      // The title exist and unique.
+    } else {
+      final Future<Position> coordinates = getGeolocation();
+      await geolocationDialog(
+        coordinates.then(
+          (coordinates) => [
+            'Успешно.',
+            '''Ваши координаты: ${coordinates.latitude}, ${coordinates.longitude}.''',
+          ],
+        ),
+      );
+
+      await coordinates
+          .then((coordinates) async {
+            final File? videoFile = await openVideoShootPage();
+
+            // The video returned.
+            if (videoFile != null) {
+              await addVideo(
+                video: VideoModel(
+                  videoid: null,
+                  title: title,
+                  file: videoFile,
+                  latitude: coordinates.latitude,
+                  longitude: coordinates.longitude,
+                ),
+              );
+
+              // Clear title.
+              // newTitleController.text = '';
+              notifyListeners();
+            }
+          })
+          .catchError((Object err) {
+            if (kDebugMode) {
+              debugPrint('Ошибка получение геопозиции: $err');
+            }
+          });
+    }
+  }
+
+  /// Check unique video title.
+  ///
+  /// Param [title] is new title.
+  /// Returns true if unique.
+  bool uniqueTitle({required String title, required TaskModel task}) {
+    final HashSet<String> hashSet = HashSet<String>()
+      ..addAll(task.videos.map((video) => video.title).toSet());
+    return !hashSet.contains(title);
+  }
+
+  /// Determine the current position of the device.
+  ///
+  /// When the location services are not enabled or permissions
+  /// are denied the `Future` will return an error.
+  Future<Position> getGeolocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      /// Location services are not enabled don't continue
+      /// accessing the position and request users of the
+      /// App to enable the location services.
+      return Future.error('Службы определения местоположения выключены.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error(
+          'Отказано в разрешениях на определение местоположения',
+        );
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      /// Permissions are denied forever, handle appropriately.
+      return Future.error(
+        'Навсегда отказано в разрешениях на определение местоположения',
+      );
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
+
+  /// When delete button click
+  Future<void> delete({required VideoModel video}) async {
+    await deleteDialog().then((del) async {
+      if (del == true) {
+        await deleteFromTask(video: video);
+        notifyListeners();
+      }
+    });
+  }
+}

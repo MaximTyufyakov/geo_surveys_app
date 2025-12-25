@@ -1,38 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/models/report.model.dart';
-import 'package:geo_surveys_app/features/task/viewmodels/report.viewmodel.dart';
-import 'package:provider/provider.dart';
+import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
 
 /// A Widget with report text field.
 ///
 /// The [provider] parameter is a report view model.
 class ReportWidget extends StatelessWidget {
-  ReportWidget({super.key, required ReportModel report})
-    : provider = ReportViewModel(model: report);
+  ReportWidget({super.key, required this.report, required this.provider})
+    : _reportController = TextEditingController(text: report);
 
-  /// Report view model.
-  final ReportViewModel provider;
+  /// Task provider.
+  final TaskPageProvider provider;
+
+  /// Report.
+  final String report;
+
+  /// Controller with a text of the report.
+  final TextEditingController _reportController;
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<ReportViewModel>(
-    create: (BuildContext context) => provider,
-    child: Consumer<ReportViewModel>(
-      builder: (context, provider, child) => ListView(
-        padding: const EdgeInsets.all(8),
-        children: [
-          TextField(
-            decoration: const InputDecoration(
-              hintText: 'Здесь можно написать отчёт о выполненной работе.',
-            ),
-            controller: provider.reportController,
-            onChanged: (action) => provider.onTextChange(),
-            maxLines: null,
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(8),
+    children: [
+      TextField(
+        decoration: const InputDecoration(
+          hintText: 'Здесь можно написать отчёт о выполненной работе.',
+        ),
+        controller: _reportController,
+        onChanged: (action) =>
+            provider.onReportChange(report: _reportController.text),
+        maxLines: null,
 
-            /// Unfocus.
-            onTapOutside: (event) => FocusScope.of(context).unfocus(),
-          ),
-        ],
+        /// Unfocus.
+        onTapOutside: (event) => FocusScope.of(context).unfocus(),
       ),
-    ),
+    ],
   );
 }
