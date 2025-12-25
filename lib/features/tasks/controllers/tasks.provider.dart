@@ -7,7 +7,7 @@ import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
 /// A provider of the tasks page.
 class TasksProvider extends ChangeNotifier {
   TasksProvider({required this.goAuth, required this.openTaskPage}) {
-    tasks = _repository.getAll();
+    tasks = _repository.get();
   }
 
   /// The tasks repository.
@@ -35,7 +35,7 @@ class TasksProvider extends ChangeNotifier {
 
   /// Reload page.
   void reload() {
-    tasks = _repository.getAll();
+    tasks = _repository.get();
     notifyListeners();
   }
 

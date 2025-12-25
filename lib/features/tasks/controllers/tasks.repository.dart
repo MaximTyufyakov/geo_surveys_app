@@ -8,7 +8,7 @@ class TasksRepository {
   ///
   /// Returns a [Future] that completes when the response is successful.
   /// Throws a [Future.error] with [String] message if database fails.
-  Future<List<BaseTaskModel>> getAll() async {
+  Future<List<BaseTaskModel>> get() async {
     try {
       // Api response.
       final Response<Map<String, dynamic>> response = await dio.get(
