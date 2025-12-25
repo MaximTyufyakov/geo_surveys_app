@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
+import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
 /// A widget with task photo card.
@@ -14,7 +14,7 @@ class VideoCardWidget extends StatelessWidget {
   final VideoModel video;
 
   /// Provider.
-  final TaskPageProvider provider;
+  final TaskProvider provider;
 
   @override
   Widget build(BuildContext context) => Card(

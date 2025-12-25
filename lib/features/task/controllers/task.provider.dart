@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/task/controllers/task.repository.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
@@ -11,8 +10,8 @@ import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// A provider of the task page.
-class TaskPageProvider extends ChangeNotifier {
-  TaskPageProvider({
+class TaskProvider extends ChangeNotifier {
+  TaskProvider({
     required this.taskid,
     required this.unsavedDialog,
     required this.goBack,

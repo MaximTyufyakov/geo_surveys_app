@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
+import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/widgets/point.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/section.widget.dart';
@@ -12,7 +12,7 @@ class TaskWidget extends StatelessWidget {
   const TaskWidget({super.key, required this.task, required this.provider});
 
   /// Task task provider.
-  final TaskPageProvider provider;
+  final TaskProvider provider;
 
   /// Task model.
   final TaskModel task;

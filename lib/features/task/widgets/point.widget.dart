@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
+import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 
 /// A Widget with check-box and point information.
@@ -9,7 +9,7 @@ class PointWidget extends StatelessWidget {
   const PointWidget({super.key, required this.point, required this.provider});
 
   /// Task provider.
-  final TaskPageProvider provider;
+  final TaskProvider provider;
 
   /// Point Model.
   final PointModel point;

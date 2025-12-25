@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
+import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 
 /// A Widget with report text field.
 ///
@@ -9,7 +9,7 @@ class ReportWidget extends StatelessWidget {
     : _reportController = TextEditingController(text: report);
 
   /// Task provider.
-  final TaskPageProvider provider;
+  final TaskProvider provider;
 
   /// Report.
   final String report;

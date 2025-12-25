@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
-import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
+import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geo_surveys_app/features/task/widgets/video_card.widget.dart';
@@ -13,7 +13,7 @@ class VideosWidget extends StatelessWidget {
   final TaskModel task;
 
   /// Provider.
-  final TaskPageProvider provider;
+  final TaskProvider provider;
 
   final TextEditingController newTitleController = TextEditingController(
     text: '',
