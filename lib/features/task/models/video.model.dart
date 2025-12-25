@@ -1,6 +1,5 @@
-import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'package:geo_surveys_app/features/task/models/task.model.dart';
 
 /// The video model.
 ///
@@ -17,8 +16,13 @@ class VideoModel {
     required this.longitude,
   }) : format = file?.path.split('.').last;
 
-  /// Parent model.
-  late TaskModel parent;
+  factory VideoModel.fromJson(Map<String, dynamic> json) => VideoModel(
+    videoid: json['video_id'] as int,
+    title: json['title'] as String,
+    file: null,
+    latitude: (json['latitude'] as num).toDouble(),
+    longitude: (json['longitude'] as num).toDouble(),
+  );
 
   /// The video identifier.
   final int? videoid;
@@ -38,43 +42,22 @@ class VideoModel {
   /// Start geographic longitude.
   double longitude;
 
-  // /// Rename video file, delete from tmpDir and save in docDir.
-  // Future<String> _saveFileLocal() async {
-  //   /// Video created.
-  //   if (file != null) {
-  //     final Directory docDir = await getApplicationDocumentsDirectory();
-  //     final Directory videosDir = Directory('${docDir.path}/videos');
-  //     await videosDir.create(recursive: true);
-  //     final String videoPath =
-  //         '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.$format';
-  //     file = await file!.rename(videoPath);
-  //     return ('Успешно.');
-  //   } else {
-  //     return Future.error('Ошибка. Файл не найден.');
-  //   }
-  // }
+  Map<String, dynamic> toJson() => {
+    'video_id': videoid,
+    'title': title,
+    'format': format,
+    'file': file != null ? base64Encode(file!.readAsBytesSync()) : null,
+    'latitude': latitude,
+    'longitude': longitude,
+  };
 
-  /// Delete video file from local storage.
-  Future<String> deleteFileLocal() async {
-    /// File exists.
-    if (file != null) {
-      try {
-        await file!.delete();
-        file = null;
-        return 'Успешно.';
-      } catch (e) {
-        return Future.error(
-          'Ошибка при удалении видео из локального хранилища.',
-        );
-      }
-    } else {
-      return 'Локальный файл уже удалён.';
-    }
-  }
-
-  /// Delete file and video from task model.
-  Future<void> deleteFromTask() async {
-    await deleteFileLocal();
-    parent.deleteVideo(this);
+  /// Update this video.
+  ///
+  /// Param [copy] is new model.
+  void copyWith(VideoModel copy) {
+    title = copy.title;
+    latitude = copy.latitude;
+    longitude = copy.longitude;
+    file = copy.file;
   }
 }

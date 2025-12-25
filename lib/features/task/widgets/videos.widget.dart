@@ -1,99 +1,70 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/common/widgets/dialogs/future_dialog.widget.dart';
-import 'package:geo_surveys_app/common/widgets/dialogs/text_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
+import 'package:geo_surveys_app/features/task/controllers/task_page.provider.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
-import 'package:geo_surveys_app/features/task/viewmodels/videos.viewmodel.dart';
 import 'package:geo_surveys_app/features/task/widgets/video_card.widget.dart';
-import 'package:geo_surveys_app/features/video_shoot/pages/video_shoot.page.dart';
-import 'package:provider/provider.dart';
 
 /// A widget with task videos.
 class VideosWidget extends StatelessWidget {
-  const VideosWidget({super.key, required this.task});
+  VideosWidget({super.key, required this.task, required this.provider});
 
+  /// Model.
   final TaskModel task;
 
+  /// Provider.
+  final TaskPageProvider provider;
+
+  final TextEditingController newTitleController = TextEditingController(
+    text: '',
+  );
+
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider<VideosViewModel>(
-    create: (BuildContext context) => VideosViewModel(
-      model: task,
-      errorDialog: (text) => showDialog<bool>(
-        context: context,
-        builder: (context) => TextDialog(
-          title: 'Ошибка',
-          text: text,
-          greenTitle: 'Ок',
-          redTitle: null,
-        ),
-      ),
-      openVideoShootPage: () => Navigator.of(context).push(
-        MaterialPageRoute<File>(builder: (context) => const VideoShootPage()),
-      ),
-      geolocationDialog: (Future<List<String>> futureText) => showDialog<bool>(
-        context: context,
-        builder: (context) => FutureDialog(
-          futureText: futureText,
-          title: 'Определение местоположения',
-          greenTitle: 'Ок',
-          redTitle: null,
-        ),
-      ),
-    ),
-    child: Consumer<VideosViewModel>(
-      builder: (context, provider, child) {
-        /// Video cards.
-        final List<Widget> videoCards = [];
-        for (final VideoModel video in provider.model.videos) {
-          videoCards.add(
-            VideoCardWidget(
-              video: video,
-              videosUpd: provider.notifyListeners,
-              key: UniqueKey(),
-            ),
-          );
-        }
-        return Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
+  Widget build(BuildContext context) {
+    /// Video cards.
+    final List<Widget> videoCards = [];
+    for (final VideoModel video in task.videos) {
+      videoCards.add(
+        VideoCardWidget(video: video, provider: provider, key: UniqueKey()),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        children: [
+          Expanded(
+            child: videoCards.isEmpty
+                ? const ScrollMessageWidget(
+                    mes: 'Нет видео.',
+                    icon: Icons.video_library,
+                  )
+                : ListView(children: videoCards),
+          ),
+          const SizedBox(height: 8),
+          Row(
             children: [
               Expanded(
-                child: videoCards.isEmpty
-                    ? const ScrollMessageWidget(
-                        mes: 'Нет видео.',
-                        icon: Icons.video_library,
-                      )
-                    : ListView(children: videoCards),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Название видео',
-                      ),
-                      controller: provider.newTitleController,
+                child: TextField(
+                  decoration: const InputDecoration(hintText: 'Название видео'),
+                  controller: newTitleController,
 
-                      /// Unfocus.
-                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => provider.videoCreate(),
-                    icon: const Icon(Icons.add_a_photo),
-                    color: Colors.lightGreen[400],
-                    iconSize: 30,
-                  ),
-                ],
+                  /// Unfocus.
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                ),
+              ),
+              IconButton(
+                onPressed: () => provider.videoCreate(
+                  newTitle: newTitleController.text,
+                  task: task,
+                ),
+                icon: const Icon(Icons.add_a_photo),
+                color: Colors.lightGreen[400],
+                iconSize: 30,
               ),
             ],
           ),
-        );
-      },
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
