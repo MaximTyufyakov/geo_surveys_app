@@ -5,7 +5,7 @@ import 'package:geo_surveys_app/common/api.dart';
 class AuthRepository {
   /// Check login and password.
   ///
-  /// Returns a [Future] that completes when the response is successful and
+  /// Returns a [Future] with [String] token when the response is successful and
   /// correct login or password entry.
   ///
   /// Throws a [Future.error] with [String] message if database fails
