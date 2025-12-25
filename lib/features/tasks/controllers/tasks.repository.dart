@@ -22,14 +22,11 @@ class TasksRepository {
         // Ok.
         case 200:
           // Create list.
-          return (response.data!['tasks'] as List<dynamic>).map((task) {
-            final taskMap = task as Map<String, dynamic>;
-            return BaseTaskModel(
-              taskid: taskMap['task_id'] as int,
-              title: taskMap['title'] as String,
-              completed: taskMap['completed'] as bool,
-            );
-          }).toList();
+          return (response.data!['tasks'] as List<dynamic>)
+              .map(
+                (task) => BaseTaskModel.fromJson(task as Map<String, dynamic>),
+              )
+              .toList();
 
         // Forbidden
         case 403:
