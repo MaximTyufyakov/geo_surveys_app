@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/auth/controllers/auth.repository.dart';
 
@@ -13,28 +12,19 @@ class AuthProvider extends ChangeNotifier {
   /// CallBack from page.
   final ValueGetter<Future<void>> openTasksPage;
 
-  /// Controller for login.
-  final loginController = TextEditingController();
-
-  /// Controller for password.
-  final passwordController = TextEditingController();
-
   /// Login message.
   Future<String> message = Future.value('');
 
   /// Check input and login in api.
-  Future<void> login() async {
+  Future<void> login({required String login, required String password}) async {
     /// Check password and login before request.
-    message = _validate();
+    message = _validate(login: login, password: password);
     notifyListeners();
     await message
         /// Valid.
         .then((valid) async {
           /// Login request.
-          message = _repository.auth(
-            loginController.text,
-            passwordController.text,
-          );
+          message = _repository.auth(login: login, password: password);
           notifyListeners();
           await message
               /// Ok.
@@ -65,9 +55,12 @@ class AuthProvider extends ChangeNotifier {
   /// Returns [Future] value if valid.
   ///
   /// Throws a [Future.error] with [String] message if not valid.
-  Future<String> _validate() async {
+  Future<String> _validate({
+    required String login,
+    required String password,
+  }) async {
     /// Empty check.
-    if (loginController.text.isEmpty || passwordController.text.isEmpty) {
+    if (login.isEmpty || password.isEmpty) {
       return Future.error('Введите логин и пароль.');
     }
     return 'Успешно.';

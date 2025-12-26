@@ -16,7 +16,7 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) => Card(
     /// To click.
     child: InkWell(
-      onTap: () => provider.openTask(task),
+      onTap: () => provider.openTask(task: task),
 
       /// Content.
       /// ListTile with a title and completed text.

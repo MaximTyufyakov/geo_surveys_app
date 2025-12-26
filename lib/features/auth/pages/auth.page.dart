@@ -13,6 +13,12 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   bool passwordVisible = false;
 
+  /// Controller for login.
+  final loginController = TextEditingController();
+
+  /// Controller for password.
+  final passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<AuthProvider>(
     create: (context) => AuthProvider(
@@ -41,7 +47,7 @@ class _AuthPageState extends State<AuthPage> {
                   /// Login.
                   TextField(
                     decoration: const InputDecoration(hintText: 'Логин'),
-                    controller: provider.loginController,
+                    controller: loginController,
 
                     /// Unfocus.
                     onTapOutside: (event) => FocusScope.of(context).unfocus(),
@@ -50,7 +56,7 @@ class _AuthPageState extends State<AuthPage> {
 
                   /// Password.
                   TextField(
-                    controller: provider.passwordController,
+                    controller: passwordController,
                     obscureText: !passwordVisible,
                     decoration: InputDecoration(
                       hintText: 'Пароль',
@@ -72,7 +78,10 @@ class _AuthPageState extends State<AuthPage> {
                   ),
                   const SizedBox(height: 5),
                   FilledButton.tonal(
-                    onPressed: () => provider.login(),
+                    onPressed: () => provider.login(
+                      login: loginController.text,
+                      password: passwordController.text,
+                    ),
                     child: const Text('Войти'),
                   ),
                   const SizedBox(height: 5),

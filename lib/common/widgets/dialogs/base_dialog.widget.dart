@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 /// The [content] parameter is the content of the dialog (any widget).
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
-class AbstractDialog extends StatelessWidget {
-  AbstractDialog({
+class BaseDialog extends StatelessWidget {
+  BaseDialog({
     super.key,
     required this.title,
     required this.content,

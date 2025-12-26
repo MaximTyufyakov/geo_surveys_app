@@ -38,7 +38,7 @@ class VideoCardWidget extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: () => provider.delete(video: video),
+          onPressed: () => provider.onVideoDelete(video: video),
           icon: const Icon(Icons.delete),
           color: Colors.red[400],
         ),

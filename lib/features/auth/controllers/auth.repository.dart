@@ -10,7 +10,7 @@ class AuthRepository {
   ///
   /// Throws a [Future.error] with [String] message if database fails
   /// or incorrect login or password entry.
-  Future<String> auth(String login, String password) async {
+  Future<String> auth({required String login, required String password}) async {
     try {
       /// Api response.
       final Response<Map<String, dynamic>> response = await dio.post(

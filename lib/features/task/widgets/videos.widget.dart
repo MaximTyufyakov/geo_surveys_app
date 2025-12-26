@@ -53,7 +53,7 @@ class VideosWidget extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => provider.videoCreate(
+                onPressed: () => provider.onVideoAdd(
                   newTitle: newTitleController.text,
                   task: task,
                 ),

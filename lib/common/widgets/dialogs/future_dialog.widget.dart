@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/common/widgets/dialogs/abstract_dialog.widget.dart';
+import 'package:geo_surveys_app/common/widgets/dialogs/base_dialog.widget.dart';
 
 /// Dialog with a FutureBuilder and choice between two actions.
 /// Returns true when GreenBtn is clicked.
@@ -10,7 +10,7 @@ import 'package:geo_surveys_app/common/widgets/dialogs/abstract_dialog.widget.da
 /// The [futureText] parameter is the [Future] content (Strings) of the dialog.
 /// The [greenTitle] parameter is the title of the green button.
 /// The [redTitle] parameter is the title of the red button.
-class FutureDialog extends AbstractDialog {
+class FutureDialog extends BaseDialog {
   FutureDialog({
     super.key,
     required super.title,

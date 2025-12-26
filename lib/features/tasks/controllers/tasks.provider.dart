@@ -25,7 +25,7 @@ class TasksProvider extends ChangeNotifier {
   /// Opens a page with information about task.
   ///
   /// The [task] parameter is the target task.
-  Future<void> openTask(BaseTaskModel task) async {
+  Future<void> openTask({required BaseTaskModel task}) async {
     final bool? completed = await openTaskPage(task.taskid);
     if (completed != null) {
       task.completed = completed;

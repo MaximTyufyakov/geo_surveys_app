@@ -87,7 +87,7 @@ class _TaskPageState extends State<TaskPage> {
           redTitle: null,
         ),
       ),
-      deleteDialog: () => showDialog<bool>(
+      videoDeleteDialog: () => showDialog<bool>(
         context: context,
         builder: (context) => TextDialog(
           title: 'Удаление видео',
@@ -110,7 +110,7 @@ class _TaskPageState extends State<TaskPage> {
           actions: [
             /// Save.
             IconButton(
-              onPressed: () async => await provider.save(),
+              onPressed: () async => await provider.onSave(),
               icon: const Icon(Icons.save),
             ),
 

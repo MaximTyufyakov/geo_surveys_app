@@ -20,7 +20,7 @@ class TaskProvider extends ChangeNotifier {
     required this.errorDialog,
     required this.geolocationDialog,
     required this.openVideoShootPage,
-    required this.deleteDialog,
+    required this.videoDeleteDialog,
   }) {
     task = _repository.get(taskid: taskid);
   }
@@ -43,7 +43,7 @@ class TaskProvider extends ChangeNotifier {
   /// Show saving dialog.
   final Future<void> Function(Future<List<String>>) saveDialog;
 
-  /// Logout view.
+  /// Logout page open.
   VoidCallback goAuth;
 
   /// Show error.
@@ -52,18 +52,23 @@ class TaskProvider extends ChangeNotifier {
   /// Open camera page.
   final ValueGetter<Future<File?>> openVideoShootPage;
 
-  /// Show geolocation.
+  /// Show geolocation dialog.
   final Future<void> Function(Future<List<String>>) geolocationDialog;
 
   /// Video delete dialog.
-  final ValueGetter<Future<bool?>> deleteDialog;
+  final ValueGetter<Future<bool?>> videoDeleteDialog;
 
   @override
   Future<void> dispose() async {
     /// Delete unsaved in db videos.
     await task
         .then((value) async {
-          await deleteUnsavedVideoFiles();
+          // Delete unsaved videofiles (without id).
+          for (final VideoModel video in value.videos.where(
+            (v) => v.videoid == null,
+          )) {
+            await _deleteVideoFileLocal(file: video.file);
+          }
         })
         .catchError((Object err) {
           if (kDebugMode) {
@@ -86,7 +91,7 @@ class TaskProvider extends ChangeNotifier {
             /// Unsave = false;
             /// Close = null.
             if (ret == true) {
-              await save();
+              await onSave();
               if (value.saved) {
                 action();
               }
@@ -103,15 +108,13 @@ class TaskProvider extends ChangeNotifier {
   }
 
   /// Exit to previous page.
-  Future<void> toPrevPage() async {
-    await _unsaveTemplate(
-      action: () async => goBack(
-        await task
-            .then<bool?>((value) => value.completed)
-            .catchError((err) => null),
-      ),
-    );
-  }
+  Future<void> toPrevPage() async => await _unsaveTemplate(
+    action: () async => goBack(
+      await task
+          .then<bool?>((value) => value.completed)
+          .catchError((err) => null),
+    ),
+  );
 
   /// Exit to login page.
   Future<void> logout() async => await _unsaveTemplate(
@@ -129,107 +132,75 @@ class TaskProvider extends ChangeNotifier {
     },
   );
 
-  /// Save task data.
-  Future<void> save() async {
+  /// Save task data with dialog.
+  Future<void> onSave() async {
     /// Open dialog.
     await saveDialog(
-      task.then((value) async {
-        /// Delete report spaces.
-        value.report.trim();
-        return value.saved
-            /// Saved.
-            ? ['Нет изменений.', await completedCheck()]
-            /// Not saved.
-            : _repository
-                  .save(
-                    task: value,
-                    updatedPoints: value.points,
+      task
+          .then<List<String>>((value) {
+            /// Delete report spaces.
+            value.report = value.report.trim();
+            return value.saved
+                /// Saved.
+                ? ['Нет изменений.', _completedCheck(task: value)]
+                /// Not saved.
+                : _repository
+                      .save(
+                        task: value,
+                        updatedPoints: value.points,
 
-                    /// If local file exist.
-                    createdVideos: value.videos
-                        .where((video) => video.file != null)
-                        .toList(),
-                  )
-                  .then((sValue) async {
-                    // Delete local files of saved videos.
-                    for (final VideoModel video in value.videos) {
-                      await deleteFileLocal(file: video.file);
-                    }
-                    // Update task object.
-                    value.copyWith(copy: sValue);
-                    return ['Успешно.', await completedCheck()];
-                  })
-                  .catchError((Object err) => [err.toString()]);
-      }),
+                        /// If local file exist.
+                        createdVideos: value.videos
+                            .where((video) => video.file != null)
+                            .toList(),
+                      )
+                      .then((sValue) async {
+                        // Delete local files of saved videos.
+                        for (final VideoModel video in value.videos) {
+                          await _deleteVideoFileLocal(file: video.file);
+                        }
+                        // Update task object.
+                        value.copyWith(copy: sValue);
+                        return ['Успешно.', _completedCheck(task: sValue)];
+                      })
+                      .catchError((Object err) => [err.toString()]);
+          })
+          .catchError((Object err) => [err.toString()]),
     );
     notifyListeners();
   }
 
-  /// Add new video in the list.
-  Future<void> addVideo({required VideoModel video}) async => await task
-      .then((value) {
-        value.videos.add(video);
-        value.saved = false;
-      })
-      .catchError((Object err) {
-        if (kDebugMode) {
-          debugPrint('Невозможно добавить видео: $err');
-        }
-      });
-
-  /// Delete a video from the main list and add in the deleted list.
-  Future<void> deleteVideo({required VideoModel video}) async => await task
-      .then((value) {
-        value.videos.remove(video);
-        if (video.videoid != null) {
-          value.deletedVideosId.add(video.videoid!);
-        }
-        value.saved = false;
-      })
-      .catchError((Object err) {
-        if (kDebugMode) {
-          debugPrint('Невозможно удалить видео: $err');
-        }
-      });
-
   /// Check task completed (all points completed, add video).
   ///
   /// Returns a true if task completed else false and message.
-  Future<String> completedCheck() async => await task
-      .then((value) {
-        for (final PointModel point in value.points) {
-          if (!point.completed) {
-            return 'Для завершения задания окончите все пункты.';
-          }
-        }
-        if (value.videos.isEmpty) {
-          return 'Для завершения задания прикрепите видео.';
-        }
-        return 'Задание завершено.';
-      })
-      .catchError((Object err) {
-        if (kDebugMode) {
-          debugPrint('Невозможно проверить состояние задания: $err');
-        }
-        return 'Невозможно проверить состояние задания.';
-      });
+  String _completedCheck({required TaskModel task}) {
+    for (final PointModel point in task.points) {
+      if (!point.completed) {
+        return 'Для завершения задания окончите все пункты.';
+      }
+    }
+    if (task.videos.isEmpty) {
+      return 'Для завершения задания прикрепите видео.';
+    }
+    return 'Задание завершено.';
+  }
 
-  /// Delete videofiles from local storage.
-  /// If it not saved.
-  Future<void> deleteUnsavedVideoFiles() async {
-    await task
-        .then((value) async {
-          for (final VideoModel video in value.videos.where(
-            (v) => v.videoid == null,
-          )) {
-            await deleteFileLocal(file: video.file);
-          }
-        })
-        .catchError((Object err) {
-          if (kDebugMode) {
-            debugPrint('Невозможно удалить файлы видео: $err');
-          }
-        });
+  /// Delete video file from local storage.
+  Future<String> _deleteVideoFileLocal({required File? file}) async {
+    /// File exists.
+    if (file != null) {
+      try {
+        await file.delete();
+        file = null;
+        return 'Успешно.';
+      } catch (e) {
+        return Future.error(
+          'Ошибка при удалении видео из локального хранилища.',
+        );
+      }
+    } else {
+      return 'Локальный файл уже удалён.';
+    }
   }
 
   /// Tap on the point CheckBox.
@@ -263,48 +234,8 @@ class TaskProvider extends ChangeNotifier {
         });
   }
 
-  // /// Rename video file, delete from tmpDir and save in docDir.
-  // Future<String> _saveFileLocal() async {
-  //   /// Video created.
-  //   if (file != null) {
-  //     final Directory docDir = await getApplicationDocumentsDirectory();
-  //     final Directory videosDir = Directory('${docDir.path}/videos');
-  //     await videosDir.create(recursive: true);
-  //     final String videoPath =
-  //         '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.$format';
-  //     file = await file!.rename(videoPath);
-  //     return ('Успешно.');
-  //   } else {
-  //     return Future.error('Ошибка. Файл не найден.');
-  //   }
-  // }
-
-  /// Delete video file from local storage.
-  Future<String> deleteFileLocal({required File? file}) async {
-    /// File exists.
-    if (file != null) {
-      try {
-        await file.delete();
-        file = null;
-        return 'Успешно.';
-      } catch (e) {
-        return Future.error(
-          'Ошибка при удалении видео из локального хранилища.',
-        );
-      }
-    } else {
-      return 'Локальный файл уже удалён.';
-    }
-  }
-
-  /// Delete file and video from task model.
-  Future<void> deleteFromTask({required VideoModel video}) async {
-    await deleteFileLocal(file: video.file);
-    await deleteVideo(video: video);
-  }
-
   /// Open page with camera and add new video in the list.
-  Future<void> videoCreate({
+  Future<void> onVideoAdd({
     required TaskModel task,
     required String newTitle,
   }) async {
@@ -322,13 +253,13 @@ class TaskProvider extends ChangeNotifier {
       return;
 
       // The title does not unique.
-    } else if (!uniqueTitle(title: title, task: task)) {
+    } else if (!_uniqueTitle(title: title, task: task)) {
       errorDialog(const ['Название видео не уникально.']);
       return;
 
       // The title exist and unique.
     } else {
-      final Future<Position> coordinates = getGeolocation();
+      final Future<Position> coordinates = _getGeolocation();
       await geolocationDialog(
         coordinates.then(
           (coordinates) => [
@@ -342,10 +273,11 @@ class TaskProvider extends ChangeNotifier {
           .then((coordinates) async {
             final File? videoFile = await openVideoShootPage();
 
-            // The video returned.
+            /// The video returned.
             if (videoFile != null) {
-              await addVideo(
-                video: VideoModel(
+              /// Add.
+              task.videos.add(
+                VideoModel(
                   videoid: null,
                   title: title,
                   file: videoFile,
@@ -353,9 +285,8 @@ class TaskProvider extends ChangeNotifier {
                   longitude: coordinates.longitude,
                 ),
               );
+              task.saved = false;
 
-              // Clear title.
-              // newTitleController.text = '';
               notifyListeners();
             }
           })
@@ -371,7 +302,7 @@ class TaskProvider extends ChangeNotifier {
   ///
   /// Param [title] is new title.
   /// Returns true if unique.
-  bool uniqueTitle({required String title, required TaskModel task}) {
+  bool _uniqueTitle({required String title, required TaskModel task}) {
     final HashSet<String> hashSet = HashSet<String>()
       ..addAll(task.videos.map((video) => video.title).toSet());
     return !hashSet.contains(title);
@@ -381,7 +312,7 @@ class TaskProvider extends ChangeNotifier {
   ///
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
-  Future<Position> getGeolocation() async {
+  Future<Position> _getGeolocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -421,13 +352,48 @@ class TaskProvider extends ChangeNotifier {
     return await Geolocator.getCurrentPosition();
   }
 
-  /// When delete button click
-  Future<void> delete({required VideoModel video}) async {
-    await deleteDialog().then((del) async {
+  /// When video delete button click.
+  Future<void> onVideoDelete({required VideoModel video}) async {
+    await videoDeleteDialog().then((del) async {
       if (del == true) {
-        await deleteFromTask(video: video);
+        /// Delete video model.
+        await _deleteVideo(video: video);
+
+        /// Delete file.
+        await _deleteVideoFileLocal(file: video.file);
         notifyListeners();
       }
     });
   }
+
+  /// Delete a video from the main list and add in the deleted list.
+  Future<void> _deleteVideo({required VideoModel video}) async => await task
+      .then((value) {
+        value.videos.remove(video);
+        if (video.videoid != null) {
+          value.deletedVideosId.add(video.videoid!);
+        }
+        value.saved = false;
+      })
+      .catchError((Object err) {
+        if (kDebugMode) {
+          debugPrint('Невозможно удалить видео: $err');
+        }
+      });
+
+  // /// Rename video file, delete from tmpDir and save in docDir.
+  // Future<String> _saveFileLocal() async {
+  //   /// Video created.
+  //   if (file != null) {
+  //     final Directory docDir = await getApplicationDocumentsDirectory();
+  //     final Directory videosDir = Directory('${docDir.path}/videos');
+  //     await videosDir.create(recursive: true);
+  //     final String videoPath =
+  //         '${videosDir.path}/${DateTime.now().millisecondsSinceEpoch}.$format';
+  //     file = await file!.rename(videoPath);
+  //     return ('Успешно.');
+  //   } else {
+  //     return Future.error('Ошибка. Файл не найден.');
+  //   }
+  // }
 }
