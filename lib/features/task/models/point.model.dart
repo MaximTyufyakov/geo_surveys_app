@@ -32,13 +32,6 @@ class PointModel {
   /// The completed flag.
   bool completed;
 
-  Map<String, dynamic> toJson() => {
-    'point_id': pointid,
-    'number': number,
-    'description': description,
-    'completed': completed,
-  };
-
   /// Update this point.
   ///
   /// Param [copy] is new model.

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
@@ -55,12 +57,27 @@ class TaskRepository {
           'task_id': task.taskid,
           // Changed points.
           'updatedPoints': updatedPoints
-              .map((point) => point.toJson())
+              .map(
+                (point) => {
+                  'point_id': point.pointid,
+                  'completed': point.completed,
+                },
+              )
               .toList(),
           'report': task.report,
           // Videos with file.
           'createdVideos': createdVideos
-              .map((video) => video.toJson())
+              .map(
+                (video) => {
+                  'title': video.title,
+                  'file': video.file != null
+                      ? base64Encode(video.file!.readAsBytesSync())
+                      : null,
+                  'format': video.format,
+                  'latitude': video.latitude,
+                  'longitude': video.longitude,
+                },
+              )
               .toList(),
           // Deleted videos id.
           'deletedVideos': task.deletedVideosId,

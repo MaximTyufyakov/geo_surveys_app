@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 /// The video model.
@@ -41,15 +40,6 @@ class VideoModel {
 
   /// Start geographic longitude.
   double longitude;
-
-  Map<String, dynamic> toJson() => {
-    'video_id': videoid,
-    'title': title,
-    'format': format,
-    'file': file != null ? base64Encode(file!.readAsBytesSync()) : null,
-    'latitude': latitude,
-    'longitude': longitude,
-  };
 
   /// Update this video.
   ///
