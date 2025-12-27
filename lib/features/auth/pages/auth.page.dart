@@ -22,9 +22,9 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider<AuthProvider>(
     create: (context) => AuthProvider(
-      openTasksPage: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (context) => const TasksPage())),
+      openTasksPage: () => Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(builder: (context) => const TasksPage()),
+      ),
     ),
     child: Consumer<AuthProvider>(
       builder: (context, provider, child) => Scaffold(
