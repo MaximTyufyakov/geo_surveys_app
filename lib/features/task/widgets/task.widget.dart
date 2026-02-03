@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/message.widget.dart';
-import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
+import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/widgets/point.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/section.widget.dart';
 
 /// A widget with task information.
 ///
-/// The [provider] parameter is a task view model.
+/// The [onPointTap] parameter is on point tap action.
 class TaskWidget extends StatelessWidget {
-  const TaskWidget({super.key, required this.task, required this.provider});
+  const TaskWidget({super.key, required this.task, required this.onPointTap});
 
-  /// Task task provider.
-  final TaskProvider provider;
+  /// On point tap action.
+  final ValueSetter<PointModel> onPointTap;
 
   /// Task model.
   final TaskModel task;
@@ -52,7 +52,10 @@ class TaskWidget extends StatelessWidget {
             : Column(
                 children: task.points
                     .map<Widget>(
-                      (point) => PointWidget(point: point, provider: provider),
+                      (point) => PointWidget(
+                        point: point,
+                        onPointTap: () => onPointTap(point),
+                      ),
                     )
                     .toList(),
               ),

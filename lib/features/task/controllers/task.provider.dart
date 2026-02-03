@@ -204,34 +204,18 @@ class TaskProvider extends ChangeNotifier {
   }
 
   /// Tap on the point CheckBox.
-  Future<void> onPointTap({required PointModel point}) async {
-    await task
-        .then((value) {
-          point.completed = !point.completed;
-          value.saved = false;
-        })
-        .catchError((Object err) {
-          if (kDebugMode) {
-            debugPrint('Невозможно изменить пункт: $err');
-          }
-        });
+  void onPointTap({required TaskModel task, required PointModel point}) {
+    point.completed = !point.completed;
+    task.saved = false;
 
     notifyListeners();
   }
 
   /// On report text change.
-  Future<void> onReportChange({required String report}) async {
-    await task
-        .then((value) {
-          value
-            ..report = report
-            ..saved = false;
-        })
-        .catchError((Object err) {
-          if (kDebugMode) {
-            debugPrint('Невозможно изменить отчёт: $err');
-          }
-        });
+  void onReportChange({required TaskModel task, required String report}) {
+    task
+      ..report = report
+      ..saved = false;
   }
 
   /// Open page with camera and add new video in the list.
@@ -353,11 +337,18 @@ class TaskProvider extends ChangeNotifier {
   }
 
   /// When video delete button click.
-  Future<void> onVideoDelete({required VideoModel video}) async {
+  Future<void> onVideoDelete({
+    required TaskModel task,
+    required VideoModel video,
+  }) async {
     await videoDeleteDialog().then((del) async {
       if (del == true) {
         /// Delete video model.
-        await _deleteVideo(video: video);
+        task.videos.remove(video);
+        if (video.videoid != null) {
+          task.deletedVideosId.add(video.videoid!);
+        }
+        task.saved = false;
 
         /// Delete file.
         await _deleteVideoFileLocal(file: video.file);
@@ -365,21 +356,6 @@ class TaskProvider extends ChangeNotifier {
       }
     });
   }
-
-  /// Delete a video from the main list and add in the deleted list.
-  Future<void> _deleteVideo({required VideoModel video}) async => await task
-      .then((value) {
-        value.videos.remove(video);
-        if (video.videoid != null) {
-          value.deletedVideosId.add(video.videoid!);
-        }
-        value.saved = false;
-      })
-      .catchError((Object err) {
-        if (kDebugMode) {
-          debugPrint('Невозможно удалить видео: $err');
-        }
-      });
 
   // /// Rename video file, delete from tmpDir and save in docDir.
   // Future<String> _saveFileLocal() async {

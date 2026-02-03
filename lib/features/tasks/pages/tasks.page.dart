@@ -55,7 +55,8 @@ class TasksPage extends StatelessWidget {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) => TaskCard(
                             task: snapshot.data![index],
-                            provider: provider,
+                            onCardTap: () =>
+                                provider.openTask(task: snapshot.data![index]),
                           ),
                         );
 

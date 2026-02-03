@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 
 /// A widget with task photo card.
@@ -7,14 +6,14 @@ class VideoCardWidget extends StatelessWidget {
   const VideoCardWidget({
     super.key,
     required this.video,
-    required this.provider,
+    required this.onVideoDelete,
   });
 
   /// Model.
   final VideoModel video;
 
-  /// Provider.
-  final TaskProvider provider;
+  /// On video delete action.
+  final VoidCallback onVideoDelete;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -38,7 +37,7 @@ class VideoCardWidget extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: () => provider.onVideoDelete(video: video),
+          onPressed: onVideoDelete,
           icon: const Icon(Icons.delete),
           color: Colors.red[400],
         ),

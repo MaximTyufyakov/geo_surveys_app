@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 
 /// A Widget with report text field.
 ///
-/// The [provider] parameter is a report view model.
+/// The [onReportChange] parameter is on report change action.
 class ReportWidget extends StatelessWidget {
-  ReportWidget({super.key, required this.report, required this.provider})
+  ReportWidget({super.key, required this.report, required this.onReportChange})
     : _reportController = TextEditingController(text: report);
 
-  /// Task provider.
-  final TaskProvider provider;
+  /// On report change action.
+  final ValueSetter<String> onReportChange;
 
   /// Report.
   final String report;
@@ -26,8 +25,7 @@ class ReportWidget extends StatelessWidget {
           hintText: 'Здесь можно написать отчёт о выполненной работе.',
         ),
         controller: _reportController,
-        onChanged: (action) =>
-            provider.onReportChange(report: _reportController.text),
+        onChanged: (action) => onReportChange(_reportController.text),
         maxLines: null,
 
         /// Unfocus.

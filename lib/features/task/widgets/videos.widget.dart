@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
-import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
-import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geo_surveys_app/features/task/widgets/video_card.widget.dart';
 
 /// A widget with task videos.
 class VideosWidget extends StatelessWidget {
-  VideosWidget({super.key, required this.task, required this.provider});
+  VideosWidget({
+    super.key,
+    required this.videos,
+    required this.onVideoDelete,
+    required this.onVideoAdd,
+  });
 
   /// Model.
-  final TaskModel task;
+  final List<VideoModel> videos;
 
-  /// Provider.
-  final TaskProvider provider;
+  /// On video delete action.
+  final ValueSetter<VideoModel> onVideoDelete;
+
+  /// On video add action.
+  final ValueSetter<String> onVideoAdd;
 
   final TextEditingController newTitleController = TextEditingController(
     text: '',
@@ -23,9 +29,13 @@ class VideosWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     /// Video cards.
     final List<Widget> videoCards = [];
-    for (final VideoModel video in task.videos) {
+    for (final VideoModel video in videos) {
       videoCards.add(
-        VideoCardWidget(video: video, provider: provider, key: UniqueKey()),
+        VideoCardWidget(
+          video: video,
+          onVideoDelete: () => onVideoDelete(video),
+          key: UniqueKey(),
+        ),
       );
     }
     return Padding(
@@ -53,10 +63,7 @@ class VideosWidget extends StatelessWidget {
                 ),
               ),
               IconButton(
-                onPressed: () => provider.onVideoAdd(
-                  newTitle: newTitleController.text,
-                  task: task,
-                ),
+                onPressed: () => onVideoAdd(newTitleController.text),
                 icon: const Icon(Icons.add_a_photo),
                 color: Colors.lightGreen[400],
                 iconSize: 30,

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 
 /// A Widget with check-box and point information.
 ///
-/// The [provider] parameter is a point view model.
+/// The [onPointTap] parameter is on point tap action.
 class PointWidget extends StatelessWidget {
-  const PointWidget({super.key, required this.point, required this.provider});
+  const PointWidget({super.key, required this.point, required this.onPointTap});
 
-  /// Task provider.
-  final TaskProvider provider;
+  /// On point tap action.
+  final VoidCallback onPointTap;
 
   /// Point Model.
   final PointModel point;
@@ -27,7 +26,7 @@ class PointWidget extends StatelessWidget {
 
           Checkbox(
             value: point.completed,
-            onChanged: (onChanged) => provider.onPointTap(point: point),
+            onChanged: (onChanged) => onPointTap(),
           ),
 
           /// Description.
@@ -38,7 +37,7 @@ class PointWidget extends StatelessWidget {
                 SelectableText(
                   point.description,
                   style: Theme.of(context).textTheme.bodyMedium,
-                  onTap: () => provider.onPointTap(point: point),
+                  onTap: onPointTap,
                 ),
               ],
             ),

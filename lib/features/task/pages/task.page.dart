@@ -9,6 +9,8 @@ import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
 import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
+import 'package:geo_surveys_app/features/task/models/point.model.dart';
+import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
@@ -135,28 +137,46 @@ class _TaskPageState extends State<TaskPage> {
                       case 0:
                         return TaskWidget(
                           task: snapshot.data!,
-                          provider: provider,
+                          onPointTap: (PointModel point) => provider.onPointTap(
+                            task: snapshot.data!,
+                            point: point,
+                          ),
                         );
 
                       /// Report.
                       case 1:
                         return ReportWidget(
                           report: snapshot.data!.report,
-                          provider: provider,
+                          onReportChange: (String report) =>
+                              provider.onReportChange(
+                                task: snapshot.data!,
+                                report: report,
+                              ),
                         );
 
                       /// Videos.
                       case 2:
                         return VideosWidget(
-                          task: snapshot.data!,
-                          provider: provider,
+                          videos: snapshot.data!.videos,
+                          onVideoDelete: (VideoModel video) =>
+                              provider.onVideoDelete(
+                                task: snapshot.data!,
+                                video: video,
+                              ),
+                          onVideoAdd: (String title) => provider.onVideoAdd(
+                            task: snapshot.data!,
+                            newTitle: title,
+                          ),
                         );
 
                       /// Task.
                       default:
                         return TaskWidget(
                           task: snapshot.data!,
-                          provider: provider,
+                          onPointTap: (PointModel point) => provider.onPointTap(
+                            task: snapshot.data!,
+                            point: point,
+                          ),
                         );
                     }
 
