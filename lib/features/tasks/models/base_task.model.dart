@@ -14,7 +14,7 @@ class BaseTaskModel {
   ///
   /// Param [json] is target object.
   factory BaseTaskModel.fromJson(Map<String, dynamic> json) => BaseTaskModel._(
-    taskid: json['task_id'] as int,
+    taskid: json['taskId'] as int,
     title: json['title'] as String,
     completed: json['completed'] as bool,
   );

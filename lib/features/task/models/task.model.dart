@@ -29,27 +29,22 @@ class TaskModel {
   ///
   /// The [json] parameter is the target object.
   /// Returns a [TaskModel].
-  factory TaskModel.fromJson(Map<String, dynamic> json) {
-    final Map<String, dynamic> task = json['task'] as Map<String, dynamic>;
-
-    // Create task model.
-    return TaskModel._(
-      taskid: task['task_id'] as int,
-      title: task['title'] as String,
-      description: task['description'] as String?,
-      latitude: (task['latitude'] as num?)?.toDouble(),
-      longitude: (task['longitude'] as num?)?.toDouble(),
-      completed: task['completed'] as bool,
-      report: task['report'] as String? ?? '',
-      saved: true,
-      points: (task['points'] as List<dynamic>)
-          .map((point) => PointModel.fromJson(point as Map<String, dynamic>))
-          .toList(),
-      videos: (task['videos'] as List<dynamic>)
-          .map((video) => VideoModel.fromJson(video as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+  factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel._(
+    taskid: json['taskId'] as int,
+    title: json['title'] as String,
+    description: json['description'] as String?,
+    latitude: (json['latitude'] as num?)?.toDouble(),
+    longitude: (json['longitude'] as num?)?.toDouble(),
+    completed: json['completed'] as bool,
+    report: json['report'] as String? ?? '',
+    saved: true,
+    points: (json['points'] as List<dynamic>)
+        .map((point) => PointModel.fromJson(point as Map<String, dynamic>))
+        .toList(),
+    videos: (json['videos'] as List<dynamic>)
+        .map((video) => VideoModel.fromJson(video as Map<String, dynamic>))
+        .toList(),
+  );
 
   /// The task identifier.
   final int taskid;

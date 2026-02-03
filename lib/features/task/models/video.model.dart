@@ -16,7 +16,7 @@ class VideoModel {
   }) : format = file?.path.split('.').last;
 
   factory VideoModel.fromJson(Map<String, dynamic> json) => VideoModel(
-    videoid: json['video_id'] as int,
+    videoid: json['videoId'] as int,
     title: json['title'] as String,
     file: null,
     latitude: (json['latitude'] as num).toDouble(),

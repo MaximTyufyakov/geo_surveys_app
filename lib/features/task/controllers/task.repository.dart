@@ -54,12 +54,12 @@ class TaskRepository {
       final Response<Map<String, dynamic>> response = await dio.put(
         '/tasks/save',
         data: {
-          'task_id': task.taskid,
+          'taskId': task.taskid,
           // Changed points.
           'updatedPoints': updatedPoints
               .map(
                 (point) => {
-                  'point_id': point.pointid,
+                  'pointId': point.pointid,
                   'completed': point.completed,
                 },
               )
@@ -80,7 +80,7 @@ class TaskRepository {
               )
               .toList(),
           // Deleted videos id.
-          'deletedVideos': task.deletedVideosId,
+          'deletedVideosId': task.deletedVideosId,
         },
         options: Options(
           validateStatus: (status) => status == 201 || status == 403,

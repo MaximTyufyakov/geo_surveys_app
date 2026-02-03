@@ -14,7 +14,7 @@ class PointModel {
   });
 
   factory PointModel.fromJson(Map<String, dynamic> json) => PointModel._(
-    pointid: json['point_id'] as int,
+    pointid: json['pointId'] as int,
     number: json['number'] as int,
     description: json['description'] as String,
     completed: json['completed'] as bool,

@@ -11,7 +11,7 @@ class TasksRepository {
   Future<List<BaseTaskModel>> get() async {
     try {
       // Api response.
-      final Response<Map<String, dynamic>> response = await dio.get(
+      final Response<List<dynamic>> response = await dio.get(
         '/tasks/all',
         options: Options(
           validateStatus: (status) => status == 200 || status == 403,
@@ -22,7 +22,7 @@ class TasksRepository {
         // Ok.
         case 200:
           // Create list.
-          return (response.data!['tasks'] as List<dynamic>)
+          return response.data!
               .map(
                 (task) => BaseTaskModel.fromJson(task as Map<String, dynamic>),
               )
