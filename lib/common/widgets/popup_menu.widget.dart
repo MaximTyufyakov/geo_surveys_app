@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 
 /// The main page with a list of all tasks in the database.
 class PopupMenuWidget extends StatelessWidget {
-  const PopupMenuWidget({super.key, required this.logout});
+  const PopupMenuWidget({
+    super.key,
+    required this.onLogout,
+    required this.onMap,
+  });
 
   /// Logout operation.
-  final VoidCallback logout;
+  final VoidCallback onLogout;
+
+  /// Map opening operation.
+  final VoidCallback onMap;
 
   @override
   Widget build(BuildContext context) => PopupMenuButton(
@@ -23,10 +30,10 @@ class PopupMenuWidget extends StatelessWidget {
         ),
       ),
       // Map.
-      const PopupMenuItem(
+      PopupMenuItem(
         value: 1,
-        // onTap: () {},
-        child: Row(
+        onTap: onMap,
+        child: const Row(
           children: [
             Icon(Icons.map),
             SizedBox(width: 10),
@@ -37,7 +44,7 @@ class PopupMenuWidget extends StatelessWidget {
       // Exit.
       PopupMenuItem(
         value: 2,
-        onTap: logout,
+        onTap: onLogout,
         child: const Row(
           children: [Icon(Icons.logout), SizedBox(width: 10), Text('Выход')],
         ),

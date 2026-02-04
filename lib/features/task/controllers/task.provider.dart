@@ -8,6 +8,7 @@ import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/task.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 
 /// A provider of the task page.
 class TaskProvider extends ChangeNotifier {
@@ -21,6 +22,7 @@ class TaskProvider extends ChangeNotifier {
     required this.geolocationDialog,
     required this.openVideoShootPage,
     required this.videoDeleteDialog,
+    required this.openMapPage,
   }) {
     task = _repository.get(taskid: taskid);
   }
@@ -57,6 +59,9 @@ class TaskProvider extends ChangeNotifier {
 
   /// Video delete dialog.
   final ValueGetter<Future<bool?>> videoDeleteDialog;
+
+  /// Open map page.
+  final ValueSetter<List<LatLng>> openMapPage;
 
   @override
   Future<void> dispose() async {
@@ -372,4 +377,15 @@ class TaskProvider extends ChangeNotifier {
   //     return Future.error('Ошибка. Файл не найден.');
   //   }
   // }
+
+  /// Open map page with task markers.
+  Future<void> openMap() async {
+    await task
+        .then((value) {
+          openMapPage([value.coordinates]);
+        })
+        .catchError((Object err) {
+          errorDialog([err.toString()]);
+        });
+  }
 }

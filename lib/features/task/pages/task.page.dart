@@ -8,6 +8,7 @@ import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
+import 'package:geo_surveys_app/features/map/pages/map.page.dart';
 import 'package:geo_surveys_app/features/task/controllers/task.provider.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
@@ -15,6 +16,7 @@ import 'package:geo_surveys_app/features/task/widgets/report.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/task.widget.dart';
 import 'package:geo_surveys_app/features/task/widgets/videos.widget.dart';
 import 'package:geo_surveys_app/features/video_shoot/pages/video_shoot.page.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 /// A page with BottomNavigationBar and task's widgets.
@@ -98,6 +100,11 @@ class _TaskPageState extends State<TaskPage> {
           redTitle: 'Нет',
         ),
       ),
+      openMapPage: (List<LatLng> markers) => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => MapPage(mapPoints: markers),
+        ),
+      ),
     ),
     child: Consumer<TaskProvider>(
       builder: (context, provider, child) => Scaffold(
@@ -117,7 +124,10 @@ class _TaskPageState extends State<TaskPage> {
             ),
 
             // Menu (...)
-            PopupMenuWidget(logout: () async => await provider.logout()),
+            PopupMenuWidget(
+              onLogout: () async => await provider.logout(),
+              onMap: provider.openMap,
+            ),
           ],
         ),
         body: PopScope(

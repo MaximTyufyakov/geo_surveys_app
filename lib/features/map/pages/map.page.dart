@@ -3,24 +3,19 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 
-class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+/// Page with map user interface.
+class MapPage extends StatefulWidget {
+  const MapPage({super.key, required this.mapPoints});
+
+  /// Points coordinates.
+  final List<LatLng> mapPoints;
 
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  State<MapPage> createState() => _MapPageState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapPageState extends State<MapPage> {
   late final MapController _mapController;
-
-  List<LatLng> get _mapPoints => const [
-    LatLng(55.755793, 37.617134),
-    LatLng(55.095960, 38.765519),
-    LatLng(56.129038, 40.406502),
-    LatLng(54.513645, 36.261268),
-    LatLng(54.193122, 37.617177),
-    LatLng(54.629540, 39.741809),
-  ];
 
   @override
   void initState() {
@@ -36,24 +31,30 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Map Screen')),
+    appBar: AppBar(title: const Text('Карта заданий')),
     body: FlutterMap(
       mapController: _mapController,
-      options: const MapOptions(
-        initialCenter: LatLng(55.755793, 37.617134),
-        initialZoom: 5,
+      options: MapOptions(
+        initialCenter: widget.mapPoints.first,
+
+        /// Zoom.
+        initialZoom: widget.mapPoints.length > 1 ? 10 : 15,
       ),
       children: [
+        /// Tiles.
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.example.geoSurveysApp',
         ),
+
+        /// Markers and clusters.
         MarkerClusterLayerWidget(
           options: MarkerClusterLayerOptions(
+            /// Cluster size.
             size: const Size(50, 50),
             maxClusterRadius: 50,
-            markers: _getMarkers(_mapPoints),
-            builder: (_, markers) =>
+            markers: _getMarkers(widget.mapPoints),
+            builder: (context, markers) =>
                 _ClusterMarker(markersLength: markers.length.toString()),
           ),
         ),
@@ -62,23 +63,26 @@ class _MapScreenState extends State<MapScreen> {
   );
 }
 
-/// Метод генерации маркеров
-/// Метод генерации маркеров
+/// Markers genaration.
 List<Marker> _getMarkers(List<LatLng> mapPoints) => List.generate(
   mapPoints.length,
   (index) => Marker(
     point: mapPoints[index],
+
+    /// Marker size.
     width: 50,
     height: 50,
     alignment: Alignment.center,
+
+    /// Icon and number.
     child: Stack(
       alignment: Alignment.center,
       children: [
         const Icon(Icons.location_on, color: Colors.red, size: 50),
         Positioned(
-          bottom: 10, // Настройте позиционирование под ваш дизайн
+          bottom: 10,
           child: Text(
-            '${index + 1}', // Номер с 1
+            '${index + 1}',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -91,11 +95,11 @@ List<Marker> _getMarkers(List<LatLng> mapPoints) => List.generate(
   ),
 );
 
-/// Виджет для отображения кластера
+/// Widget for cluster.
 class _ClusterMarker extends StatelessWidget {
   const _ClusterMarker({required this.markersLength});
 
-  /// Количество маркеров, объединенных в кластер
+  /// The number of markers combined into a cluster.
   final String markersLength;
 
   @override

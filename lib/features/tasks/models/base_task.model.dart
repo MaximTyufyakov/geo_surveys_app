@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 /// A class with basic information of the task.
 ///
 /// The [taskid] parameter is the task identifier.
@@ -8,6 +10,7 @@ class BaseTaskModel {
     required this.taskid,
     required this.title,
     required this.completed,
+    required this.coordinates,
   });
 
   /// Constructor with parse from json.
@@ -17,6 +20,10 @@ class BaseTaskModel {
     taskid: json['taskId'] as int,
     title: json['title'] as String,
     completed: json['completed'] as bool,
+    coordinates: LatLng(
+      (json['latitude'] as num).toDouble(),
+      (json['longitude'] as num).toDouble(),
+    ),
   );
 
   /// The task identifier.
@@ -27,4 +34,6 @@ class BaseTaskModel {
 
   /// The completed flag.
   bool completed;
+
+  LatLng coordinates;
 }

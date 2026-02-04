@@ -1,5 +1,6 @@
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
+import 'package:latlong2/latlong.dart';
 
 /// The task model.
 ///
@@ -16,8 +17,7 @@ class TaskModel {
     required this.taskid,
     required this.title,
     required this.description,
-    required this.latitude,
-    required this.longitude,
+    required this.coordinates,
     required this.completed,
     required this.points,
     required this.saved,
@@ -33,8 +33,10 @@ class TaskModel {
     taskid: json['taskId'] as int,
     title: json['title'] as String,
     description: json['description'] as String?,
-    latitude: (json['latitude'] as num?)?.toDouble(),
-    longitude: (json['longitude'] as num?)?.toDouble(),
+    coordinates: LatLng(
+      (json['latitude'] as num).toDouble(),
+      (json['longitude'] as num).toDouble(),
+    ),
     completed: json['completed'] as bool,
     report: json['report'] as String? ?? '',
     saved: true,
@@ -56,8 +58,7 @@ class TaskModel {
   String? description;
 
   /// The task geographic coordinates.
-  double? latitude;
-  double? longitude;
+  LatLng coordinates;
 
   /// The completed flag.
   bool completed;
@@ -83,8 +84,7 @@ class TaskModel {
   void copyWith({required TaskModel copy}) {
     title = copy.title;
     description = copy.description;
-    latitude = copy.latitude;
-    longitude = copy.longitude;
+    coordinates = copy.coordinates;
     completed = copy.completed;
     report = copy.report;
 

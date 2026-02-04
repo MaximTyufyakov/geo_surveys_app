@@ -1,12 +1,18 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/tasks/controllers/tasks.repository.dart';
 import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
+import 'package:latlong2/latlong.dart';
 
 /// A provider of the tasks page.
 class TasksProvider extends ChangeNotifier {
-  TasksProvider({required this.goAuth, required this.openTaskPage}) {
+  TasksProvider({
+    required this.goAuth,
+    required this.openTaskPage,
+    required this.openMapPage,
+    required this.errorDialog,
+    required this.mesDialog,
+  }) {
     tasks = _repository.get();
   }
 
@@ -21,6 +27,15 @@ class TasksProvider extends ChangeNotifier {
 
   /// Open task page.
   final Future<bool?> Function(int taskId) openTaskPage;
+
+  /// Open map page.
+  final ValueSetter<List<LatLng>> openMapPage;
+
+  /// Show error.
+  final ValueSetter<List<String>> errorDialog;
+
+  /// Show message.
+  final ValueSetter<List<String>> mesDialog;
 
   /// Opens a page with information about task.
   ///
@@ -43,5 +58,20 @@ class TasksProvider extends ChangeNotifier {
   void logout() {
     clearToken();
     goAuth();
+  }
+
+  /// Open map page with task markers.
+  Future<void> openMap() async {
+    await tasks
+        .then((value) {
+          if (value.isNotEmpty) {
+            openMapPage(value.map((elem) => elem.coordinates).toList());
+          } else {
+            mesDialog(['Нет заданий.']);
+          }
+        })
+        .catchError((Object err) {
+          errorDialog([err.toString()]);
+        });
   }
 }

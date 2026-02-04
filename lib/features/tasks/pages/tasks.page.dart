@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:geo_surveys_app/common/widgets/dialogs/text_dialog.widget.dart';
 import 'package:geo_surveys_app/common/widgets/loading.widget.dart';
 import 'package:geo_surveys_app/common/widgets/popup_menu.widget.dart';
 import 'package:geo_surveys_app/common/widgets/scroll_message.widget.dart';
 import 'package:geo_surveys_app/features/auth/pages/auth.page.dart';
+import 'package:geo_surveys_app/features/map/pages/map.page.dart';
 import 'package:geo_surveys_app/features/task/pages/task.page.dart';
 import 'package:geo_surveys_app/features/tasks/controllers/tasks.provider.dart';
 import 'package:geo_surveys_app/features/tasks/widgets/task_card.widget.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 /// The main page with a list of all tasks in the database.
@@ -22,6 +25,29 @@ class TasksPage extends StatelessWidget {
       openTaskPage: (int taskId) => Navigator.of(context).push(
         MaterialPageRoute<bool>(builder: (context) => TaskPage(taskid: taskId)),
       ),
+      openMapPage: (List<LatLng> markers) => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => MapPage(mapPoints: markers),
+        ),
+      ),
+      errorDialog: (text) => showDialog<bool>(
+        context: context,
+        builder: (context) => TextDialog(
+          title: 'Ошибка',
+          text: text,
+          greenTitle: 'Ок',
+          redTitle: null,
+        ),
+      ),
+      mesDialog: (text) => showDialog<bool>(
+        context: context,
+        builder: (context) => TextDialog(
+          title: 'Сообщение',
+          text: text,
+          greenTitle: 'Ок',
+          redTitle: null,
+        ),
+      ),
     ),
     child: Consumer<TasksProvider>(
       builder: (context, provider, child) => Scaffold(
@@ -33,7 +59,7 @@ class TasksPage extends StatelessWidget {
           ),
           actions: [
             // Menu (...)
-            PopupMenuWidget(logout: provider.logout),
+            PopupMenuWidget(onLogout: provider.logout, onMap: provider.openMap),
           ],
         ),
         body: RefreshIndicator(

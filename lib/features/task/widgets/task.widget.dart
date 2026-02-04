@@ -37,7 +37,7 @@ class TaskWidget extends StatelessWidget {
       SectionWidget(
         title: 'Координаты',
         content: SelectableText(
-          '${task.latitude ?? 'н/д'}, ${task.longitude ?? 'н/д'}',
+          '${task.coordinates.latitude}, ${task.coordinates.longitude}',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       ),
