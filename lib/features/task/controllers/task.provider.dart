@@ -143,32 +143,36 @@ class TaskProvider extends ChangeNotifier {
     await saveDialog(
       task
           .then<List<String>>((value) {
-            /// Delete report spaces.
-            value.report = value.report.trim();
-            return value.saved
-                /// Saved.
-                ? ['Нет изменений.', _completedCheck(task: value)]
-                /// Not saved.
-                : _repository
-                      .save(
-                        task: value,
-                        updatedPoints: value.points,
+            /// Saved.
+            if (value.saved) {
+              return ['Нет изменений.', _completedCheck(task: value)];
+            }
+            /// Not saved.
+            else {
+              /// Delete report spaces.
+              value.report = value.report.trim();
 
-                        /// If local file exist.
-                        createdVideos: value.videos
-                            .where((video) => video.file != null)
-                            .toList(),
-                      )
-                      .then((sValue) async {
-                        // Delete local files of saved videos.
-                        for (final VideoModel video in value.videos) {
-                          await _deleteVideoFileLocal(file: video.file);
-                        }
-                        // Update task object.
-                        value.copyWith(copy: sValue);
-                        return ['Успешно.', _completedCheck(task: sValue)];
-                      })
-                      .catchError((Object err) => [err.toString()]);
+              return _repository
+                  .save(
+                    task: value,
+                    updatedPoints: value.points,
+
+                    /// If local file exist.
+                    createdVideos: value.videos
+                        .where((video) => video.file != null)
+                        .toList(),
+                  )
+                  .then((sValue) async {
+                    // Delete local files of saved videos.
+                    for (final VideoModel video in value.videos) {
+                      await _deleteVideoFileLocal(file: video.file);
+                    }
+                    // Update task object.
+                    value.copyWith(copy: sValue);
+                    return ['Успешно.', _completedCheck(task: sValue)];
+                  })
+                  .catchError((Object err) => [err.toString()]);
+            }
           })
           .catchError((Object err) => [err.toString()]),
     );
