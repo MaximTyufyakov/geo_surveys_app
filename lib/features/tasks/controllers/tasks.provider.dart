@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:geo_surveys_app/common/api.dart';
 import 'package:geo_surveys_app/features/tasks/controllers/tasks.repository.dart';
-import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
+import 'package:geo_surveys_app/common/models/base_task.model.dart';
 import 'package:latlong2/latlong.dart';
 
 /// A provider of the tasks page.

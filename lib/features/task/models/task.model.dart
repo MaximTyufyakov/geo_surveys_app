@@ -1,6 +1,6 @@
+import 'package:geo_surveys_app/common/models/base_task.model.dart';
 import 'package:geo_surveys_app/features/task/models/point.model.dart';
 import 'package:geo_surveys_app/features/task/models/video.model.dart';
-import 'package:latlong2/latlong.dart';
 
 /// The task model.
 ///
@@ -11,14 +11,14 @@ import 'package:latlong2/latlong.dart';
 /// The [report] parameter is the report model.
 /// The [points] parameter is the list of points that need to be completed.
 /// The [saved] parameter is the saved flag.
-class TaskModel {
+class TaskModel extends BaseTaskModel {
   /// Private constructor.
   TaskModel._({
-    required this.taskid,
-    required this.title,
+    required super.taskid,
+    required super.title,
     required this.description,
-    required this.coordinates,
-    required this.completed,
+    required super.coordinates,
+    required super.completed,
     required this.points,
     required this.saved,
     required this.report,
@@ -29,39 +29,28 @@ class TaskModel {
   ///
   /// The [json] parameter is the target object.
   /// Returns a [TaskModel].
-  factory TaskModel.fromJson(Map<String, dynamic> json) => TaskModel._(
-    taskid: json['taskId'] as int,
-    title: json['title'] as String,
-    description: json['description'] as String?,
-    coordinates: LatLng(
-      (json['latitude'] as num).toDouble(),
-      (json['longitude'] as num).toDouble(),
-    ),
-    completed: json['completed'] as bool,
-    report: json['report'] as String? ?? '',
-    saved: true,
-    points: (json['points'] as List<dynamic>)
-        .map((point) => PointModel.fromJson(point as Map<String, dynamic>))
-        .toList(),
-    videos: (json['videos'] as List<dynamic>)
-        .map((video) => VideoModel.fromJson(video as Map<String, dynamic>))
-        .toList(),
-  );
-
-  /// The task identifier.
-  final int taskid;
-
-  /// The task name.
-  String title;
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    /// Base part.
+    final baseTask = BaseTaskModel.fromJson(json);
+    return TaskModel._(
+      taskid: baseTask.taskid,
+      completed: baseTask.completed,
+      coordinates: baseTask.coordinates,
+      title: baseTask.title,
+      description: json['description'] as String?,
+      report: json['report'] as String? ?? '',
+      saved: true,
+      points: (json['points'] as List<dynamic>)
+          .map((point) => PointModel.fromJson(point as Map<String, dynamic>))
+          .toList(),
+      videos: (json['videos'] as List<dynamic>)
+          .map((video) => VideoModel.fromJson(video as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 
   /// The text task description.
   String? description;
-
-  /// The task geographic coordinates.
-  LatLng coordinates;
-
-  /// The completed flag.
-  bool completed;
 
   /// The text that the user writes (optional).
   String report;

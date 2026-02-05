@@ -6,7 +6,7 @@ import 'package:latlong2/latlong.dart';
 /// The [title] parameter is the task name.
 /// The [completed] parameter is the completed flag.
 class BaseTaskModel {
-  BaseTaskModel._({
+  BaseTaskModel({
     required this.taskid,
     required this.title,
     required this.completed,
@@ -16,7 +16,7 @@ class BaseTaskModel {
   /// Constructor with parse from json.
   ///
   /// Param [json] is target object.
-  factory BaseTaskModel.fromJson(Map<String, dynamic> json) => BaseTaskModel._(
+  factory BaseTaskModel.fromJson(Map<String, dynamic> json) => BaseTaskModel(
     taskid: json['taskId'] as int,
     title: json['title'] as String,
     completed: json['completed'] as bool,
@@ -35,5 +35,6 @@ class BaseTaskModel {
   /// The completed flag.
   bool completed;
 
+  /// The task geographic coordinates.
   LatLng coordinates;
 }

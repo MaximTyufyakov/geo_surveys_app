@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:geo_surveys_app/common/api.dart';
-import 'package:geo_surveys_app/features/tasks/models/base_task.model.dart';
+import 'package:geo_surveys_app/common/models/base_task.model.dart';
 
 /// A repository of /tasks endpoints.
 class TasksRepository {
